@@ -1,0 +1,20 @@
+{
+  "name": "scroll-skelly-examples",
+  "version": "0.0.1",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "test-env": "./test-env.sh",
+    "simple": "node src/attest-simple.js",
+    "server": "node src/attest-server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@ethereum-attestation-service/eas-sdk": "^1.4.2",
+    "dotenv": "^16.4.3",
+    "ethers": "^6.11.0",
+    "express": "^4.18.2"
+  }
+}

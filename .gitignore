@@ -1,3 +1,6 @@
+# MacOS files
+.DS_Store
+
 # Compiler files
 cache/
 out/
@@ -12,3 +15,6 @@ docs/
 
 # Dotenv file
 .env
+
+# Node files
+node_modules

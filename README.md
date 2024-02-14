@@ -1,66 +1,83 @@
-## Foundry
+# Scroll Skelly Contracts
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+![Components overview](docs/overview.png "Overview")
 
-Foundry consists of:
+## Overview
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+- Each user can create a `Profile` contract, minted through the `ProfileRegistry`. All profiles share the same implementation.
+- Each badge is an EAS attestation that goes through the `ScrollBadgeResolver` contract.
+- Each individual badge type is a standalone `ScrollBadge` contract, which manages the badge-specific logic.
+- Badges are minted to the user's wallet address. The user can express their personalization preferences (attach and order badges, choose a profile photo) through their `Profile`.
 
-## Documentation
+## ScrollBadge Schema and Resolver
 
-https://book.getfoundry.sh/
+We define a *Scroll badge* [EAS schema](https://docs.attest.sh/docs/core--concepts/schemas):
 
-## Usage
-
-### Build
-
-```shell
-$ forge build
+```
+address badge
+bytes   payload
 ```
 
-### Test
+This schema is tied to `ScrollBadgeResolver`. Every time a Scroll badge attestation is created or revoked, `ScrollBadgeResolver` executes some checks. After that, it forwards the call to the actual badge implementation.
 
-```shell
-$ forge test
-```
+## Badges
 
-### Format
+Each badge is a standalone contract, inheriting from `ScrollBadge`.
 
-```shell
-$ forge fmt
-```
+### Extensions
 
-### Gas Snapshots
+This repo contains some useful [extensions](src/badge/extensions):
+- `ScrollBadgeAccessControl` restricts who can create and revoke this badge.
+- `ScrollBadgeCustomPayload` adds custom payload support to the badge.
+- `ScrollBadgeNonRevocable` disables revocation for this badge.
+- `ScrollBadgeSBT` attaches an SBT token to each badge attestation.
 
-```shell
-$ forge snapshot
-```
+### Examples
 
-### Anvil
+This repo also contains some [examples](src/badge/examples):
+- `ScrollBadgeSimple` is a simple SBT badge with fixed metadata.
+- `ScrollBadgePermissionless` is a permissionless SBT badge that anyone can mint to themselves.
+- `ScrollBadgeLevels` is an SBT badge that stores a level in its payload and renders different images based on this level.
+- `ScrollBadgeOrigins` is an SBT badge that is tied to a Scroll Origins NFT.
 
-```shell
-$ anvil
-```
+## Issuing Badges
 
-### Deploy
+Once the badge contract is deployed, we can start issuing badges by creating attestations.
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
+The simplest way to create a badge attestation is to call `EAS.attest`. EAS also has [SDK support](https://github.com/ethereum-attestation-service/eas-sdk?tab=readme-ov-file#creating-onchain-attestations) for this.
 
-### Cast
+There are multiple possible badge minting flows, each described in one of the subsections below.
 
-```shell
-$ cast <subcommand>
-```
+### Fully Permissionless
 
-### Help
+It is possible to deploy a badge contract that anyone can mint permissionlessly. In this scenario, anyone can mint a badge by attesting to themselves.
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+See [ScrollBadgePermissionless](src/badge/examples/ScrollBadgePermissionless.sol).
+
+### Eligibility Check in Badge Contract
+
+A badge can allow permissionless minting, while implementing additional checks of eligibility in the contract. For example, an eligibility check could be checking if a user has a certain NFT token. It can even implement a Merkle drop.
+
+See [ScrollBadgeOrigins](src/badge/examples/ScrollBadgeOrigins.sol).
+
+### Eligibility Check in Backend with Direct Attestation
+
+An application can implement eligibility checking in a centralized backend, and airdrop badges with no user interaction. The issuer (backend) simply calls `EAS.attest` or `EAS.multiAttest`.
+
+### Eligibility Check in Backend with Delegated Attestation
+
+EAS also makes it possible to sign a delegated attestation that someone else can submit. In this scenario, the backend checks eligibility, and then signs a delegated attestation that the user can then submit.
+
+By default EAS uses ERC-712 with nonces, so delegated attestations would need to be submitted in order. For unordered submission, one can use `AttesterProxy`:
+
+- The attester signs a delegated attestation request to the `AttesterProxy` and sends it to the user.
+- The user submits this request to `AttesterProxy`.
+- `AttesterProxy` verifies the signature, then submits an equivalent attestation to EAS.
+
+The recommended way is for the backend to use `AttesterProxy` with unordered delegated attestations. An example for this can be found in [examples](examples).
+
+## Profiles
+
+Profiles are minted through `ProfileRegistry`. Each wallet can mint only one profile. All profile share the same implementation, upgradable by Scroll to enable new features.
+
+In its current version, a profile simply stores a user's preference when attaching badges.

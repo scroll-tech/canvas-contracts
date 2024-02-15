@@ -1,6 +1,6 @@
 # Scroll Skelly Contracts
 
-![Components overview](docs/overview.png "Overview")
+![Components overview](images/overview.png "Overview")
 
 ## Overview
 

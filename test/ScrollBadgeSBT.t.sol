@@ -9,7 +9,11 @@ import { ScrollBadge } from "../src/badge/ScrollBadge.sol";
 import { ScrollBadgeSBT } from "../src/badge/extensions/ScrollBadgeSBT.sol";
 
 contract TestContract is ScrollBadgeSBT {
-    constructor(address resolver_) ScrollBadge(resolver_) ScrollBadgeSBT("name", "symbol", true) {}
+    constructor(address resolver_) ScrollBadge(resolver_) ScrollBadgeSBT("name", "symbol") {}
+
+    function badgeTokenURI(bytes32 /*uid*/) public override pure returns (string memory) {
+        return "";
+    }
 }
 
 contract ScrollBadgeSBTTest is ScrollBadgeTestBase {
@@ -35,13 +39,6 @@ contract ScrollBadgeSBTTest is ScrollBadgeTestBase {
         uint256 tokenId = uint256(uid);
         address owner = badge.ownerOf(uint256(uid));
         assertEq(owner, alice);
-
-        // cannot mint second token
-        hevm.expectRevert(ScrollBadgeSBT.MultipleActiveAttestationsDisabled.selector);
-        bytes32 uid2 = _attest(address(badge), "", alice);
-
-        bool isValid2 = eas.isAttestationValid(uid2);
-        assertFalse(isValid2);
 
         // cannot transfer token
         hevm.prank(alice);

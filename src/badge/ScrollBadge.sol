@@ -12,7 +12,7 @@ import { Unauthorized, AttestationBadgeMismatch } from "../Errors.sol";
 /// @title ScrollBadge
 /// @notice This contract implements the basic functionalities of a Scroll badge.
 ///         It serves as the base contract for more complex badge functionalities.
-contract ScrollBadge is IScrollBadge {
+abstract contract ScrollBadge is IScrollBadge {
     // The global Scroll badge resolver contract.
     address public immutable resolver;
 
@@ -80,4 +80,9 @@ contract ScrollBadge is IScrollBadge {
 
         return attestation;
     }
+
+    /// @notice Returns the token URI corresponding to a certain badge UID.
+    /// @param uid The badge UID.
+    /// @return The badge token URI (same format as ERC721).
+    function badgeTokenURI(bytes32 uid) public virtual view returns (string memory);
 }

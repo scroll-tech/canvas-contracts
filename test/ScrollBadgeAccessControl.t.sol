@@ -10,6 +10,10 @@ import { Unauthorized } from "../src/Errors.sol";
 
 contract TestContract is ScrollBadgeAccessControl {
     constructor(address resolver_) ScrollBadge(resolver_) {}
+
+    function badgeTokenURI(bytes32 /*uid*/) public override pure returns (string memory) {
+        return "";
+    }
 }
 
 contract ScrollBadgeAccessControlTest is ScrollBadgeTestBase {

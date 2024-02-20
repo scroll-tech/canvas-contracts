@@ -9,13 +9,21 @@ import { ScrollBadgeTestBase } from "./ScrollBadgeTestBase.sol";
 import { ScrollBadge } from "../src/badge/ScrollBadge.sol";
 import { IScrollBadge } from "../src/interfaces/IScrollBadge.sol";
 
+contract TestContract is ScrollBadge {
+    constructor(address resolver_) ScrollBadge(resolver_) {}
+
+    function badgeTokenURI(bytes32 /*uid*/) public override pure returns (string memory) {
+        return "";
+    }
+}
+
 contract ScrollBadgeTest is ScrollBadgeTestBase {
     ScrollBadge internal badge;
 
     function setUp() public virtual override {
         super.setUp();
 
-        badge = new ScrollBadge(address(resolver));
+        badge = new TestContract(address(resolver));
         resolver.toggleBadge(address(badge), true);
     }
 

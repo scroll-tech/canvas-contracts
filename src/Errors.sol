@@ -15,3 +15,4 @@ error InvalidBadge(bytes32 uid);
 error ResolverPaymentsDisabled();
 error Unauthorized();
 error InvalidOffset();
+error SingletonBadge(bytes32 uid);

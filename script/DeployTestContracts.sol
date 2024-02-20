@@ -29,7 +29,7 @@ contract DeployTestContracts is Script {
         bytes32 schema = resolver.schema();
 
         // deploy test badge
-        ScrollBadgeSimple badge = new ScrollBadgeSimple(address(resolver), "name", "symbol", "uri");
+        ScrollBadgeSimple badge = new ScrollBadgeSimple(address(resolver), "uri");
         AttesterProxy proxy = new AttesterProxy(eas);
 
         // set permissions

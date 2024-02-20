@@ -6,6 +6,10 @@ import { createBadge } from './lib.js';
 
 import 'dotenv/config';
 
+const abi = [
+  'error SingletonBadge(bytes32 uid)'
+]
+
 async function main() {
   const provider = new ethers.JsonRpcProvider(process.env.RPC_ENDPOINT);
 
@@ -14,6 +18,8 @@ async function main() {
 
   eas.connect(provider);
   attesterProxy.connect(provider);
+
+  const contract = new ethers.Interface(abi);
 
   const signer = (new ethers.Wallet(process.env.SIGNER_PRIVATE_KEY)).connect(provider);
   const claimer = (new ethers.Wallet(process.env.CLAIMER_PRIVATE_KEY)).connect(provider);
@@ -26,11 +32,17 @@ async function main() {
     signer,
   });
 
-  const res = await attesterProxy.connect(claimer).attestByDelegationProxy(badge);
+  try {
+    const res = await attesterProxy.connect(claimer).attestByDelegationProxy(badge);
 
-  const uids = await getUIDsFromMultiAttestTx(res.tx);
-  console.log(uids);
-  // const attestation = await eas.getAttestation(uid);
+    const uids = await getUIDsFromMultiAttestTx(res.tx);
+    console.log(uids);
+    // const attestation = await eas.getAttestation(uid);
+  } catch (err) {
+    console.log();
+    const decodedError = contract.parseError(err.data)
+    console.log('error:', decodedError.name)
+  }
 }
 
 main();

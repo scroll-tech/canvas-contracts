@@ -18,7 +18,7 @@ function decodePayloadData(bytes memory data) pure returns (uint8) {
 }
 
 /// @title ScrollBadgeLevels
-/// @notice A simple badge that is attached to a Scroll Origins NFT.
+/// @notice A simple badge that represents the user's level.
 contract ScrollBadgeLevels is ScrollBadgeAccessControl, ScrollBadgeCustomPayload {
     constructor(address resolver_) ScrollBadge(resolver_) {
         // empty

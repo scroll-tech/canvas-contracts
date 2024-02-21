@@ -10,19 +10,15 @@ import { SingletonBadge }from "../../Errors.sol";
 /// @title ScrollBadgeSingleton
 /// @notice This contract only allows one active badge per wallet.
 abstract contract ScrollBadgeSingleton is ScrollBadge {
-    mapping (address => bool) public hasBadge;
-
     /// @inheritdoc ScrollBadge
     function onIssueBadge(Attestation calldata attestation) internal override virtual returns (bool) {
         if (!super.onIssueBadge(attestation)) {
             return false;
         }
 
-        if (hasBadge[attestation.recipient]) {
+        if (hasBadge(attestation.recipient)) {
             revert SingletonBadge(attestation.uid);
         }
-
-        hasBadge[attestation.recipient] = true;
 
         return true;
     }

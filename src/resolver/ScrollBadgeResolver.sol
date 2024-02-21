@@ -3,7 +3,7 @@
 pragma solidity 0.8.19;
 
 import { Attestation, IEAS } from "@eas/contracts/IEAS.sol";
-import { EMPTY_UID, NO_EXPIRATION_TIME } from "@eas/contracts/Common.sol";
+import { EMPTY_UID } from "@eas/contracts/Common.sol";
 import { SchemaResolver, ISchemaResolver } from "@eas/contracts/resolver/SchemaResolver.sol";
 
 import { IScrollBadge } from "../interfaces/IScrollBadge.sol";
@@ -43,11 +43,6 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
         // do not process other schemas
         if (attestation.schema != schema) {
             revert AttestationSchemaMismatch(attestation.uid);
-        }
-
-        // disable expiration time
-        if (attestation.expirationTime != NO_EXPIRATION_TIME) {
-            revert ExpirationTimeDisabled();
         }
 
         // decode attestation

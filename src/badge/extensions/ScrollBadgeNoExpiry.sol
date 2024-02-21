@@ -3,21 +3,22 @@
 pragma solidity 0.8.19;
 
 import { Attestation } from "@eas/contracts/IEAS.sol";
+import { NO_EXPIRATION_TIME } from "@eas/contracts/Common.sol";
 
 import { ScrollBadge } from "../ScrollBadge.sol";
-import { SingletonBadge }from "../../Errors.sol";
+import { ExpirationTimeDisabled }from "../../Errors.sol";
 
-/// @title ScrollBadgeSingleton
-/// @notice This contract only allows one active badge per wallet.
-abstract contract ScrollBadgeSingleton is ScrollBadge {
+/// @title ScrollBadgeNoExpiry
+/// @notice This contract disables expiration for this badge.
+abstract contract ScrollBadgeNoExpiry is ScrollBadge {
     /// @inheritdoc ScrollBadge
     function onIssueBadge(Attestation calldata attestation) internal override virtual returns (bool) {
         if (!super.onIssueBadge(attestation)) {
             return false;
         }
 
-        if (hasBadge(attestation.recipient)) {
-            revert SingletonBadge(attestation.uid);
+        if (attestation.expirationTime != NO_EXPIRATION_TIME) {
+            revert ExpirationTimeDisabled();
         }
 
         return true;

@@ -16,6 +16,9 @@ abstract contract ScrollBadge is IScrollBadge {
     // The global Scroll badge resolver contract.
     address public immutable resolver;
 
+    // wallet address => badge count
+    mapping (address => uint256) private _userBadgeCount;
+
     /// @dev Creates a new ScrollBadge instance.
     /// @param resolver_ The address of the global Scroll badge resolver contract.
     constructor(address resolver_) {
@@ -34,6 +37,8 @@ abstract contract ScrollBadge is IScrollBadge {
             return false;
         }
 
+        _userBadgeCount[attestation.recipient] += 1;
+
         emit IssueBadge(attestation.uid);
         return true;
     }
@@ -49,6 +54,8 @@ abstract contract ScrollBadge is IScrollBadge {
         if (!onRevokeBadge(attestation)) {
             return false;
         }
+
+        _userBadgeCount[attestation.recipient] -= 1;
 
         emit RevokeBadge(attestation.uid);
         return true;
@@ -85,4 +92,11 @@ abstract contract ScrollBadge is IScrollBadge {
     /// @param uid The badge UID.
     /// @return The badge token URI (same format as ERC721).
     function badgeTokenURI(bytes32 uid) public virtual view returns (string memory);
+
+    /// @notice Returns true if the user has one or more of this badge.
+    /// @param user The user's wallet address.
+    /// @return True if the user has one or more of this badge.
+    function hasBadge(address user) public view returns (bool) {
+        return _userBadgeCount[user] > 0;
+    }
 }

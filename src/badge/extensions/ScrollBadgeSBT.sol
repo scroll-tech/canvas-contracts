@@ -6,12 +6,13 @@ import { Attestation } from "@eas/contracts/IEAS.sol";
 
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-import { ScrollBadge } from "../ScrollBadge.sol";
 import { SBT } from "../../misc/SBT.sol";
+import { ScrollBadge } from "../ScrollBadge.sol";
+import { ScrollBadgeNoExpiry } from "./ScrollBadgeNoExpiry.sol";
 
 /// @title ScrollBadgeSBT
 /// @notice This contract attaches an SBT token to each badge.
-abstract contract ScrollBadgeSBT is SBT, ScrollBadge {
+abstract contract ScrollBadgeSBT is SBT, ScrollBadgeNoExpiry {
     /// @dev Creates a new ScrollBadgeSBT instance.
     /// @param name_ The ERC721 token name.
     /// @param symbol_ The ERC721 token symbol.

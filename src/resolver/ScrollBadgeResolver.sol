@@ -3,7 +3,7 @@
 pragma solidity 0.8.19;
 
 import { Attestation, IEAS } from "@eas/contracts/IEAS.sol";
-import { EMPTY_UID, NO_EXPIRATION_TIME } from "@eas/contracts/Common.sol";
+import { EMPTY_UID } from "@eas/contracts/Common.sol";
 import { SchemaResolver, ISchemaResolver } from "@eas/contracts/resolver/SchemaResolver.sol";
 
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
@@ -12,14 +12,13 @@ import { IScrollBadge } from "../interfaces/IScrollBadge.sol";
 import { IScrollBadgeResolver } from "../interfaces/IScrollBadgeResolver.sol";
 import { ResolverPaymentsDisabled, AttestationSchemaMismatch, ExpirationTimeDisabled, BadgeNotFound, BadgeNotAllowed, AttestationNotFound, AttestationExpired, AttestationRevoked } from "../Errors.sol";
 import { SCROLL_BADGE_SCHEMA, decodeBadgeData } from "../Common.sol";
-import { ScrollBadgeResolverIndexing } from "./ScrollBadgeResolverIndexing.sol";
 import { ScrollBadgeResolverWhitelist } from "./ScrollBadgeResolverWhitelist.sol";
 
 /// @title ScrollBadgeResolver
 /// @notice This resolver contract receives callbacks every time a Scroll badge
 //          attestation is created or revoked. It executes some basic checks and
 //          then delegates the logic to the specific badge implementation.
-contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadgeResolverWhitelist, ScrollBadgeResolverIndexing {
+contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadgeResolverWhitelist {
     /// @inheritdoc IScrollBadgeResolver
     bytes32 public immutable schema;
 
@@ -47,11 +46,6 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
             revert AttestationSchemaMismatch(attestation.uid);
         }
 
-        // disable expiration time
-        if (attestation.expirationTime != NO_EXPIRATION_TIME) {
-            revert ExpirationTimeDisabled();
-        }
-
         // decode attestation
         (address badge,) = decodeBadgeData(attestation.data);
 
@@ -70,7 +64,6 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
             return false;
         }
 
-        _indexBadge(attestation);
         emit IssueBadge(attestation.uid);
         return true;
     }

@@ -16,3 +16,8 @@ error ResolverPaymentsDisabled();
 error Unauthorized();
 error InvalidOffset();
 error SingletonBadge(bytes32 uid);
+error CallerIsNotUserProfile();
+error BadgeCountReached();
+error InvalidUsername();
+error DuplicatedUsername();
+error LengthMismatch();

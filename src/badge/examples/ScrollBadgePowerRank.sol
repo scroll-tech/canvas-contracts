@@ -12,6 +12,7 @@ import { ScrollBadgeAccessControl } from "../extensions/ScrollBadgeAccessControl
 import { ScrollBadgeCustomPayload } from "../extensions/ScrollBadgeCustomPayload.sol";
 import { ScrollBadgeNoExpiry } from "../extensions/ScrollBadgeNoExpiry.sol";
 import { ScrollBadgeNonRevocable } from "../extensions/ScrollBadgeNonRevocable.sol";
+import { ScrollBadgeSingleton } from "../extensions/ScrollBadgeSingleton.sol";
 import { Unauthorized } from "../../Errors.sol";
 
 string constant SCROLL_BADGE_POWER_RANK_SCHEMA = "uint256 firstTxTimestamp";
@@ -22,7 +23,7 @@ function decodePayloadData(bytes memory data) pure returns (uint256) {
 
 /// @title ScrollBadgePowerRank
 /// @notice A badge that represents the user's power rank.
-contract ScrollBadgePowerRank is ScrollBadgeAccessControl, ScrollBadgeCustomPayload, ScrollBadgeNoExpiry, ScrollBadgeNonRevocable {
+contract ScrollBadgePowerRank is ScrollBadgeAccessControl, ScrollBadgeCustomPayload, ScrollBadgeNoExpiry, ScrollBadgeNonRevocable, ScrollBadgeSingleton {
     error CannotUpgrade();
     event Upgrade(uint256 oldRank, uint256 newRank);
 
@@ -34,7 +35,7 @@ contract ScrollBadgePowerRank is ScrollBadgeAccessControl, ScrollBadgeCustomPayl
     }
 
     /// @inheritdoc ScrollBadge
-    function onIssueBadge(Attestation calldata attestation) internal override(ScrollBadgeAccessControl, ScrollBadgeCustomPayload, ScrollBadgeNoExpiry, ScrollBadgeNonRevocable) returns (bool) {
+    function onIssueBadge(Attestation calldata attestation) internal override(ScrollBadgeAccessControl, ScrollBadgeCustomPayload, ScrollBadgeNoExpiry, ScrollBadgeNonRevocable, ScrollBadgeSingleton) returns (bool) {
         if (!super.onIssueBadge(attestation)) {
             return false;
         }

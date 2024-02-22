@@ -62,7 +62,7 @@ We can use the EAS GraphQL API to query a user's Skelly badges.
 
 > Warning: Badges are minted to the user's wallet address, not to their profile address!
 
-```json
+```
 query Attestation {
   attestations(
     where: {

@@ -34,6 +34,10 @@ contract ProfileRegistry is UpgradeableBeacon, IProfileRegistry {
     /// @notice Mapping from username hash to the status.
     mapping(bytes32 => bool) private isUsernameHashUsed;
 
+    /// @notice The token URI for default profile avatar.
+    /// @dev It should follow the Metadata Standards by opensea: https://docs.opensea.io/docs/metadata-standards.
+    string private defaultProfileAvatar;
+
     /*************
      * Modifiers *
      *************/
@@ -68,6 +72,11 @@ contract ProfileRegistry is UpgradeableBeacon, IProfileRegistry {
         return isUsernameHashUsed[hash];
     }
 
+    /// @inheritdoc IProfileRegistry
+    function getDefaultProfileAvatar() external view override returns (string memory) {
+        return defaultProfileAvatar;
+    }
+
     /*****************************
      * Public Mutating Functions *
      *****************************/
@@ -83,7 +92,7 @@ contract ProfileRegistry is UpgradeableBeacon, IProfileRegistry {
         if (isUsernameHashUsed[hash]) revert DuplicatedUsername();
         isUsernameHashUsed[hash] = true;
 
-        emit RegisterProfile(_msgSender(), username);
+        emit RegisterUsername(_msgSender(), username);
     }
 
     /// @inheritdoc IProfileRegistry
@@ -91,7 +100,7 @@ contract ProfileRegistry is UpgradeableBeacon, IProfileRegistry {
         bytes32 hash = keccak256(bytes(username));
         isUsernameHashUsed[hash] = false;
 
-        emit UnregisterProfile(_msgSender(), username);
+        emit UnregisterUsername(_msgSender(), username);
     }
 
     /************************
@@ -106,10 +115,19 @@ contract ProfileRegistry is UpgradeableBeacon, IProfileRegistry {
         }
     }
 
+    /// @notice Update the default profile avatar.
+    /// @param newAvatar The new default profile avatar.
+    function updateDefaultProfileAvatar(string memory newAvatar) external onlyOwner {
+        string memory oldAvatar = defaultProfileAvatar;
+        defaultProfileAvatar = newAvatar;
+
+        emit UpdateDefaultProfileAvatar(oldAvatar, newAvatar);
+    }
+
     /**********************
      * Internal Functions *
      **********************/
-    
+
     /// @dev Internal function to mint a profile with given account address and username.
     /// @param account The address of user to mint profile.
     /// @param username The username of the profile.

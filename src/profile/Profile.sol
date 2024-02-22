@@ -6,12 +6,14 @@ import {EMPTY_UID} from "@eas/contracts/Common.sol";
 import {IEAS, Attestation} from "@eas/contracts/IEAS.sol";
 
 import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import {IProfileRegistry} from "../interfaces/IProfileRegistry.sol";
 import {IScrollBadgeResolver} from "../interfaces/IScrollBadgeResolver.sol";
 import {MAX_ATTACHED_BADGE_NUM} from "../Common.sol";
-import {BadgeCountReached, InvalidBadge, InvalidUsername, LengthMismatch, Unauthorized} from "../Errors.sol";
+import {BadgeCountReached, InvalidBadge, InvalidUsername, LengthMismatch, Unauthorized, TokenNotOwnedByUser} from "../Errors.sol";
 
 contract Profile is Initializable {
     using EnumerableSet for EnumerableSet.Bytes32Set;
@@ -22,6 +24,18 @@ contract Profile is Initializable {
 
     /// @notice The address of `ScrollBadgeResolver` contract.
     address public immutable resolver;
+
+    /***********
+     * Structs *
+     ***********/
+
+    /// @dev The struct holding profile avatar information.
+    /// @param token The address of ERC721 token.
+    /// @param tokenId The token id.
+    struct Avatar {
+        address token;
+        uint256 tokenId;
+    }
 
     /*************
      * Variables *
@@ -36,10 +50,13 @@ contract Profile is Initializable {
     /// @notice The name of the profile.
     string public username;
 
+    /// @notice The profile avatar information.
+    Avatar public avatar;
+
     /// @dev The list of uids for attached badges.
     bytes32[] private uids;
 
-    /// @dev Position of the value in the `values` array, plus 1
+    /// @dev Position of the value in the `uids` array, plus 1
     //  because index 0 means a value is not in the set.
     mapping(bytes32 => uint256) indexes;
 
@@ -145,6 +162,19 @@ contract Profile is Initializable {
         return result;
     }
 
+    /// @notice Return the token URI for profile avatar.
+    function getAvatar() external view returns (string memory) {
+        Avatar memory _avatar = avatar;
+        if (IERC721(_avatar.token).ownerOf(_avatar.tokenId) == owner) {
+            try IERC721Metadata(_avatar.token).tokenURI(_avatar.tokenId) returns (string memory uri) {
+                return uri;
+            } catch {
+                // no logic here
+            }
+        }
+        return IProfileRegistry(registry).getDefaultProfileAvatar();
+    }
+
     /*****************************
      * Public Mutating Functions *
      *****************************/
@@ -193,26 +223,35 @@ contract Profile is Initializable {
         username = newUsername;
     }
 
+    /// @notice Change the avatar.
+    /// @param token The address of ERC721 token.
+    /// @param tokenId The token id.
+    function changeAvatar(address token, uint256 tokenId) external onlyOwner {
+        if (IERC721(token).ownerOf(tokenId) != owner) {
+            revert TokenNotOwnedByUser(token, tokenId);
+        }
+
+        avatar = Avatar(token, tokenId);
+    }
+
     /**********************
      * Internal Functions *
      **********************/
 
     /// @dev Internal function to validate the username. We only accept username consisting of
-    /// lowercase and uppercase English letter (`a-z, A-Z`), digits (`0-9`), underscore (`_`),
-    /// hyphen (`-`) and period (`.`).
+    /// lowercase and uppercase English letter (`a-z, A-Z`), digits (`0-9`) and underscore (`_`).
     ///
     /// @param username_ The username to validate.
     function _validateUsername(string memory username_) private pure {
         bytes memory s = bytes(username_);
         uint256 length = s.length;
+        if (length < 4 || length > 15) revert InvalidUsername();
         for (uint256 i = 0; i < length; i++) {
             if (
                 !((bytes1(0x61) <= s[i] && s[i] <= bytes1(0x7a)) ||
                     (bytes1(0x41) <= s[i] && s[i] <= bytes1(0x5a)) ||
                     (bytes1(0x30) <= s[i] && s[i] <= bytes1(0x39)) ||
-                    s[i] == bytes1(0x5f) ||
-                    s[i] == bytes1(0x2d) ||
-                    s[i] == bytes1(0x2e))
+                    s[i] == bytes1(0x5f))
             ) revert InvalidUsername();
         }
     }

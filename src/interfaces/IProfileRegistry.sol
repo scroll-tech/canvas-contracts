@@ -15,12 +15,17 @@ interface IProfileRegistry {
     /// @notice Emitted when profile register username.
     /// @param profile The address of profile.
     /// @param username The username registered.
-    event RegisterProfile(address indexed profile, string username);
+    event RegisterUsername(address indexed profile, string username);
 
     /// @notice Emitted when profile unregister username.
     /// @param profile The address of profile.
     /// @param username The username unregistered.
-    event UnregisterProfile(address indexed profile, string username);
+    event UnregisterUsername(address indexed profile, string username);
+
+    /// @notice Emitted when the default profile avatar is updated.
+    /// @param oldAvatar The token URI of the previous avatar.
+    /// @param newAvatar The token URI of the current avatar.
+    event UpdateDefaultProfileAvatar(string oldAvatar, string newAvatar);
 
     /*************************
      * Public View Functions *
@@ -37,6 +42,9 @@ interface IProfileRegistry {
     /// @notice Calculate the address of profile with given account address.
     /// @param account The address of account to query.
     function getProfile(address account) external view returns (address);
+
+    /// @notice Return the tokenURI for default profile avatar.
+    function getDefaultProfileAvatar() external view returns (string memory);
 
     /*****************************
      * Public Mutating Functions *

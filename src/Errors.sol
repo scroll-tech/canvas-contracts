@@ -21,3 +21,4 @@ error BadgeCountReached();
 error InvalidUsername();
 error DuplicatedUsername();
 error LengthMismatch();
+error TokenNotOwnedByUser(address token, uint256 tokenId);

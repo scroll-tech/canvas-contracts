@@ -6,10 +6,12 @@ import { Attestation, IEAS } from "@eas/contracts/IEAS.sol";
 import { EMPTY_UID } from "@eas/contracts/Common.sol";
 import { SchemaResolver, ISchemaResolver } from "@eas/contracts/resolver/SchemaResolver.sol";
 
+import { Address } from "@openzeppelin/contracts/utils/Address.sol";
+
 import { IScrollBadge } from "../interfaces/IScrollBadge.sol";
 import { IScrollBadgeResolver } from "../interfaces/IScrollBadgeResolver.sol";
 import { ResolverPaymentsDisabled, AttestationSchemaMismatch, ExpirationTimeDisabled, BadgeNotFound, BadgeNotAllowed, AttestationNotFound, AttestationExpired, AttestationRevoked } from "../Errors.sol";
-import { SCROLL_BADGE_SCHEMA, decodeBadgeData, isContract } from "../Common.sol";
+import { SCROLL_BADGE_SCHEMA, decodeBadgeData } from "../Common.sol";
 import { ScrollBadgeResolverWhitelist } from "./ScrollBadgeResolverWhitelist.sol";
 
 /// @title ScrollBadgeResolver
@@ -48,7 +50,7 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
         (address badge,) = decodeBadgeData(attestation.data);
 
         // check if badge exists
-        if (!isContract(badge)) {
+        if (!Address.isContract(badge)) {
             revert BadgeNotFound(badge);
         }
 

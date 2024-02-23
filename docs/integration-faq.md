@@ -156,3 +156,54 @@ The result is a badge token URI, which follows the same schema as ERC721 tokens:
 > cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_SIMPLE_BADGE_ADDRESS" "hasBadge(address)(bool)" "0xF138EdC6038C237e94450bcc9a7085a7b213cAf0"
 true
 ```
+
+
+### How to configure a profile avatar?
+
+A user can use one of their own NFTs as their avatar. To do this, they need to provide the ERC721 contract address and the token ID.
+
+```bash
+> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "changeAvatar(address,uint256)" "0x74670A3998d9d6622E32D0847fF5977c37E0eC91" "1" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
+```
+
+
+### How to attach a badge?
+
+A user can attach one or more badges to their profile. Badges are referenced by their attestation UID.
+
+```bash
+# attach one
+> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "attachOne(bytes32)" "0x6346f8fd2ba17fb5540589cf4ba88ce1c5a5c3af01f3b807c28abd0ea4f80737" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
+
+# attach many
+> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "attach(bytes32[])" "[0x6346f8fd2ba17fb5540589cf4ba88ce1c5a5c3af01f3b807c28abd0ea4f80737]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
+
+# detach
+> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "detach(bytes32[])" "[0x6346f8fd2ba17fb5540589cf4ba88ce1c5a5c3af01f3b807c28abd0ea4f80737]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
+```
+
+
+### How to reorder the attached badges?
+
+Let's say the user has 3 badges attached: `A`, `B`, `C`. If we want to reorder these to `C`, `B`, `A`, we need to submit the following transaction:
+
+```bash
+> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "reorderBadges(uint256[])" "[2, 1, 0]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
+```
+
+
+### How to query the attached badges?
+
+To see which badges are attached to a profile, we can call `getAttachedBadges`:
+
+```bash
+> cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "getAttachedBadges()(bytes32[])"
+
+```
+
+To get the order of the badges, we can call `getBadgeOrder`:
+
+```bash
+> cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "getBadgeOrder()(uint256[])"
+
+```

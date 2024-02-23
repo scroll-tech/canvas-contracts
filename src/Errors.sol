@@ -22,3 +22,7 @@ error InvalidUsername();
 error DuplicatedUsername();
 error LengthMismatch();
 error TokenNotOwnedByUser(address token, uint256 tokenId);
+error ImplementationNotContract();
+error MsgValueMismatchWithMintFee();
+error ExpiredSignature();
+error InvalidSignature();

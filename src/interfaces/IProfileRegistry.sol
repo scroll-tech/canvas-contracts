@@ -27,6 +27,21 @@ interface IProfileRegistry {
     /// @param newAvatar The token URI of the current avatar.
     event UpdateDefaultProfileAvatar(string oldAvatar, string newAvatar);
 
+    /// @dev Emitted when the profile implementation is updated.
+    /// @param oldImplementation The address of previous profile implementation.
+    /// @param newImplementation The address of current profile implementation.
+    event UpdateProfileImplementation(address indexed oldImplementation, address indexed newImplementation);
+
+    /// @dev Emitted when the referral signer is updated.
+    /// @param oldSigner The address of previous signer.
+    /// @param newSigner The address of current signer.
+    event UpdateSigner(address indexed oldSigner, address indexed newSigner);
+
+    /// @dev Emitted when the mint fee treasury is updated.
+    /// @param oldTreasury The address of previous treasury.
+    /// @param newTreasury The address of current treasury.
+    event UpdateTreasury(address indexed oldTreasury, address indexed newTreasury);
+
     /*************************
      * Public View Functions *
      *************************/
@@ -52,8 +67,9 @@ interface IProfileRegistry {
 
     /// @notice Mint a profile for caller with given username.
     /// @param username The username of the profile.
+    /// @param referral The referral data.
     /// @return The address of minted profile.
-    function mintProfile(string calldata username) external returns (address);
+    function mint(string calldata username, bytes calldata referral) external payable returns (address);
 
     /// @notice Register an username.
     /// @param username The username to register.

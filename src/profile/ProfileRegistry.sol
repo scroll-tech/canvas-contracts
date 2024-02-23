@@ -25,7 +25,7 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
      * Constants *
      *************/
 
-    /// @notice The mint fee for each profile withour referral.
+    /// @notice The mint fee for each profile without referral.
     uint256 public constant MINT_FEE = 0.001 ether;
 
     /// @notice The codehash for `ClonableBeaconProxy` contract.

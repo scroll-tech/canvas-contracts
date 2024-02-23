@@ -13,7 +13,7 @@ import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet
 import {IProfileRegistry} from "../interfaces/IProfileRegistry.sol";
 import {IScrollBadgeResolver} from "../interfaces/IScrollBadgeResolver.sol";
 import {MAX_ATTACHED_BADGE_NUM} from "../Common.sol";
-import {BadgeCountReached, InvalidBadge, InvalidUsername, LengthMismatch, Unauthorized, TokenNotOwnedByUser} from "../Errors.sol";
+import {BadgeCountReached, InvalidBadge, LengthMismatch, Unauthorized, TokenNotOwnedByUser} from "../Errors.sol";
 
 contract Profile is Initializable {
     using EnumerableSet for EnumerableSet.Bytes32Set;
@@ -93,8 +93,6 @@ contract Profile is Initializable {
     /// @param owner_ The address of profile owner.
     /// @param username_ The name of the profile.
     function initialize(address owner_, string memory username_) external initializer {
-        _validateUsername(username_);
-
         registry = msg.sender;
         owner = owner_;
         username = username_;
@@ -215,8 +213,6 @@ contract Profile is Initializable {
     /// @notice Change the username.
     /// @param newUsername The new username.
     function changeUsername(string memory newUsername) external onlyOwner {
-        _validateUsername(newUsername);
-
         address _registry = registry;
         IProfileRegistry(_registry).unregisterUsername(username);
         IProfileRegistry(_registry).registerUsername(newUsername);
@@ -237,24 +233,6 @@ contract Profile is Initializable {
     /**********************
      * Internal Functions *
      **********************/
-
-    /// @dev Internal function to validate the username. We only accept username consisting of
-    /// lowercase and uppercase English letter (`a-z, A-Z`), digits (`0-9`) and underscore (`_`).
-    ///
-    /// @param username_ The username to validate.
-    function _validateUsername(string memory username_) private pure {
-        bytes memory s = bytes(username_);
-        uint256 length = s.length;
-        if (length < 4 || length > 15) revert InvalidUsername();
-        for (uint256 i = 0; i < length; i++) {
-            if (
-                !((bytes1(0x61) <= s[i] && s[i] <= bytes1(0x7a)) ||
-                    (bytes1(0x41) <= s[i] && s[i] <= bytes1(0x5a)) ||
-                    (bytes1(0x30) <= s[i] && s[i] <= bytes1(0x39)) ||
-                    s[i] == bytes1(0x5f))
-            ) revert InvalidUsername();
-        }
-    }
 
     /// @dev Internal function to attach one batch to this profile.
     /// @param uid The badge uid to attach.

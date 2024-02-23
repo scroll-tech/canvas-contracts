@@ -221,7 +221,7 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
     /// @dev Internal function to update the profile implementation contract.
     /// @param newImplementation The address of new implementation.
     function _updateProfileImplementation(address newImplementation) private {
-        if (Address.isContract(newImplementation)) revert ImplementationNotContract();
+        if (!Address.isContract(newImplementation)) revert ImplementationNotContract();
 
         address oldImplementation = implementation;
         implementation = newImplementation;

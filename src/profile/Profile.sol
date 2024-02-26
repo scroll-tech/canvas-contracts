@@ -163,7 +163,7 @@ contract Profile is Initializable {
     /// @notice Return the token URI for profile avatar.
     function getAvatar() external view returns (string memory) {
         Avatar memory _avatar = avatar;
-        if (IERC721(_avatar.token).ownerOf(_avatar.tokenId) == owner) {
+        if (_avatar.token != address(0) && IERC721(_avatar.token).ownerOf(_avatar.tokenId) == owner) {
             try IERC721Metadata(_avatar.token).tokenURI(_avatar.tokenId) returns (string memory uri) {
                 return uri;
             } catch {

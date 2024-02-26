@@ -11,7 +11,7 @@ const SCROLL_REFERRAL_DOMAIN = {
 
 const SCROLL_REFERRAL_TYPES = {
   Referral: [
-    { name: 'referral', type: 'address' },
+    { name: 'referrer', type: 'address' },
     { name: 'owner',    type: 'address' },
     { name: 'deadline', type: 'uint256' },
   ],
@@ -21,7 +21,7 @@ async function signTypedData() {
   const provider = new ethers.JsonRpcProvider(process.env.RPC_ENDPOINT);
   const signer = (new ethers.Wallet(process.env.SIGNER_PRIVATE_KEY)).connect(provider);
   const referrer = (new ethers.Wallet(process.env.DEPLOYER_PRIVATE_KEY)).address;
-  const claimer = (new ethers.Wallet(process.env.CLAIMER_PRIVATE_KEY)).address;
+  const owner = (new ethers.Wallet(process.env.CLAIMER_PRIVATE_KEY)).address;
 
   // set correct chain ID
   const chainId = (await provider.getNetwork()).chainId;
@@ -33,10 +33,8 @@ async function signTypedData() {
 
   // construct and sign message
   const message = {
-    // "referral" is the referrer address, this is the user who will get the fee reward.
-    referral: referrer,
-    // "owner" is the mint transaction sender, the owner of the new profile.
-    owner: claimer,
+    referrer,
+    owner,
     deadline,
   };
 
@@ -46,7 +44,7 @@ async function signTypedData() {
   console.log('Signature:', signature);
 
   const coder = ethers.AbiCoder.defaultAbiCoder();
-  const referral = coder.encode(['address', 'uint256', 'bytes'], [claimer, deadline, signature]);
+  const referral = coder.encode(['address', 'uint256', 'bytes'], [referrer, deadline, signature]);
   console.log('Referral:', referral);
 }
 

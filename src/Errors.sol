@@ -26,3 +26,5 @@ error ImplementationNotContract();
 error MsgValueMismatchWithMintFee();
 error ExpiredSignature();
 error InvalidSignature();
+error InvalidReferrer();
+error ProfileAlreadyMinted();

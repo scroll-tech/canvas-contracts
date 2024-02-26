@@ -11,7 +11,7 @@ import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 import {Create2} from "@openzeppelin/contracts/utils/Create2.sol";
 
 import {IProfileRegistry} from "../interfaces/IProfileRegistry.sol";
-import {CallerIsNotUserProfile, DuplicatedUsername, ExpiredSignature, ImplementationNotContract, InvalidSignature, InvalidUsername, MsgValueMismatchWithMintFee} from "../Errors.sol";
+import {CallerIsNotUserProfile, DuplicatedUsername, ExpiredSignature, ImplementationNotContract, InvalidReferrer, InvalidSignature, InvalidUsername, MsgValueMismatchWithMintFee, ProfileAlreadyMinted} from "../Errors.sol";
 import {Profile} from "./Profile.sol";
 
 contract ClonableBeaconProxy is BeaconProxy {
@@ -33,7 +33,7 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
 
     // solhint-disable-next-line var-name-mixedcase
     bytes32 private constant _REFERRAL_TYPEHASH =
-        keccak256("Referral(address referral,address owner,uint256 deadline)");
+        keccak256("Referral(address referrer,address owner,uint256 deadline)");
 
     /*************
      * Variables *
@@ -124,6 +124,10 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
             (receiver, deadline, signature) = abi.decode(referral, (address, uint256, bytes));
             if (deadline < block.timestamp) revert ExpiredSignature();
 
+            if (!isProfileMinted[getProfile(receiver)]) {
+                revert InvalidReferrer();
+            }
+
             bytes32 structHash = keccak256(abi.encode(_REFERRAL_TYPEHASH, receiver, _msgSender(), deadline));
             bytes32 hash = _hashTypedDataV4(structHash);
             address recovered = ECDSAUpgradeable.recover(hash, signature);
@@ -134,6 +138,10 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
         }
         if (msg.value != mintFee) revert MsgValueMismatchWithMintFee();
         Address.sendValue(payable(receiver), mintFee);
+
+        if (isProfileMinted[getProfile(_msgSender())]) {
+            revert ProfileAlreadyMinted();
+        }
 
         return _mintProfile(_msgSender(), username);
     }

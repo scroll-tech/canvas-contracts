@@ -164,7 +164,7 @@ address badge, bytes payload
 
 ### How to get a badge image?
 
-First, collect the badge attestation UID and the badge contract address. Then call `badgeTokenURI`:
+To get the token URI of a certain badge, first collect the badge attestation UID and the badge contract address. Then call `badgeTokenURI`:
 
 ```bash
 > cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_SIMPLE_BADGE_A_ADDRESS" "badgeTokenURI(bytes32)(string)" "0xad95b842d4dda20d4de0056214bfb2de0eac7157ab2ee90ed252c55bea05f0ff"
@@ -172,6 +172,13 @@ First, collect the badge attestation UID and the badge contract address. Then ca
 ```
 
 The result is a badge token URI, which follows the same schema as ERC721 tokens: The token URI points to a JSON file with `name`, `description`, and `image` fields. The token URI can be a HTTP or IPFS link, or it can be a [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs).
+
+To get the default token URI of a badge, simply call `badgeTokenURI` with the *zero UID*. The default badge token URI can be the same as the token URI of a specific badge, or it can be different, depending on the badge implementation.
+
+```
+> cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_SIMPLE_BADGE_A_ADDRESS" "badgeTokenURI(bytes32)(string)" "0x0000000000000000000000000000000000000000000000000000000000000000"
+"https://ipfs.io/ipfs/QmVXPw1DfL9h5uZ34voQ3QtdN8akpPEuVpKKNRPjfAii2K"
+```
 
 
 ### How to check if a user has a certain badge or not?

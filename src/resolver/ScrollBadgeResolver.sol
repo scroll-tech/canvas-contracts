@@ -21,14 +21,26 @@ import { ScrollBadgeResolverWhitelist } from "./ScrollBadgeResolverWhitelist.sol
 //          attestation is created or revoked. It executes some basic checks and
 //          then delegates the logic to the specific badge implementation.
 contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadgeResolverWhitelist {
+    /*************
+     * Constants *
+     *************/
+
     /// @inheritdoc IScrollBadgeResolver
     bytes32 public immutable schema;
 
     /// @inheritdoc IScrollBadgeResolver
-    address public registry;
+    address public immutable registry;
+
+    /*************
+     * Variables *
+     *************/
 
     /// @inheritdoc IScrollBadgeResolver
     mapping(address => bool) public isBadgeAutoAttach;
+
+    /***************
+     * Constructor *
+     ***************/
 
     /// @dev Creates a new ScrollBadgeResolver instance.
     /// @param eas_ The address of the global EAS contract.
@@ -44,6 +56,10 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
 
         registry = registry_;
     }
+
+    /*****************************
+     * Schema Resolver Functions *
+     *****************************/
 
     /// @inheritdoc SchemaResolver
     function onAttest(Attestation calldata attestation, uint256 value) internal override(SchemaResolver) returns (bool) {
@@ -102,6 +118,10 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
         return true;
     }
 
+    /*************************
+     * Public View Functions *
+     *************************/
+
     /// @inheritdoc IScrollBadgeResolver
     function eas() external view returns (address) {
         return address(_eas);
@@ -130,6 +150,10 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
         return attestation;
     }
 
+    /************************
+     * Restricted Functions *
+     ************************/
+
     /// @notice Enable or disable auto-attach for a badge.
     /// @param badge The address of the badge contract.
     /// @param enable Enable auto-attach if true, disable if false.
@@ -137,6 +161,10 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
         isBadgeAutoAttach[badge] = enable;
         emit UpdateAutoAttachWhitelist(badge, enable);
     }
+
+    /**********************
+     * Internal Functions *
+     **********************/
 
     function _autoAttach(Attestation calldata attestation) internal {
         IProfileRegistry _registry = IProfileRegistry(registry);

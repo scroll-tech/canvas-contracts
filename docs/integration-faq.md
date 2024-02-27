@@ -210,7 +210,7 @@ A user can attach one or more badges to their profile. Badges are referenced by 
 
 ```bash
 # attach one
-> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "attachOne(bytes32)" "0xfa97ab8fd614a202937e83b8f68fdf16e688b2fa4d0e657b5e02872ec7521c83" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
+> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "attach([bytes32])" "[0xfa97ab8fd614a202937e83b8f68fdf16e688b2fa4d0e657b5e02872ec7521c83]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
 
 # attach many
 > cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "attach(bytes32[])" "[0xb9a4419bc40585bd37d3642302b35b1e79249843af501a4795ad8497dbc6e5ec,0x609040a78544efe6caceddd184836907060a9ebbdf606d264a8665e245bb2115]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"

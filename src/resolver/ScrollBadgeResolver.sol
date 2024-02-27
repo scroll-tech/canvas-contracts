@@ -8,6 +8,8 @@ import { SchemaResolver, ISchemaResolver } from "@eas/contracts/resolver/SchemaR
 
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
+import { IProfile } from "../interfaces/IProfile.sol";
+import { IProfileRegistry } from "../interfaces/IProfileRegistry.sol";
 import { IScrollBadge } from "../interfaces/IScrollBadge.sol";
 import { IScrollBadgeResolver } from "../interfaces/IScrollBadgeResolver.sol";
 import { ResolverPaymentsDisabled, AttestationSchemaMismatch, ExpirationTimeDisabled, BadgeNotFound, BadgeNotAllowed, AttestationNotFound, AttestationExpired, AttestationRevoked } from "../Errors.sol";
@@ -22,9 +24,16 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
     /// @inheritdoc IScrollBadgeResolver
     bytes32 public immutable schema;
 
+    /// @inheritdoc IScrollBadgeResolver
+    address public registry;
+
+    /// @inheritdoc IScrollBadgeResolver
+    mapping(address => bool) public isBadgeAutoAttach;
+
     /// @dev Creates a new ScrollBadgeResolver instance.
     /// @param eas_ The address of the global EAS contract.
-    constructor(address eas_) SchemaResolver(IEAS(eas_)) {
+    /// @param registry_ The address of the profile registry contract.
+    constructor(address eas_, address registry_) SchemaResolver(IEAS(eas_)) {
         // register Scroll badge schema,
         // we do this here to ensure that the resolver is correctly configured
         schema = IEAS(eas_).getSchemaRegistry().register(
@@ -32,6 +41,8 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
             ISchemaResolver(address(this)), // resolver
             true // revocable
         );
+
+        registry = registry_;
     }
 
     /// @inheritdoc SchemaResolver
@@ -62,6 +73,11 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
         // delegate to badge contract for application-specific checks and actions
         if (!IScrollBadge(badge).issueBadge(attestation)) {
             return false;
+        }
+
+        // auto-attach whitelisted badges
+        if (isBadgeAutoAttach[badge]) {
+            _autoAttach(attestation);
         }
 
         emit IssueBadge(attestation.uid);
@@ -112,5 +128,26 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
         }
 
         return attestation;
+    }
+
+    /// @notice Enable or disable auto-attach for a badge.
+    /// @param badge The address of the badge contract.
+    /// @param enable Enable auto-attach if true, disable if false.
+    function toggleBadgeAutoAttach(address badge, bool enable) external onlyOwner {
+        isBadgeAutoAttach[badge] = enable;
+        emit UpdateAutoAttachWhitelist(badge, enable);
+    }
+
+    function _autoAttach(Attestation calldata attestation) internal {
+        IProfileRegistry _registry = IProfileRegistry(registry);
+        address profile = _registry.getProfile(attestation.recipient);
+
+        if (!_registry.isProfileMinted(profile)) {
+            return;
+        }
+
+        bytes32[] memory uids = new bytes32[](1);
+        uids[0] = attestation.uid;
+        IProfile(profile).attach(uids);
     }
 }

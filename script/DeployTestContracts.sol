@@ -14,6 +14,7 @@ import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
 import {ScrollBadgeSimple} from "../src/badge/examples/ScrollBadgeSimple.sol";
 import {ProfileRegistry} from "../src/profile/ProfileRegistry.sol";
 import {Profile} from "../src/profile/Profile.sol";
+import {ProfileRegistry} from "../src/profile/ProfileRegistry.sol";
 import {EmptyContract} from "../src/misc/EmptyContract.sol";
 
 contract DeployTestContracts is Script {
@@ -32,20 +33,17 @@ contract DeployTestContracts is Script {
         // deploy profile registry placeholder
         address proxyAdmin = vm.addr(DEPLOYER_PRIVATE_KEY);
         EmptyContract placeholder = new EmptyContract();
-        TransparentUpgradeableProxy profileRegistryProxy = new TransparentUpgradeableProxy(address(placeholder), proxyAdmin, "");
+        address profileRegistryProxy = address(new TransparentUpgradeableProxy(address(placeholder), proxyAdmin, ""));
 
         // deploy Scroll badge resolver
-        ScrollBadgeResolver resolver = new ScrollBadgeResolver(address(eas), address(profileRegistryProxy));
+        ScrollBadgeResolver resolver = new ScrollBadgeResolver(address(eas), profileRegistryProxy);
         bytes32 schema = resolver.schema();
 
         // deploy profile implementation and upgrade registry
         Profile profileImpl = new Profile(address(resolver));
         ProfileRegistry profileRegistryImpl = new ProfileRegistry();
-
-        ITransparentUpgradeableProxy(address(profileRegistryProxy)).upgradeToAndCall(
-            address(profileRegistryImpl),
-            abi.encodeCall(ProfileRegistry.initialize, (TREASURY_ADDRESS, SIGNER_ADDRESS, address(profileImpl)))
-        );
+        ITransparentUpgradeableProxy(profileRegistryProxy).upgradeTo(address(profileRegistryImpl));
+        ProfileRegistry(profileRegistryProxy).initialize(TREASURY_ADDRESS, SIGNER_ADDRESS, address(profileImpl));
 
         // deploy test badge
         ScrollBadgeSimple badge = new ScrollBadgeSimple(address(resolver), "uri");

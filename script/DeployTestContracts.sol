@@ -7,6 +7,7 @@ import {console} from "forge-std/console.sol";
 import {SchemaRegistry, ISchemaRegistry} from "@eas/contracts/SchemaRegistry.sol";
 import {EAS} from "@eas/contracts/EAS.sol";
 
+import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 import {ITransparentUpgradeableProxy, TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 import {AttesterProxy} from "../src/AttesterProxy.sol";
@@ -14,6 +15,7 @@ import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
 import {ScrollBadgeSimple} from "../src/badge/examples/ScrollBadgeSimple.sol";
 import {ProfileRegistry} from "../src/profile/ProfileRegistry.sol";
 import {Profile} from "../src/profile/Profile.sol";
+import {ProfileRegistry} from "../src/profile/ProfileRegistry.sol";
 import {EmptyContract} from "../src/misc/EmptyContract.sol";
 
 contract DeployTestContracts is Script {
@@ -29,23 +31,22 @@ contract DeployTestContracts is Script {
         SchemaRegistry schemaRegistry = new SchemaRegistry();
         EAS eas = new EAS(schemaRegistry);
 
+        // deploy proxy admin
+        ProxyAdmin proxyAdmin = new ProxyAdmin();
+
         // deploy profile registry placeholder
-        address proxyAdmin = vm.addr(DEPLOYER_PRIVATE_KEY);
         EmptyContract placeholder = new EmptyContract();
-        TransparentUpgradeableProxy profileRegistryProxy = new TransparentUpgradeableProxy(address(placeholder), proxyAdmin, "");
+        address profileRegistryProxy = address(new TransparentUpgradeableProxy(address(placeholder), address(proxyAdmin), ""));
 
         // deploy Scroll badge resolver
-        ScrollBadgeResolver resolver = new ScrollBadgeResolver(address(eas), address(profileRegistryProxy));
+        ScrollBadgeResolver resolver = new ScrollBadgeResolver(address(eas), profileRegistryProxy);
         bytes32 schema = resolver.schema();
 
         // deploy profile implementation and upgrade registry
         Profile profileImpl = new Profile(address(resolver));
         ProfileRegistry profileRegistryImpl = new ProfileRegistry();
-
-        ITransparentUpgradeableProxy(address(profileRegistryProxy)).upgradeToAndCall(
-            address(profileRegistryImpl),
-            abi.encodeCall(ProfileRegistry.initialize, (TREASURY_ADDRESS, SIGNER_ADDRESS, address(profileImpl)))
-        );
+        proxyAdmin.upgrade(ITransparentUpgradeableProxy(profileRegistryProxy), address(profileRegistryImpl));
+        ProfileRegistry(profileRegistryProxy).initialize(TREASURY_ADDRESS, SIGNER_ADDRESS, address(profileImpl));
 
         // deploy test badge
         ScrollBadgeSimple badge = new ScrollBadgeSimple(address(resolver), "uri");
@@ -59,6 +60,7 @@ contract DeployTestContracts is Script {
         // log addresses
         logAddress("EAS_REGISTRY_CONTRACT_ADDRESS", address(schemaRegistry));
         logAddress("EAS_MAIN_CONTRACT_ADDRESS", address(eas));
+        logAddress("SCROLL_BADGE_PROXY_ADMIN_ADDRESS", address(proxyAdmin));
         logAddress("SCROLL_BADGE_RESOLVER_CONTRACT_ADDRESS", address(resolver));
         logBytes32("SCROLL_BADGE_SCHEMA_UID", schema);
         logAddress("SIMPLE_BADGE_CONTRACT_ADDRESS", address(badge));

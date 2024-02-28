@@ -11,9 +11,10 @@ import {IEAS} from "@eas/contracts/IEAS.sol";
 import {ISchemaResolver} from "@eas/contracts/resolver/ISchemaResolver.sol";
 import {SchemaRegistry, ISchemaRegistry} from "@eas/contracts/SchemaRegistry.sol";
 
-import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import {ITransparentUpgradeableProxy, TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 import {IProfileRegistry} from "../src/interfaces/IProfileRegistry.sol";
+import {EmptyContract} from "../src/misc/EmptyContract.sol";
 import {Profile} from "../src/profile/Profile.sol";
 import {ProfileRegistry} from "../src/profile/ProfileRegistry.sol";
 import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
@@ -32,6 +33,9 @@ contract ProfileRegistryTest is Test {
     address private constant TREASURY_ADDRESS =
         0x1000000000000000000000000000000000000000;
 
+    address private constant PROXY_ADMIN_ADDRESS =
+        0x2000000000000000000000000000000000000000;
+
     ISchemaRegistry internal schemaRegistry;
     IEAS internal eas;
     ScrollBadgeResolver internal resolver;
@@ -46,20 +50,17 @@ contract ProfileRegistryTest is Test {
     function setUp() public {
         schemaRegistry = new SchemaRegistry();
         eas = new EAS(schemaRegistry);
-        resolver = new ScrollBadgeResolver(address(eas));
+        address profileRegistryProxy = address(new TransparentUpgradeableProxy(address(new EmptyContract()), PROXY_ADMIN_ADDRESS, ""));
+        resolver = new ScrollBadgeResolver(address(eas), profileRegistryProxy);
 
         signer = vm.createWallet(10001);
 
         profileImpl = new Profile(address(resolver));
         ProfileRegistry profileRegistryImpl = new ProfileRegistry();
-        ERC1967Proxy profileRegistryProxy = new ERC1967Proxy(
-            address(profileRegistryImpl),
-            abi.encodeCall(
-                ProfileRegistry.initialize,
-                (TREASURY_ADDRESS, signer.addr, address(profileImpl))
-            )
-        );
-        profileRegistry = ProfileRegistry(address(profileRegistryProxy));
+        vm.prank(PROXY_ADMIN_ADDRESS);
+        ITransparentUpgradeableProxy(profileRegistryProxy).upgradeTo(address(profileRegistryImpl));
+        profileRegistry = ProfileRegistry(profileRegistryProxy);
+        profileRegistry.initialize(TREASURY_ADDRESS, signer.addr, address(profileImpl));
         vm.warp(1000000);
     }
 

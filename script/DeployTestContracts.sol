@@ -7,6 +7,7 @@ import {console} from "forge-std/console.sol";
 import {SchemaRegistry, ISchemaRegistry} from "@eas/contracts/SchemaRegistry.sol";
 import {EAS} from "@eas/contracts/EAS.sol";
 
+import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 import {ITransparentUpgradeableProxy, TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 import {AttesterProxy} from "../src/AttesterProxy.sol";
@@ -30,10 +31,12 @@ contract DeployTestContracts is Script {
         SchemaRegistry schemaRegistry = new SchemaRegistry();
         EAS eas = new EAS(schemaRegistry);
 
+        // deploy proxy admin
+        ProxyAdmin proxyAdmin = new ProxyAdmin();
+
         // deploy profile registry placeholder
-        address proxyAdmin = vm.addr(DEPLOYER_PRIVATE_KEY);
         EmptyContract placeholder = new EmptyContract();
-        address profileRegistryProxy = address(new TransparentUpgradeableProxy(address(placeholder), proxyAdmin, ""));
+        address profileRegistryProxy = address(new TransparentUpgradeableProxy(address(placeholder), address(proxyAdmin), ""));
 
         // deploy Scroll badge resolver
         ScrollBadgeResolver resolver = new ScrollBadgeResolver(address(eas), profileRegistryProxy);
@@ -42,7 +45,7 @@ contract DeployTestContracts is Script {
         // deploy profile implementation and upgrade registry
         Profile profileImpl = new Profile(address(resolver));
         ProfileRegistry profileRegistryImpl = new ProfileRegistry();
-        ITransparentUpgradeableProxy(profileRegistryProxy).upgradeTo(address(profileRegistryImpl));
+        proxyAdmin.upgrade(ITransparentUpgradeableProxy(profileRegistryProxy), address(profileRegistryImpl));
         ProfileRegistry(profileRegistryProxy).initialize(TREASURY_ADDRESS, SIGNER_ADDRESS, address(profileImpl));
 
         // deploy test badge
@@ -57,6 +60,7 @@ contract DeployTestContracts is Script {
         // log addresses
         logAddress("EAS_REGISTRY_CONTRACT_ADDRESS", address(schemaRegistry));
         logAddress("EAS_MAIN_CONTRACT_ADDRESS", address(eas));
+        logAddress("SCROLL_BADGE_PROXY_ADMIN_ADDRESS", address(proxyAdmin));
         logAddress("SCROLL_BADGE_RESOLVER_CONTRACT_ADDRESS", address(resolver));
         logBytes32("SCROLL_BADGE_SCHEMA_UID", schema);
         logAddress("SIMPLE_BADGE_CONTRACT_ADDRESS", address(badge));

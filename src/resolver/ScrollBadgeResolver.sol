@@ -204,16 +204,9 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
             return;
         }
 
-        bytes32[] memory uids = new bytes32[](1);
-        uids[0] = attestation.uid;
-
         // note: at this point the attestation is already registered in EAS,
-        // so attaching it should succeed, unless the profile is full.
-
-        try IProfile(profile).attach(uids) {
-            // successful
-        } catch {
-            // failed, e.g. profile is full
-        }
+        // so attaching it should succeed, unless the profile is full, in
+        // which case the following call will be a no-op.
+        IProfile(profile).autoAttach(attestation.uid);
     }
 }

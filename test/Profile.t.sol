@@ -354,6 +354,18 @@ contract ProfileRegistryTest is Test {
         assertEq(profile.getAvatar(), "123");
     }
 
+    function testAutoAttach() external {
+        bytes32[] memory badges = profile.getAttachedBadges();
+        assertEq(badges.length, 0);
+
+        resolver.toggleBadgeAutoAttach(address(badge), true);
+
+        _attest(address(badge), "1", address(this));
+
+        badges = profile.getAttachedBadges();
+        assertEq(badges.length, 1);
+    }
+
     function _attachOne(bytes32 uid) private {
         bytes32[] memory uids = new bytes32[](1);
         uids[0] = uid;

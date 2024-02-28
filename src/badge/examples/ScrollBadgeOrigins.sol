@@ -2,13 +2,13 @@
 
 pragma solidity 0.8.19;
 
-import { Attestation } from "@eas/contracts/IEAS.sol";
+import {Attestation} from "@eas/contracts/IEAS.sol";
 
-import { IERC721Metadata } from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-import { ScrollBadgeCustomPayload } from "../extensions/ScrollBadgeCustomPayload.sol";
-import { ScrollBadge } from "../ScrollBadge.sol";
+import {ScrollBadgeCustomPayload} from "../extensions/ScrollBadgeCustomPayload.sol";
+import {ScrollBadge} from "../ScrollBadge.sol";
 
 string constant SCROLL_BADGE_ORIGINS_SCHEMA = "address originsTokenAddress, uint256 originsTokenId";
 
@@ -48,7 +48,7 @@ contract ScrollBadgeOrigins is ScrollBadgeCustomPayload {
     }
 
     /// @inheritdoc ScrollBadge
-    function badgeTokenURI(bytes32 uid) public override view returns (string memory) {
+    function badgeTokenURI(bytes32 uid) public view override returns (string memory) {
         Attestation memory attestation = getAndValidateBadge(uid);
         bytes memory payload = getPayload(attestation);
         (address originsTokenAddress, uint256 originsTokenId) = decodePayloadData(payload);

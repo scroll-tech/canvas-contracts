@@ -8,7 +8,13 @@ import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
 
 import {EAS} from "@eas/contracts/EAS.sol";
 import {EMPTY_UID, NO_EXPIRATION_TIME} from "@eas/contracts/Common.sol";
-import {IEAS, AttestationRequest, AttestationRequestData, RevocationRequest, RevocationRequestData} from "@eas/contracts/IEAS.sol";
+import {
+    IEAS,
+    AttestationRequest,
+    AttestationRequestData,
+    RevocationRequest,
+    RevocationRequestData
+} from "@eas/contracts/IEAS.sol";
 import {ISchemaResolver} from "@eas/contracts/resolver/ISchemaResolver.sol";
 import {SchemaRegistry, ISchemaRegistry} from "@eas/contracts/SchemaRegistry.sol";
 
@@ -24,9 +30,7 @@ import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
 contract TestBadge is ScrollBadge {
     constructor(address resolver_) ScrollBadge(resolver_) {}
 
-    function badgeTokenURI(
-        bytes32 /*uid*/
-    ) public pure override returns (string memory) {
+    function badgeTokenURI(bytes32 /*uid*/ ) public pure override returns (string memory) {
         return "";
     }
 }
@@ -51,8 +55,7 @@ contract ProfileRegistryTest is Test {
     error DuplicatedUsername();
     error TokenNotOwnedByUser(address token, uint256 tokenId);
 
-    address private constant TREASURY_ADDRESS =
-        0x1000000000000000000000000000000000000000;
+    address private constant TREASURY_ADDRESS = 0x1000000000000000000000000000000000000000;
 
     ISchemaRegistry private schemaRegistry;
     IEAS private eas;
@@ -82,9 +85,7 @@ contract ProfileRegistryTest is Test {
             )
         );
         profileRegistry = ProfileRegistry(address(profileRegistryProxy));
-        profile = Profile(
-            profileRegistry.mint{value: 0.001 ether}("xxxxx", new bytes(0))
-        );
+        profile = Profile(profileRegistry.mint{value: 0.001 ether}("xxxxx", new bytes(0)));
     }
 
     function testInitialize() external {
@@ -144,14 +145,8 @@ contract ProfileRegistryTest is Test {
         vm.stopPrank();
 
         // revert when invalid badge
-        bytes32 invalidUID = _attest(
-            address(badge),
-            "invalidUID",
-            address(badge)
-        );
-        vm.expectRevert(
-            abi.encodeWithSelector(InvalidBadge.selector, invalidUID)
-        );
+        bytes32 invalidUID = _attest(address(badge), "invalidUID", address(badge));
+        vm.expectRevert(abi.encodeWithSelector(InvalidBadge.selector, invalidUID));
         profile.attachOne(invalidUID);
 
         bytes32 uid0 = _attest(address(badge), "1", address(this));
@@ -185,11 +180,7 @@ contract ProfileRegistryTest is Test {
 
         // attach 46 badges
         for (uint256 i = 1; i <= 46; ++i) {
-            bytes32 uid = _attest(
-                address(badge),
-                abi.encodePacked(i),
-                address(this)
-            );
+            bytes32 uid = _attest(address(badge), abi.encodePacked(i), address(this));
             profile.attachOne(uid);
         }
         badges = profile.getAttachedBadges();
@@ -203,11 +194,7 @@ contract ProfileRegistryTest is Test {
         }
 
         // revert exceed maximum
-        bytes32 badgeCountReachedUID = _attest(
-            address(badge),
-            "BadgeCountReached",
-            address(this)
-        );
+        bytes32 badgeCountReachedUID = _attest(address(badge), "BadgeCountReached", address(this));
         vm.expectRevert(BadgeCountReached.selector);
         profile.attachOne(badgeCountReachedUID);
     }
@@ -221,11 +208,7 @@ contract ProfileRegistryTest is Test {
 
         // attach 10 badges
         for (uint256 i = 1; i <= 10; ++i) {
-            bytes32 uid = _attest(
-                address(badge),
-                abi.encodePacked(i),
-                address(this)
-            );
+            bytes32 uid = _attest(address(badge), abi.encodePacked(i), address(this));
             profile.attachOne(uid);
         }
 
@@ -277,11 +260,7 @@ contract ProfileRegistryTest is Test {
 
         // attach count badges
         for (uint256 i = 1; i <= count; ++i) {
-            bytes32 uid = _attest(
-                address(badge),
-                abi.encodePacked(i),
-                address(this)
-            );
+            bytes32 uid = _attest(address(badge), abi.encodePacked(i), address(this));
             profile.attachOne(uid);
         }
 
@@ -295,8 +274,9 @@ contract ProfileRegistryTest is Test {
             uint256 index = type(uint256).max;
             for (uint256 j = 0; j < count; ++j) {
                 if ((mask >> j) & 1 > 0) continue;
-                if (index == type(uint256).max || orders[j] < orders[index])
+                if (index == type(uint256).max || orders[j] < orders[index]) {
                     index = j;
+                }
             }
             orders[index] = i + 1;
             mask |= 1 << index;
@@ -353,13 +333,7 @@ contract ProfileRegistryTest is Test {
         profileRegistry.updateDefaultProfileAvatar("123");
 
         // revert, token not owned
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                TokenNotOwnedByUser.selector,
-                address(token),
-                2
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(TokenNotOwnedByUser.selector, address(token), 2));
         profile.changeAvatar(address(token), 2);
 
         // succeed
@@ -372,11 +346,7 @@ contract ProfileRegistryTest is Test {
         assertEq(profile.getAvatar(), "123");
     }
 
-    function _attest(
-        address _badge,
-        bytes memory payload,
-        address recipient
-    ) internal returns (bytes32) {
+    function _attest(address _badge, bytes memory payload, address recipient) internal returns (bytes32) {
         bytes memory attestationData = abi.encode(_badge, payload);
         AttestationRequestData memory _attData = AttestationRequestData({
             recipient: recipient,
@@ -386,22 +356,13 @@ contract ProfileRegistryTest is Test {
             data: attestationData,
             value: 0
         });
-        AttestationRequest memory _req = AttestationRequest({
-            schema: resolver.schema(),
-            data: _attData
-        });
+        AttestationRequest memory _req = AttestationRequest({schema: resolver.schema(), data: _attData});
         return eas.attest(_req);
     }
 
     function _revoke(bytes32 uid) internal {
-        RevocationRequestData memory _data = RevocationRequestData({
-            uid: uid,
-            value: 0
-        });
-        RevocationRequest memory _req = RevocationRequest({
-            schema: resolver.schema(),
-            data: _data
-        });
+        RevocationRequestData memory _data = RevocationRequestData({uid: uid, value: 0});
+        RevocationRequest memory _req = RevocationRequest({schema: resolver.schema(), data: _data});
         eas.revoke(_req);
     }
 }

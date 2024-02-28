@@ -11,7 +11,17 @@ import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 import {Create2} from "@openzeppelin/contracts/utils/Create2.sol";
 
 import {IProfileRegistry} from "../interfaces/IProfileRegistry.sol";
-import {CallerIsNotUserProfile, DuplicatedUsername, ExpiredSignature, ImplementationNotContract, InvalidReferrer, InvalidSignature, InvalidUsername, MsgValueMismatchWithMintFee, ProfileAlreadyMinted} from "../Errors.sol";
+import {
+    CallerIsNotUserProfile,
+    DuplicatedUsername,
+    ExpiredSignature,
+    ImplementationNotContract,
+    InvalidReferrer,
+    InvalidSignature,
+    InvalidUsername,
+    MsgValueMismatchWithMintFee,
+    ProfileAlreadyMinted
+} from "../Errors.sol";
 import {Profile} from "./Profile.sol";
 
 contract ClonableBeaconProxy is BeaconProxy {
@@ -21,9 +31,11 @@ contract ClonableBeaconProxy is BeaconProxy {
 /// @title ProfileRegistry
 /// @notice Profile registry keeps track of minted profiles and manages their implementation.
 contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IProfileRegistry {
-    /*************
+    /**
+     *
      * Constants *
-     *************/
+     *
+     */
 
     /// @notice The mint fee for each profile without referral.
     uint256 public constant MINT_FEE = 0.001 ether;
@@ -32,12 +44,13 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
     bytes32 public constant cloneableProxyHash = keccak256(type(ClonableBeaconProxy).creationCode);
 
     // solhint-disable-next-line var-name-mixedcase
-    bytes32 private constant _REFERRAL_TYPEHASH =
-        keccak256("Referral(address referrer,address owner,uint256 deadline)");
+    bytes32 private constant _REFERRAL_TYPEHASH = keccak256("Referral(address referrer,address owner,uint256 deadline)");
 
-    /*************
+    /**
+     *
      * Variables *
-     *************/
+     *
+     */
 
     /// @notice The address of fee treasury.
     address public treasury;
@@ -59,18 +72,22 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
     /// @dev It should follow the Metadata Standards by opensea: https://docs.opensea.io/docs/metadata-standards.
     string private defaultProfileAvatar;
 
-    /*************
+    /**
+     *
      * Modifiers *
-     *************/
+     *
+     */
 
     modifier onlyProfile() {
         if (!isProfileMinted[_msgSender()]) revert CallerIsNotUserProfile();
         _;
     }
 
-    /***************
+    /**
+     *
      * Constructor *
-     ***************/
+     *
+     */
 
     constructor() {
         _disableInitializers();
@@ -89,9 +106,11 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
         _updateProfileImplementation(profileImpl_);
     }
 
-    /*************************
+    /**
+     *
      * Public View Functions *
-     *************************/
+     *
+     */
 
     /// @inheritdoc IProfileRegistry
     function getProfile(address account) public view override returns (address) {
@@ -110,9 +129,11 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
         return defaultProfileAvatar;
     }
 
-    /*****************************
+    /**
+     *
      * Public Mutating Functions *
-     *****************************/
+     *
+     */
 
     /// @inheritdoc IProfileRegistry
     function mint(string calldata username, bytes memory referral) external payable override returns (address) {
@@ -164,9 +185,11 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
         emit UnregisterUsername(_msgSender(), username);
     }
 
-    /************************
+    /**
+     *
      * Restricted Functions *
-     ************************/
+     *
+     */
 
     /// @notice Blacklist a list of usernames by given username hashes.
     /// @param hashes The list of username hashes to blacklist.
@@ -203,9 +226,11 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
         _updateTreasury(newTreasury);
     }
 
-    /**********************
+    /**
+     *
      * Internal Functions *
-     **********************/
+     *
+     */
 
     /// @dev Internal function to mint a profile with given account address and username.
     /// @param account The address of user to mint profile.
@@ -264,10 +289,10 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
         if (length < 4 || length > 15) revert InvalidUsername();
         for (uint256 i = 0; i < length; i++) {
             if (
-                !((bytes1(0x61) <= s[i] && s[i] <= bytes1(0x7a)) ||
-                    (bytes1(0x41) <= s[i] && s[i] <= bytes1(0x5a)) ||
-                    (bytes1(0x30) <= s[i] && s[i] <= bytes1(0x39)) ||
-                    s[i] == bytes1(0x5f))
+                !(
+                    (bytes1(0x61) <= s[i] && s[i] <= bytes1(0x7a)) || (bytes1(0x41) <= s[i] && s[i] <= bytes1(0x5a))
+                        || (bytes1(0x30) <= s[i] && s[i] <= bytes1(0x39)) || s[i] == bytes1(0x5f)
+                )
             ) revert InvalidUsername();
         }
     }

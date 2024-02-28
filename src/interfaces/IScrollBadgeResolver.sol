@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.19;
 
-import { Attestation } from "@eas/contracts/IEAS.sol";
+import {Attestation} from "@eas/contracts/IEAS.sol";
 
 interface IScrollBadgeResolver {
     event IssueBadge(bytes32 indexed uid);

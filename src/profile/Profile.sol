@@ -18,16 +18,20 @@ import {BadgeCountReached, InvalidBadge, LengthMismatch, Unauthorized, TokenNotO
 contract Profile is Initializable {
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
-    /*************
+    /**
+     *
      * Constants *
-     *************/
+     *
+     */
 
     /// @notice The address of `ScrollBadgeResolver` contract.
     address public immutable resolver;
 
-    /***********
+    /**
+     *
      * Structs *
-     ***********/
+     *
+     */
 
     /// @dev The struct holding profile avatar information.
     /// @param token The address of ERC721 token.
@@ -37,9 +41,11 @@ contract Profile is Initializable {
         uint256 tokenId;
     }
 
-    /*************
+    /**
+     *
      * Variables *
-     *************/
+     *
+     */
 
     /// @notice The address of profile registry.
     address public registry;
@@ -68,9 +74,11 @@ contract Profile is Initializable {
     /// see here for more details: https://www.cnblogs.com/sinkinben/p/15847869.html
     uint256 private badgeOrderEncoding;
 
-    /*************
+    /**
+     *
      * Modifiers *
-     *************/
+     *
+     */
 
     modifier onlyOwner() {
         if (msg.sender != owner) {
@@ -79,9 +87,11 @@ contract Profile is Initializable {
         _;
     }
 
-    /***************
+    /**
+     *
      * Constructor *
-     ***************/
+     *
+     */
 
     /// @param resolver_ The address of `ScrollBadgeResolver` contract.
     constructor(address resolver_) {
@@ -100,9 +110,11 @@ contract Profile is Initializable {
         IProfileRegistry(msg.sender).registerUsername(username_);
     }
 
-    /*************************
+    /**
+     *
      * Public View Functions *
-     *************************/
+     *
+     */
 
     /// @notice Return the attestation information for the given badge uid.
     /// @param uid The badge uid to query.
@@ -173,9 +185,11 @@ contract Profile is Initializable {
         return IProfileRegistry(registry).getDefaultProfileAvatar();
     }
 
-    /*****************************
+    /**
+     *
      * Public Mutating Functions *
-     *****************************/
+     *
+     */
 
     /// @notice Attach a list of badges to this profile.
     /// @param _uids The list of badge uids to attach.
@@ -230,9 +244,11 @@ contract Profile is Initializable {
         avatar = Avatar(token, tokenId);
     }
 
-    /**********************
+    /**
+     *
      * Internal Functions *
-     **********************/
+     *
+     */
 
     /// @dev Internal function to attach one batch to this profile.
     /// @param uid The badge uid to attach.

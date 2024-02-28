@@ -2,12 +2,17 @@
 
 pragma solidity 0.8.19;
 
-import { EIP712Proxy, AttestationRequest, RevocationRequest, DelegatedProxyAttestationRequest } from "@eas/contracts/eip712/proxy/EIP712Proxy.sol";
+import {
+    EIP712Proxy,
+    AttestationRequest,
+    RevocationRequest,
+    DelegatedProxyAttestationRequest
+} from "@eas/contracts/eip712/proxy/EIP712Proxy.sol";
 
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-import { AccessDenied } from "@eas/contracts/Common.sol";
-import { IEAS, Attestation } from "@eas/contracts/IEAS.sol";
+import {AccessDenied} from "@eas/contracts/Common.sol";
+import {IEAS, Attestation} from "@eas/contracts/IEAS.sol";
 
 /// @title AttesterProxy
 /// @notice An EIP712 proxy that allows only specific addresses to attest.
@@ -17,7 +22,7 @@ contract AttesterProxy is EIP712Proxy, Ownable {
     IEAS private immutable _eas;
 
     // Authorized badge attester accounts.
-    mapping (address => bool) public isAttester;
+    mapping(address => bool) public isAttester;
 
     /// @dev Creates a new PermissionedEIP712Proxy instance.
     /// @param eas The address of the global EAS contract.
@@ -28,12 +33,17 @@ contract AttesterProxy is EIP712Proxy, Ownable {
     /// @notice Enables or disables a given attester.
     /// @param attester The attester address.
     /// @param enable True if enable, false if disable.
-    function toggleAttester(address attester, bool enable) external onlyOwner() {
+    function toggleAttester(address attester, bool enable) external onlyOwner {
         isAttester[attester] = enable;
     }
 
     /// @inheritdoc EIP712Proxy
-    function attestByDelegation(DelegatedProxyAttestationRequest calldata delegatedRequest) public payable override returns (bytes32) {
+    function attestByDelegation(DelegatedProxyAttestationRequest calldata delegatedRequest)
+        public
+        payable
+        override
+        returns (bytes32)
+    {
         // Ensure that only the owner is allowed to delegate attestations.
         _verifyAttester(delegatedRequest.attester);
 

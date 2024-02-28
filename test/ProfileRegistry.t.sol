@@ -29,8 +29,7 @@ contract ProfileRegistryTest is Test {
     error ImplementationNotContract();
     error ProfileAlreadyMinted();
 
-    address private constant TREASURY_ADDRESS =
-        0x1000000000000000000000000000000000000000;
+    address private constant TREASURY_ADDRESS = 0x1000000000000000000000000000000000000000;
 
     ISchemaRegistry internal schemaRegistry;
     IEAS internal eas;
@@ -48,7 +47,7 @@ contract ProfileRegistryTest is Test {
         eas = new EAS(schemaRegistry);
         resolver = new ScrollBadgeResolver(address(eas));
 
-        signer = vm.createWallet(10001);
+        signer = vm.createWallet(10_001);
 
         profileImpl = new Profile(address(resolver));
         ProfileRegistry profileRegistryImpl = new ProfileRegistry();
@@ -60,7 +59,7 @@ contract ProfileRegistryTest is Test {
             )
         );
         profileRegistry = ProfileRegistry(address(profileRegistryProxy));
-        vm.warp(1000000);
+        vm.warp(1_000_000);
     }
 
     function testInitialize() external {
@@ -77,45 +76,24 @@ contract ProfileRegistryTest is Test {
         profileRegistry.mint{value: 0.001 ether}("x", new bytes(0));
         // should revert when invalid username: length > 15
         vm.expectRevert(InvalidUsername.selector);
-        profileRegistry.mint{value: 0.001 ether}(
-            "xxxxxyyyyyzzzzza",
-            new bytes(0)
-        );
+        profileRegistry.mint{value: 0.001 ether}("xxxxxyyyyyzzzzza", new bytes(0));
         // should revert when invalid username: has characters other than a-z, A-Z, 0-9, _
         vm.expectRevert(InvalidUsername.selector);
         profileRegistry.mint{value: 0.001 ether}("xxxxx.xxxxx", new bytes(0));
 
         // should revert when ExpiredSignature
         uint256 deadline = block.timestamp - 1;
-        bytes memory signature = _signReferralData(
-            signer.privateKey,
-            address(this),
-            address(this),
-            deadline
-        );
+        bytes memory signature = _signReferralData(signer.privateKey, address(this), address(this), deadline);
         vm.expectRevert(ExpiredSignature.selector);
-        profileRegistry.mint(
-            "xxxxx",
-            abi.encode(address(this), deadline, signature)
-        );
+        profileRegistry.mint("xxxxx", abi.encode(address(this), deadline, signature));
 
         // should mint without referral and fee goes to treasury
         uint256 balanceBefore = TREASURY_ADDRESS.balance;
-        assertEq(
-            profileRegistry.isProfileMinted(
-                profileRegistry.getProfile(address(this))
-            ),
-            false
-        );
+        assertEq(profileRegistry.isProfileMinted(profileRegistry.getProfile(address(this))), false);
         assertEq(profileRegistry.isUsernameUsed("xxxxx"), false);
         profileRegistry.mint{value: 0.001 ether}("xxxxx", new bytes(0));
         assertEq(profileRegistry.isUsernameUsed("xxxxx"), true);
-        assertEq(
-            profileRegistry.isProfileMinted(
-                profileRegistry.getProfile(address(this))
-            ),
-            true
-        );
+        assertEq(profileRegistry.isProfileMinted(profileRegistry.getProfile(address(this))), true);
         uint256 balanceAfter = TREASURY_ADDRESS.balance;
         assertEq(balanceAfter - balanceBefore, 0.001 ether);
 
@@ -125,47 +103,23 @@ contract ProfileRegistryTest is Test {
 
         // should revert when InvalidReferrer
         deadline = block.timestamp + 1;
-        signature = _signReferralData(
-            signer.privateKey + 1,
-            address(1),
-            address(this),
-            deadline
-        );
+        signature = _signReferralData(signer.privateKey + 1, address(1), address(this), deadline);
         vm.expectRevert(InvalidReferrer.selector);
-        profileRegistry.mint(
-            "xxxxx",
-            abi.encode(address(1), deadline, signature)
-        );
+        profileRegistry.mint("xxxxx", abi.encode(address(1), deadline, signature));
 
         // should revert when InvalidSignature
         deadline = block.timestamp + 1;
-        signature = _signReferralData(
-            signer.privateKey + 1,
-            address(this),
-            address(this),
-            deadline
-        );
+        signature = _signReferralData(signer.privateKey + 1, address(this), address(this), deadline);
         vm.expectRevert(InvalidSignature.selector);
-        profileRegistry.mint(
-            "xxxxx",
-            abi.encode(address(this), deadline, signature)
-        );
+        profileRegistry.mint("xxxxx", abi.encode(address(this), deadline, signature));
 
         // should mint with referral and fee goes to referral
         deadline = block.timestamp + 1;
-        signature = _signReferralData(
-            signer.privateKey,
-            address(this),
-            address(2),
-            deadline
-        );
+        signature = _signReferralData(signer.privateKey, address(this), address(2), deadline);
         payable(address(2)).transfer(1 ether);
         vm.prank(address(2));
         balanceBefore = address(this).balance;
-        profileRegistry.mint{value: 0.0005 ether}(
-            "yyyyy",
-            abi.encode(address(this), deadline, signature)
-        );
+        profileRegistry.mint{value: 0.0005 ether}("yyyyy", abi.encode(address(this), deadline, signature));
         balanceAfter = address(this).balance;
         assertEq(balanceAfter - balanceBefore, 0.0005 ether);
         vm.stopPrank();
@@ -249,33 +203,19 @@ contract ProfileRegistryTest is Test {
         assertEq(profileRegistry.treasury(), newTreasury);
     }
 
-    function _signReferralData(
-        uint256 privateKey,
-        address referrer,
-        address owner,
-        uint256 deadline
-    ) private view returns (bytes memory) {
-        bytes32 TYPE_HASH = keccak256(
-            "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-        );
+    function _signReferralData(uint256 privateKey, address referrer, address owner, uint256 deadline)
+        private
+        view
+        returns (bytes memory)
+    {
+        bytes32 TYPE_HASH =
+            keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
         bytes32 DOMAIN_SEPARATOR = keccak256(
-            abi.encode(
-                TYPE_HASH,
-                keccak256("ProfileRegistry"),
-                keccak256("1"),
-                block.chainid,
-                address(profileRegistry)
-            )
+            abi.encode(TYPE_HASH, keccak256("ProfileRegistry"), keccak256("1"), block.chainid, address(profileRegistry))
         );
-        bytes32 REFERRAL_TYPEHASH = keccak256(
-            "Referral(address referrer,address owner,uint256 deadline)"
-        );
-        bytes32 structHash = keccak256(
-            abi.encode(REFERRAL_TYPEHASH, referrer, owner, deadline)
-        );
-        bytes32 digest = keccak256(
-            abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash)
-        );
+        bytes32 REFERRAL_TYPEHASH = keccak256("Referral(address referrer,address owner,uint256 deadline)");
+        bytes32 structHash = keccak256(abi.encode(REFERRAL_TYPEHASH, referrer, owner, deadline));
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(privateKey, digest);
         return abi.encodePacked(r, s, v);
     }

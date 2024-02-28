@@ -254,6 +254,13 @@ contract ProfileRegistryTest is Test {
         assertEq(orders[2], 2);
         assertEq(orders[3], 5);
         assertEq(orders[4], 1);
+
+        // detach all
+        profile.detach(badges);
+        badges = profile.getAttachedBadges();
+        assertEq(badges.length, 0);
+        orders = profile.getBadgeOrder();
+        assertEq(orders.length, 0);
     }
 
     function testReorderBadges(uint256 count, uint256 encoding) external {

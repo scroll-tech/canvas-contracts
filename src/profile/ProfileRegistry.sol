@@ -123,7 +123,6 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
             bytes memory signature;
             (receiver, deadline, signature) = abi.decode(referral, (address, uint256, bytes));
             if (deadline < block.timestamp) revert ExpiredSignature();
-
             if (!isProfileMinted[getProfile(receiver)]) {
                 revert InvalidReferrer();
             }

@@ -7,13 +7,14 @@ import {console} from "forge-std/console.sol";
 import {SchemaRegistry, ISchemaRegistry} from "@eas/contracts/SchemaRegistry.sol";
 import {EAS} from "@eas/contracts/EAS.sol";
 
-import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import {ITransparentUpgradeableProxy, TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 import {AttesterProxy} from "../src/AttesterProxy.sol";
 import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
 import {ScrollBadgeSimple} from "../src/badge/examples/ScrollBadgeSimple.sol";
 import {ProfileRegistry} from "../src/profile/ProfileRegistry.sol";
 import {Profile} from "../src/profile/Profile.sol";
+import {EmptyContract} from "../src/misc/EmptyContract.sol";
 
 contract DeployTestContracts is Script {
     uint256 DEPLOYER_PRIVATE_KEY = vm.envUint("DEPLOYER_PRIVATE_KEY");
@@ -28,9 +29,23 @@ contract DeployTestContracts is Script {
         SchemaRegistry schemaRegistry = new SchemaRegistry();
         EAS eas = new EAS(schemaRegistry);
 
+        // deploy profile registry placeholder
+        address proxyAdmin = vm.addr(DEPLOYER_PRIVATE_KEY);
+        EmptyContract placeholder = new EmptyContract();
+        TransparentUpgradeableProxy profileRegistryProxy = new TransparentUpgradeableProxy(address(placeholder), proxyAdmin, "");
+
         // deploy Scroll badge resolver
-        ScrollBadgeResolver resolver = new ScrollBadgeResolver(address(eas));
+        ScrollBadgeResolver resolver = new ScrollBadgeResolver(address(eas), address(profileRegistryProxy));
         bytes32 schema = resolver.schema();
+
+        // deploy profile implementation and upgrade registry
+        Profile profileImpl = new Profile(address(resolver));
+        ProfileRegistry profileRegistryImpl = new ProfileRegistry();
+
+        ITransparentUpgradeableProxy(address(profileRegistryProxy)).upgradeToAndCall(
+            address(profileRegistryImpl),
+            abi.encodeCall(ProfileRegistry.initialize, (TREASURY_ADDRESS, SIGNER_ADDRESS, address(profileImpl)))
+        );
 
         // deploy test badge
         ScrollBadgeSimple badge = new ScrollBadgeSimple(address(resolver), "uri");
@@ -40,14 +55,6 @@ contract DeployTestContracts is Script {
         resolver.toggleBadge(address(badge), true);
         badge.toggleAttester(address(proxy), true);
         proxy.toggleAttester(ATTESTER_ADDRESS, true);
-
-        // deploy profile implementation and registry
-        Profile profileImpl = new Profile(address(resolver));
-        ProfileRegistry profileRegistryImpl = new ProfileRegistry();
-        ERC1967Proxy profileRegistryProxy = new ERC1967Proxy(
-            address(profileRegistryImpl),
-            abi.encodeCall(ProfileRegistry.initialize, (TREASURY_ADDRESS, SIGNER_ADDRESS, address(profileImpl)))
-        );
 
         // log addresses
         logAddress("EAS_REGISTRY_CONTRACT_ADDRESS", address(schemaRegistry));

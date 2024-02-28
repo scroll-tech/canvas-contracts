@@ -10,12 +10,13 @@ import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/I
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
+import {IProfile} from "../interfaces/IProfile.sol";
 import {IProfileRegistry} from "../interfaces/IProfileRegistry.sol";
 import {IScrollBadgeResolver} from "../interfaces/IScrollBadgeResolver.sol";
 import {MAX_ATTACHED_BADGE_NUM} from "../Common.sol";
 import {BadgeCountReached, InvalidBadge, LengthMismatch, Unauthorized, TokenNotOwnedByUser} from "../Errors.sol";
 
-contract Profile is Initializable {
+contract Profile is IProfile, Initializable {
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
     /*************
@@ -74,6 +75,13 @@ contract Profile is Initializable {
 
     modifier onlyOwner() {
         if (msg.sender != owner) {
+            revert Unauthorized();
+        }
+        _;
+    }
+
+    modifier onlyOwnerOrResolver() {
+        if (msg.sender != owner && msg.sender != resolver) {
             revert Unauthorized();
         }
         _;
@@ -177,18 +185,11 @@ contract Profile is Initializable {
      * Public Mutating Functions *
      *****************************/
 
-    /// @notice Attach a list of badges to this profile.
-    /// @param _uids The list of badge uids to attach.
-    function attach(bytes32[] memory _uids) external onlyOwner {
+    /// @inheritdoc IProfile
+    function attach(bytes32[] memory _uids) external onlyOwnerOrResolver {
         for (uint256 i = 0; i < _uids.length; i++) {
             _attachOne(_uids[i]);
         }
-    }
-
-    /// @notice Attach one badge to this profile.
-    /// @param _uid The badge uid to attach.
-    function attachOne(bytes32 _uid) external onlyOwner {
-        _attachOne(_uid);
     }
 
     /// @notice Detach a list of badges to this profile.

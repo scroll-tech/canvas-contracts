@@ -2,17 +2,17 @@
 
 pragma solidity 0.8.19;
 
-import { Attestation } from "@eas/contracts/IEAS.sol";
+import {Attestation} from "@eas/contracts/IEAS.sol";
 
-import { ScrollBadge } from "../ScrollBadge.sol";
-import { decodeBadgeData }from "../../Common.sol";
-import { InvalidPayload }from "../../Errors.sol";
+import {ScrollBadge} from "../ScrollBadge.sol";
+import {decodeBadgeData} from "../../Common.sol";
+import {InvalidPayload} from "../../Errors.sol";
 
 /// @title ScrollBadgeCustomPayload
 /// @notice This contract adds custom payload to ScrollBadge.
 abstract contract ScrollBadgeCustomPayload is ScrollBadge {
     /// @inheritdoc ScrollBadge
-    function onIssueBadge(Attestation calldata attestation) internal override virtual returns (bool) {
+    function onIssueBadge(Attestation calldata attestation) internal virtual override returns (bool) {
         if (!super.onIssueBadge(attestation)) {
             return false;
         }
@@ -27,7 +27,7 @@ abstract contract ScrollBadgeCustomPayload is ScrollBadge {
     }
 
     /// @inheritdoc ScrollBadge
-    function onRevokeBadge(Attestation calldata attestation) internal override virtual returns (bool) {
+    function onRevokeBadge(Attestation calldata attestation) internal virtual override returns (bool) {
         return super.onRevokeBadge(attestation);
     }
 

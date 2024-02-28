@@ -2,29 +2,65 @@
 
 pragma solidity 0.8.19;
 
-import { Attestation, IEAS } from "@eas/contracts/IEAS.sol";
-import { EMPTY_UID, NO_EXPIRATION_TIME } from "@eas/contracts/Common.sol";
-import { SchemaResolver, ISchemaResolver } from "@eas/contracts/resolver/SchemaResolver.sol";
+import {Attestation, IEAS} from "@eas/contracts/IEAS.sol";
+import {EMPTY_UID, NO_EXPIRATION_TIME} from "@eas/contracts/Common.sol";
+import {SchemaResolver, ISchemaResolver} from "@eas/contracts/resolver/SchemaResolver.sol";
 
-import { Address } from "@openzeppelin/contracts/utils/Address.sol";
+import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
-import { IScrollBadge } from "../interfaces/IScrollBadge.sol";
-import { IScrollBadgeResolver } from "../interfaces/IScrollBadgeResolver.sol";
-import { ResolverPaymentsDisabled, AttestationSchemaMismatch, ExpirationTimeDisabled, BadgeNotFound, BadgeNotAllowed, AttestationNotFound, AttestationExpired, AttestationRevoked } from "../Errors.sol";
-import { SCROLL_BADGE_SCHEMA, decodeBadgeData } from "../Common.sol";
-import { ScrollBadgeResolverWhitelist } from "./ScrollBadgeResolverWhitelist.sol";
+import {IScrollBadge} from "../interfaces/IScrollBadge.sol";
+import {IScrollBadgeResolver} from "../interfaces/IScrollBadgeResolver.sol";
+import {IProfile} from "../interfaces/IProfile.sol";
+import {IProfileRegistry} from "../interfaces/IProfileRegistry.sol";
+import {
+    ResolverPaymentsDisabled,
+    AttestationSchemaMismatch,
+    ExpirationTimeDisabled,
+    BadgeNotFound,
+    BadgeNotAllowed,
+    AttestationNotFound,
+    AttestationExpired,
+    AttestationRevoked
+} from "../Errors.sol";
+import {SCROLL_BADGE_SCHEMA, decodeBadgeData} from "../Common.sol";
+import {ScrollBadgeResolverWhitelist} from "./ScrollBadgeResolverWhitelist.sol";
 
 /// @title ScrollBadgeResolver
 /// @notice This resolver contract receives callbacks every time a Scroll badge
 //          attestation is created or revoked. It executes some basic checks and
 //          then delegates the logic to the specific badge implementation.
 contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadgeResolverWhitelist {
+    /**
+     *
+     * Constants *
+     *
+     */
+
     /// @inheritdoc IScrollBadgeResolver
     bytes32 public immutable schema;
 
+    /// @inheritdoc IScrollBadgeResolver
+    address public immutable registry;
+
+    /**
+     *
+     * Variables *
+     *
+     */
+
+    /// @inheritdoc IScrollBadgeResolver
+    mapping(address => bool) public isBadgeAutoAttach;
+
+    /**
+     *
+     * Constructor *
+     *
+     */
+
     /// @dev Creates a new ScrollBadgeResolver instance.
     /// @param eas_ The address of the global EAS contract.
-    constructor(address eas_) SchemaResolver(IEAS(eas_)) {
+    /// @param registry_ The address of the profile registry contract.
+    constructor(address eas_, address registry_) SchemaResolver(IEAS(eas_)) {
         // register Scroll badge schema,
         // we do this here to ensure that the resolver is correctly configured
         schema = IEAS(eas_).getSchemaRegistry().register(
@@ -32,10 +68,22 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
             ISchemaResolver(address(this)), // resolver
             true // revocable
         );
+
+        registry = registry_;
     }
 
+    /**
+     *
+     * Schema Resolver Functions *
+     *
+     */
+
     /// @inheritdoc SchemaResolver
-    function onAttest(Attestation calldata attestation, uint256 value) internal override(SchemaResolver) returns (bool) {
+    function onAttest(Attestation calldata attestation, uint256 value)
+        internal
+        override (SchemaResolver)
+        returns (bool)
+    {
         // do not accept resolver tips
         if (value != 0) {
             revert ResolverPaymentsDisabled();
@@ -64,12 +112,21 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
             return false;
         }
 
+        // auto-attach whitelisted badges
+        if (isBadgeAutoAttach[badge]) {
+            _autoAttach(attestation);
+        }
+
         emit IssueBadge(attestation.uid);
         return true;
     }
 
     /// @inheritdoc SchemaResolver
-    function onRevoke(Attestation calldata attestation, uint256 value) internal override(SchemaResolver) returns (bool) {
+    function onRevoke(Attestation calldata attestation, uint256 value)
+        internal
+        override (SchemaResolver)
+        returns (bool)
+    {
         // do not accept resolver tips
         if (value != 0) {
             revert ResolverPaymentsDisabled();
@@ -85,6 +142,12 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
         emit RevokeBadge(attestation.uid);
         return true;
     }
+
+    /**
+     *
+     * Public View Functions *
+     *
+     */
 
     /// @inheritdoc IScrollBadgeResolver
     function eas() external view returns (address) {
@@ -112,5 +175,38 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
         }
 
         return attestation;
+    }
+
+    /**
+     *
+     * Restricted Functions *
+     *
+     */
+
+    /// @notice Enable or disable auto-attach for a badge.
+    /// @param badge The address of the badge contract.
+    /// @param enable Enable auto-attach if true, disable if false.
+    function toggleBadgeAutoAttach(address badge, bool enable) external onlyOwner {
+        isBadgeAutoAttach[badge] = enable;
+        emit UpdateAutoAttachWhitelist(badge, enable);
+    }
+
+    /**
+     *
+     * Internal Functions *
+     *
+     */
+    function _autoAttach(Attestation calldata attestation) internal {
+        IProfileRegistry _registry = IProfileRegistry(registry);
+        address profile = _registry.getProfile(attestation.recipient);
+
+        if (!_registry.isProfileMinted(profile)) {
+            return;
+        }
+
+        // note: at this point the attestation is already registered in EAS,
+        // so attaching it should succeed, unless the profile is full, in
+        // which case the following call will be a no-op.
+        IProfile(profile).autoAttach(attestation.uid);
     }
 }

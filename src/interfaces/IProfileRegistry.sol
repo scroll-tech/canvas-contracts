@@ -3,9 +3,11 @@
 pragma solidity 0.8.19;
 
 interface IProfileRegistry {
-    /**********
+    /**
+     *
      * Events *
-     **********/
+     *
+     */
 
     /// @notice Emitted when a new profile is minted.
     /// @param account The address of account who minted the profile.
@@ -42,9 +44,11 @@ interface IProfileRegistry {
     /// @param newTreasury The address of current treasury.
     event UpdateTreasury(address indexed oldTreasury, address indexed newTreasury);
 
-    /*************************
+    /**
+     *
      * Public View Functions *
-     *************************/
+     *
+     */
 
     /// @notice Check whether the profile is minted in this contract.
     /// @param profile The address of profile to check.
@@ -61,9 +65,11 @@ interface IProfileRegistry {
     /// @notice Return the tokenURI for default profile avatar.
     function getDefaultProfileAvatar() external view returns (string memory);
 
-    /*****************************
+    /**
+     *
      * Public Mutating Functions *
-     *****************************/
+     *
+     */
 
     /// @notice Mint a profile for caller with given username.
     /// @param username The username of the profile.

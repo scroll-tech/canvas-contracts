@@ -2,11 +2,11 @@
 
 pragma solidity 0.8.19;
 
-import { Attestation } from "@eas/contracts/IEAS.sol";
+import {Attestation} from "@eas/contracts/IEAS.sol";
 
-import { ScrollBadgeAccessControl } from "../extensions/ScrollBadgeAccessControl.sol";
-import { ScrollBadgeSingleton } from "../extensions/ScrollBadgeSingleton.sol";
-import { ScrollBadge } from "../ScrollBadge.sol";
+import {ScrollBadgeAccessControl} from "../extensions/ScrollBadgeAccessControl.sol";
+import {ScrollBadgeSingleton} from "../extensions/ScrollBadgeSingleton.sol";
+import {ScrollBadge} from "../ScrollBadge.sol";
 
 /// @title ScrollBadgeSimple
 /// @notice A simple badge that has the same static metadata for each token.
@@ -18,17 +18,25 @@ contract ScrollBadgeSimple is ScrollBadgeAccessControl, ScrollBadgeSingleton {
     }
 
     /// @inheritdoc ScrollBadge
-    function onIssueBadge(Attestation calldata attestation) internal override(ScrollBadgeAccessControl, ScrollBadgeSingleton) returns (bool) {
+    function onIssueBadge(Attestation calldata attestation)
+        internal
+        override (ScrollBadgeAccessControl, ScrollBadgeSingleton)
+        returns (bool)
+    {
         return super.onIssueBadge(attestation);
     }
 
     /// @inheritdoc ScrollBadge
-    function onRevokeBadge(Attestation calldata attestation) internal override(ScrollBadge, ScrollBadgeAccessControl) returns (bool) {
+    function onRevokeBadge(Attestation calldata attestation)
+        internal
+        override (ScrollBadge, ScrollBadgeAccessControl)
+        returns (bool)
+    {
         return super.onIssueBadge(attestation);
     }
 
     /// @inheritdoc ScrollBadge
-    function badgeTokenURI(bytes32 /*uid*/) public override view returns (string memory) {
+    function badgeTokenURI(bytes32 /*uid*/ ) public view override returns (string memory) {
         return sharedTokenURI;
     }
 }

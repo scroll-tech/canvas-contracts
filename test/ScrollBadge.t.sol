@@ -2,17 +2,17 @@
 
 pragma solidity 0.8.19;
 
-import { Attestation } from "@eas/contracts/IEAS.sol";
+import {Attestation} from "@eas/contracts/IEAS.sol";
 
-import { ScrollBadgeTestBase } from "./ScrollBadgeTestBase.sol";
+import {ScrollBadgeTestBase} from "./ScrollBadgeTestBase.sol";
 
-import { ScrollBadge } from "../src/badge/ScrollBadge.sol";
-import { IScrollBadge } from "../src/interfaces/IScrollBadge.sol";
+import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
+import {IScrollBadge} from "../src/interfaces/IScrollBadge.sol";
 
 contract TestContract is ScrollBadge {
     constructor(address resolver_) ScrollBadge(resolver_) {}
 
-    function badgeTokenURI(bytes32 /*uid*/) public override pure returns (string memory) {
+    function badgeTokenURI(bytes32 /*uid*/ ) public pure override returns (string memory) {
         return "";
     }
 }

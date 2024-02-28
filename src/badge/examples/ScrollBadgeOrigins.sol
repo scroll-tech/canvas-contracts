@@ -2,15 +2,15 @@
 
 pragma solidity 0.8.19;
 
-import { Attestation } from "@eas/contracts/IEAS.sol";
+import {Attestation} from "@eas/contracts/IEAS.sol";
 
-import { IERC721Metadata } from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-import { ScrollBadgeCustomPayload } from "../extensions/ScrollBadgeCustomPayload.sol";
-import { ScrollBadgeSingleton } from "../extensions/ScrollBadgeSingleton.sol";
-import { ScrollBadge } from "../ScrollBadge.sol";
-import { Unauthorized } from "../../Errors.sol";
+import {ScrollBadgeCustomPayload} from "../extensions/ScrollBadgeCustomPayload.sol";
+import {ScrollBadgeSingleton} from "../extensions/ScrollBadgeSingleton.sol";
+import {ScrollBadge} from "../ScrollBadge.sol";
+import {Unauthorized} from "../../Errors.sol";
 
 string constant SCROLL_BADGE_ORIGINS_SCHEMA = "address originsTokenAddress, uint256 originsTokenId";
 
@@ -28,7 +28,11 @@ contract ScrollBadgeOrigins is ScrollBadgeCustomPayload, ScrollBadgeSingleton {
     }
 
     /// @inheritdoc ScrollBadge
-    function onIssueBadge(Attestation calldata attestation) internal override(ScrollBadgeCustomPayload, ScrollBadgeSingleton) returns (bool) {
+    function onIssueBadge(Attestation calldata attestation)
+        internal
+        override (ScrollBadgeCustomPayload, ScrollBadgeSingleton)
+        returns (bool)
+    {
         if (!super.onIssueBadge(attestation)) {
             return false;
         }
@@ -50,12 +54,16 @@ contract ScrollBadgeOrigins is ScrollBadgeCustomPayload, ScrollBadgeSingleton {
     }
 
     /// @inheritdoc ScrollBadge
-    function onRevokeBadge(Attestation calldata attestation) internal override(ScrollBadge, ScrollBadgeCustomPayload) returns (bool) {
+    function onRevokeBadge(Attestation calldata attestation)
+        internal
+        override (ScrollBadge, ScrollBadgeCustomPayload)
+        returns (bool)
+    {
         return super.onRevokeBadge(attestation);
     }
 
     /// @inheritdoc ScrollBadge
-    function badgeTokenURI(bytes32 uid) public override view returns (string memory) {
+    function badgeTokenURI(bytes32 uid) public view override returns (string memory) {
         Attestation memory attestation = getAndValidateBadge(uid);
         bytes memory payload = getPayload(attestation);
         (address originsTokenAddress, uint256 originsTokenId) = decodePayloadData(payload);

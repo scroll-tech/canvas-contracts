@@ -4,12 +4,18 @@ pragma solidity 0.8.19;
 
 import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
 
-import { EAS } from "@eas/contracts/EAS.sol";
-import { EMPTY_UID, NO_EXPIRATION_TIME } from "@eas/contracts/Common.sol";
-import { IEAS, AttestationRequest, AttestationRequestData, RevocationRequest, RevocationRequestData } from "@eas/contracts/IEAS.sol";
-import { ISchemaResolver } from "@eas/contracts/resolver/ISchemaResolver.sol";
-import { SchemaRegistry, ISchemaRegistry } from "@eas/contracts/SchemaRegistry.sol";
-import { ScrollBadgeResolver } from "../src/resolver/ScrollBadgeResolver.sol";
+import {EAS} from "@eas/contracts/EAS.sol";
+import {EMPTY_UID, NO_EXPIRATION_TIME} from "@eas/contracts/Common.sol";
+import {
+    IEAS,
+    AttestationRequest,
+    AttestationRequestData,
+    RevocationRequest,
+    RevocationRequestData
+} from "@eas/contracts/IEAS.sol";
+import {ISchemaResolver} from "@eas/contracts/resolver/ISchemaResolver.sol";
+import {SchemaRegistry, ISchemaRegistry} from "@eas/contracts/SchemaRegistry.sol";
+import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
 
 contract ScrollBadgeTestBase is DSTestPlus {
     ISchemaRegistry internal registry;
@@ -27,7 +33,8 @@ contract ScrollBadgeTestBase is DSTestPlus {
         eas = new EAS(registry);
 
         // Scroll components
-        resolver = new ScrollBadgeResolver(address(eas));
+        address profileRegistry = address(0);
+        resolver = new ScrollBadgeResolver(address(eas), profileRegistry);
         schema = resolver.schema();
     }
 
@@ -43,24 +50,15 @@ contract ScrollBadgeTestBase is DSTestPlus {
             value: 0
         });
 
-        AttestationRequest memory _req = AttestationRequest({
-            schema: schema,
-            data: _attData
-        });
+        AttestationRequest memory _req = AttestationRequest({schema: schema, data: _attData});
 
         return eas.attest(_req);
     }
 
     function _revoke(bytes32 uid) internal {
-        RevocationRequestData memory _data = RevocationRequestData({
-            uid: uid,
-            value: 0
-        });
+        RevocationRequestData memory _data = RevocationRequestData({uid: uid, value: 0});
 
-        RevocationRequest memory _req = RevocationRequest({
-            schema: schema,
-            data: _data
-        });
+        RevocationRequest memory _req = RevocationRequest({schema: schema, data: _data});
 
         eas.revoke(_req);
     }

@@ -10,24 +10,29 @@ import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/I
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
+import {IProfile} from "../interfaces/IProfile.sol";
 import {IProfileRegistry} from "../interfaces/IProfileRegistry.sol";
 import {IScrollBadgeResolver} from "../interfaces/IScrollBadgeResolver.sol";
 import {MAX_ATTACHED_BADGE_NUM} from "../Common.sol";
 import {BadgeCountReached, InvalidBadge, LengthMismatch, Unauthorized, TokenNotOwnedByUser} from "../Errors.sol";
 
-contract Profile is Initializable {
+contract Profile is IProfile, Initializable {
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
-    /*************
+    /**
+     *
      * Constants *
-     *************/
+     *
+     */
 
     /// @notice The address of `ScrollBadgeResolver` contract.
     address public immutable resolver;
 
-    /***********
+    /**
+     *
      * Structs *
-     ***********/
+     *
+     */
 
     /// @dev The struct holding profile avatar information.
     /// @param token The address of ERC721 token.
@@ -37,9 +42,11 @@ contract Profile is Initializable {
         uint256 tokenId;
     }
 
-    /*************
+    /**
+     *
      * Variables *
-     *************/
+     *
+     */
 
     /// @notice The address of profile registry.
     address public registry;
@@ -68,10 +75,11 @@ contract Profile is Initializable {
     /// see here for more details: https://www.cnblogs.com/sinkinben/p/15847869.html
     uint256 private badgeOrderEncoding;
 
-    /*************
+    /**
+     *
      * Modifiers *
-     *************/
-
+     *
+     */
     modifier onlyOwner() {
         if (msg.sender != owner) {
             revert Unauthorized();
@@ -79,9 +87,18 @@ contract Profile is Initializable {
         _;
     }
 
-    /***************
+    modifier onlyResolver() {
+        if (msg.sender != resolver) {
+            revert Unauthorized();
+        }
+        _;
+    }
+
+    /**
+     *
      * Constructor *
-     ***************/
+     *
+     */
 
     /// @param resolver_ The address of `ScrollBadgeResolver` contract.
     constructor(address resolver_) {
@@ -100,9 +117,11 @@ contract Profile is Initializable {
         IProfileRegistry(msg.sender).registerUsername(username_);
     }
 
-    /*************************
+    /**
+     *
      * Public View Functions *
-     *************************/
+     *
+     */
 
     /// @notice Return the attestation information for the given badge uid.
     /// @param uid The badge uid to query.
@@ -163,7 +182,7 @@ contract Profile is Initializable {
     /// @notice Return the token URI for profile avatar.
     function getAvatar() external view returns (string memory) {
         Avatar memory _avatar = avatar;
-        if (IERC721(_avatar.token).ownerOf(_avatar.tokenId) == owner) {
+        if (_avatar.token != address(0) && IERC721(_avatar.token).ownerOf(_avatar.tokenId) == owner) {
             try IERC721Metadata(_avatar.token).tokenURI(_avatar.tokenId) returns (string memory uri) {
                 return uri;
             } catch {
@@ -173,21 +192,31 @@ contract Profile is Initializable {
         return IProfileRegistry(registry).getDefaultProfileAvatar();
     }
 
-    /*****************************
+    /**
+     *
      * Public Mutating Functions *
-     *****************************/
+     *
+     */
 
-    /// @notice Attach a list of badges to this profile.
-    /// @param _uids The list of badge uids to attach.
+    /// @inheritdoc IProfile
     function attach(bytes32[] memory _uids) external onlyOwner {
+        uint256 numAttached = uids.length + _uids.length;
+        if (numAttached > MAX_ATTACHED_BADGE_NUM) {
+            revert BadgeCountReached();
+        }
+
         for (uint256 i = 0; i < _uids.length; i++) {
+            getAndValidateBadge(_uids[i]); // validate
             _attachOne(_uids[i]);
         }
     }
 
-    /// @notice Attach one badge to this profile.
-    /// @param _uid The badge uid to attach.
-    function attachOne(bytes32 _uid) external onlyOwner {
+    /// @inheritdoc IProfile
+    function autoAttach(bytes32 _uid) external onlyResolver {
+        if (uids.length >= MAX_ATTACHED_BADGE_NUM) {
+            return;
+        }
+
         _attachOne(_uid);
     }
 
@@ -230,22 +259,18 @@ contract Profile is Initializable {
         avatar = Avatar(token, tokenId);
     }
 
-    /**********************
+    /**
+     *
      * Internal Functions *
-     **********************/
+     *
+     */
 
     /// @dev Internal function to attach one batch to this profile.
     /// @param uid The badge uid to attach.
     function _attachOne(bytes32 uid) private {
         if (indexes[uid] > 0) return;
-        getAndValidateBadge(uid); // validate
-
-        uint256 numAttached = uids.length + 1;
-        if (numAttached > MAX_ATTACHED_BADGE_NUM) {
-            revert BadgeCountReached();
-        }
         uids.push(uid);
-        indexes[uid] = numAttached;
+        indexes[uid] = uids.length;
     }
 
     /// @dev Internal function to detach one batch from this profile.

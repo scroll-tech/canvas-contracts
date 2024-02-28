@@ -77,7 +77,6 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
      * Modifiers *
      *
      */
-
     modifier onlyProfile() {
         if (!isProfileMinted[_msgSender()]) revert CallerIsNotUserProfile();
         _;
@@ -88,7 +87,6 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
      * Constructor *
      *
      */
-
     constructor() {
         _disableInitializers();
     }

@@ -33,7 +33,8 @@ contract ScrollBadgeTestBase is DSTestPlus {
         eas = new EAS(registry);
 
         // Scroll components
-        resolver = new ScrollBadgeResolver(address(eas));
+        address profileRegistry = address(0);
+        resolver = new ScrollBadgeResolver(address(eas), profileRegistry);
         schema = resolver.schema();
     }
 

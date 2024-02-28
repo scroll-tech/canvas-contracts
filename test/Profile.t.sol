@@ -18,11 +18,15 @@ import {
 import {ISchemaResolver} from "@eas/contracts/resolver/ISchemaResolver.sol";
 import {SchemaRegistry, ISchemaRegistry} from "@eas/contracts/SchemaRegistry.sol";
 
-import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import {
+    ITransparentUpgradeableProxy,
+    TransparentUpgradeableProxy
+} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
 import {IProfileRegistry} from "../src/interfaces/IProfileRegistry.sol";
+import {EmptyContract} from "../src/misc/EmptyContract.sol";
 import {Profile} from "../src/profile/Profile.sol";
 import {ProfileRegistry} from "../src/profile/ProfileRegistry.sol";
 import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
@@ -57,6 +61,8 @@ contract ProfileRegistryTest is Test {
 
     address private constant TREASURY_ADDRESS = 0x1000000000000000000000000000000000000000;
 
+    address private constant PROXY_ADMIN_ADDRESS = 0x2000000000000000000000000000000000000000;
+
     ISchemaRegistry private schemaRegistry;
     IEAS private eas;
     ScrollBadgeResolver private resolver;
@@ -71,20 +77,18 @@ contract ProfileRegistryTest is Test {
     function setUp() public {
         schemaRegistry = new SchemaRegistry();
         eas = new EAS(schemaRegistry);
-        resolver = new ScrollBadgeResolver(address(eas));
+        address profileRegistryProxy =
+            address(new TransparentUpgradeableProxy(address(new EmptyContract()), PROXY_ADMIN_ADDRESS, ""));
+        resolver = new ScrollBadgeResolver(address(eas), profileRegistryProxy);
         badge = new TestBadge(address(resolver));
         resolver.toggleBadge(address(badge), true);
 
         profileImpl = new Profile(address(resolver));
         ProfileRegistry profileRegistryImpl = new ProfileRegistry();
-        ERC1967Proxy profileRegistryProxy = new ERC1967Proxy(
-            address(profileRegistryImpl),
-            abi.encodeCall(
-                ProfileRegistry.initialize,
-                (TREASURY_ADDRESS, TREASURY_ADDRESS, address(profileImpl))
-            )
-        );
-        profileRegistry = ProfileRegistry(address(profileRegistryProxy));
+        vm.prank(PROXY_ADMIN_ADDRESS);
+        ITransparentUpgradeableProxy(profileRegistryProxy).upgradeTo(address(profileRegistryImpl));
+        profileRegistry = ProfileRegistry(profileRegistryProxy);
+        profileRegistry.initialize(TREASURY_ADDRESS, TREASURY_ADDRESS, address(profileImpl));
         profile = Profile(profileRegistry.mint{value: 0.001 ether}("xxxxx", new bytes(0)));
     }
 
@@ -141,18 +145,18 @@ contract ProfileRegistryTest is Test {
         // revert when not owner
         vm.prank(address(1));
         vm.expectRevert(Unauthorized.selector);
-        profile.attachOne(bytes32(0));
+        _attachOne(bytes32(0));
         vm.stopPrank();
 
         // revert when invalid badge
         bytes32 invalidUID = _attest(address(badge), "invalidUID", address(badge));
         vm.expectRevert(abi.encodeWithSelector(InvalidBadge.selector, invalidUID));
-        profile.attachOne(invalidUID);
+        _attachOne(invalidUID);
 
         bytes32 uid0 = _attest(address(badge), "1", address(this));
         bytes32 uid1 = _attest(address(badge), "2", address(this));
         // attach one badge
-        profile.attachOne(uid0);
+        _attachOne(uid0);
         bytes32[] memory badges = profile.getAttachedBadges();
         assertEq(badges.length, 1);
         assertEq(badges[0], uid0);
@@ -164,7 +168,7 @@ contract ProfileRegistryTest is Test {
         assertEq(orders[0], 1);
 
         // attach another badge
-        profile.attachOne(uid1);
+        _attachOne(uid1);
         badges = profile.getAttachedBadges();
         assertEq(badges.length, 2);
         assertEq(badges[0], uid0);
@@ -181,7 +185,7 @@ contract ProfileRegistryTest is Test {
         // attach 46 badges
         for (uint256 i = 1; i <= 46; ++i) {
             bytes32 uid = _attest(address(badge), abi.encodePacked(i), address(this));
-            profile.attachOne(uid);
+            _attachOne(uid);
         }
         badges = profile.getAttachedBadges();
         assertEq(badges.length, 48);
@@ -196,7 +200,7 @@ contract ProfileRegistryTest is Test {
         // revert exceed maximum
         bytes32 badgeCountReachedUID = _attest(address(badge), "BadgeCountReached", address(this));
         vm.expectRevert(BadgeCountReached.selector);
-        profile.attachOne(badgeCountReachedUID);
+        _attachOne(badgeCountReachedUID);
     }
 
     function testDetach() external {
@@ -209,7 +213,9 @@ contract ProfileRegistryTest is Test {
         // attach 10 badges
         for (uint256 i = 1; i <= 10; ++i) {
             bytes32 uid = _attest(address(badge), abi.encodePacked(i), address(this));
-            profile.attachOne(uid);
+            bytes32[] memory uids = new bytes32[](1);
+            uids[0] = uid;
+            profile.attach(uids);
         }
 
         // current order is: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
@@ -261,7 +267,9 @@ contract ProfileRegistryTest is Test {
         // attach count badges
         for (uint256 i = 1; i <= count; ++i) {
             bytes32 uid = _attest(address(badge), abi.encodePacked(i), address(this));
-            profile.attachOne(uid);
+            bytes32[] memory uids = new bytes32[](1);
+            uids[0] = uid;
+            profile.attach(uids);
         }
 
         uint256[] memory orders = new uint256[](count);
@@ -344,6 +352,12 @@ contract ProfileRegistryTest is Test {
         // transfer token
         token.transferFrom(address(this), address(badge), 1);
         assertEq(profile.getAvatar(), "123");
+    }
+
+    function _attachOne(bytes32 uid) private {
+        bytes32[] memory uids = new bytes32[](1);
+        uids[0] = uid;
+        profile.attach(uids);
     }
 
     function _attest(address _badge, bytes memory payload, address recipient) internal returns (bytes32) {

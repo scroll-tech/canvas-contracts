@@ -8,7 +8,9 @@ import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/I
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 import {ScrollBadgeCustomPayload} from "../extensions/ScrollBadgeCustomPayload.sol";
+import {ScrollBadgeSingleton} from "../extensions/ScrollBadgeSingleton.sol";
 import {ScrollBadge} from "../ScrollBadge.sol";
+import {Unauthorized} from "../../Errors.sol";
 
 string constant SCROLL_BADGE_ORIGINS_SCHEMA = "address originsTokenAddress, uint256 originsTokenId";
 
@@ -18,7 +20,7 @@ function decodePayloadData(bytes memory data) pure returns (address, uint256) {
 
 /// @title ScrollBadgeOrigins
 /// @notice A simple badge that is attached to a Scroll Origins NFT.
-contract ScrollBadgeOrigins is ScrollBadgeCustomPayload {
+contract ScrollBadgeOrigins is ScrollBadgeCustomPayload, ScrollBadgeSingleton {
     error IncorrectBadgeOwner();
 
     constructor(address resolver_) ScrollBadge(resolver_) {
@@ -26,9 +28,18 @@ contract ScrollBadgeOrigins is ScrollBadgeCustomPayload {
     }
 
     /// @inheritdoc ScrollBadge
-    function onIssueBadge(Attestation calldata attestation) internal override returns (bool) {
+    function onIssueBadge(Attestation calldata attestation)
+        internal
+        override (ScrollBadgeCustomPayload, ScrollBadgeSingleton)
+        returns (bool)
+    {
         if (!super.onIssueBadge(attestation)) {
             return false;
+        }
+
+        // do not allow minting for other users
+        if (msg.sender != attestation.recipient) {
+            revert Unauthorized();
         }
 
         // check that badge payload attestation is correct
@@ -43,7 +54,11 @@ contract ScrollBadgeOrigins is ScrollBadgeCustomPayload {
     }
 
     /// @inheritdoc ScrollBadge
-    function onRevokeBadge(Attestation calldata attestation) internal override returns (bool) {
+    function onRevokeBadge(Attestation calldata attestation)
+        internal
+        override (ScrollBadge, ScrollBadgeCustomPayload)
+        returns (bool)
+    {
         return super.onRevokeBadge(attestation);
     }
 

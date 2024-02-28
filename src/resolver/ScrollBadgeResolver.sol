@@ -2,28 +2,39 @@
 
 pragma solidity 0.8.19;
 
-import { Attestation, IEAS } from "@eas/contracts/IEAS.sol";
-import { EMPTY_UID, NO_EXPIRATION_TIME } from "@eas/contracts/Common.sol";
-import { SchemaResolver, ISchemaResolver } from "@eas/contracts/resolver/SchemaResolver.sol";
+import {Attestation, IEAS} from "@eas/contracts/IEAS.sol";
+import {EMPTY_UID, NO_EXPIRATION_TIME} from "@eas/contracts/Common.sol";
+import {SchemaResolver, ISchemaResolver} from "@eas/contracts/resolver/SchemaResolver.sol";
 
-import { Address } from "@openzeppelin/contracts/utils/Address.sol";
+import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
-import { IProfile } from "../interfaces/IProfile.sol";
-import { IProfileRegistry } from "../interfaces/IProfileRegistry.sol";
-import { IScrollBadge } from "../interfaces/IScrollBadge.sol";
-import { IScrollBadgeResolver } from "../interfaces/IScrollBadgeResolver.sol";
-import { ResolverPaymentsDisabled, AttestationSchemaMismatch, ExpirationTimeDisabled, BadgeNotFound, BadgeNotAllowed, AttestationNotFound, AttestationExpired, AttestationRevoked } from "../Errors.sol";
-import { SCROLL_BADGE_SCHEMA, decodeBadgeData } from "../Common.sol";
-import { ScrollBadgeResolverWhitelist } from "./ScrollBadgeResolverWhitelist.sol";
+import {IScrollBadge} from "../interfaces/IScrollBadge.sol";
+import {IScrollBadgeResolver} from "../interfaces/IScrollBadgeResolver.sol";
+import {IProfile} from "../interfaces/IProfile.sol";
+import {IProfileRegistry} from "../interfaces/IProfileRegistry.sol";
+import {
+    ResolverPaymentsDisabled,
+    AttestationSchemaMismatch,
+    ExpirationTimeDisabled,
+    BadgeNotFound,
+    BadgeNotAllowed,
+    AttestationNotFound,
+    AttestationExpired,
+    AttestationRevoked
+} from "../Errors.sol";
+import {SCROLL_BADGE_SCHEMA, decodeBadgeData} from "../Common.sol";
+import {ScrollBadgeResolverWhitelist} from "./ScrollBadgeResolverWhitelist.sol";
 
 /// @title ScrollBadgeResolver
 /// @notice This resolver contract receives callbacks every time a Scroll badge
 //          attestation is created or revoked. It executes some basic checks and
 //          then delegates the logic to the specific badge implementation.
 contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadgeResolverWhitelist {
-    /*************
+    /**
+     *
      * Constants *
-     *************/
+     *
+     */
 
     /// @inheritdoc IScrollBadgeResolver
     bytes32 public immutable schema;
@@ -31,16 +42,20 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
     /// @inheritdoc IScrollBadgeResolver
     address public immutable registry;
 
-    /*************
+    /**
+     *
      * Variables *
-     *************/
+     *
+     */
 
     /// @inheritdoc IScrollBadgeResolver
     mapping(address => bool) public isBadgeAutoAttach;
 
-    /***************
+    /**
+     *
      * Constructor *
-     ***************/
+     *
+     */
 
     /// @dev Creates a new ScrollBadgeResolver instance.
     /// @param eas_ The address of the global EAS contract.
@@ -57,12 +72,18 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
         registry = registry_;
     }
 
-    /*****************************
+    /**
+     *
      * Schema Resolver Functions *
-     *****************************/
+     *
+     */
 
     /// @inheritdoc SchemaResolver
-    function onAttest(Attestation calldata attestation, uint256 value) internal override(SchemaResolver) returns (bool) {
+    function onAttest(Attestation calldata attestation, uint256 value)
+        internal
+        override (SchemaResolver)
+        returns (bool)
+    {
         // do not accept resolver tips
         if (value != 0) {
             revert ResolverPaymentsDisabled();
@@ -101,7 +122,11 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
     }
 
     /// @inheritdoc SchemaResolver
-    function onRevoke(Attestation calldata attestation, uint256 value) internal override(SchemaResolver) returns (bool) {
+    function onRevoke(Attestation calldata attestation, uint256 value)
+        internal
+        override (SchemaResolver)
+        returns (bool)
+    {
         // do not accept resolver tips
         if (value != 0) {
             revert ResolverPaymentsDisabled();
@@ -118,9 +143,11 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
         return true;
     }
 
-    /*************************
+    /**
+     *
      * Public View Functions *
-     *************************/
+     *
+     */
 
     /// @inheritdoc IScrollBadgeResolver
     function eas() external view returns (address) {
@@ -150,9 +177,11 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
         return attestation;
     }
 
-    /************************
+    /**
+     *
      * Restricted Functions *
-     ************************/
+     *
+     */
 
     /// @notice Enable or disable auto-attach for a badge.
     /// @param badge The address of the badge contract.
@@ -162,10 +191,11 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
         emit UpdateAutoAttachWhitelist(badge, enable);
     }
 
-    /**********************
+    /**
+     *
      * Internal Functions *
-     **********************/
-
+     *
+     */
     function _autoAttach(Attestation calldata attestation) internal {
         IProfileRegistry _registry = IProfileRegistry(registry);
         address profile = _registry.getProfile(attestation.recipient);

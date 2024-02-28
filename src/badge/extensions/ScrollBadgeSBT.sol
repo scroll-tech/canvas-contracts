@@ -2,13 +2,13 @@
 
 pragma solidity 0.8.19;
 
-import { Attestation } from "@eas/contracts/IEAS.sol";
+import {Attestation} from "@eas/contracts/IEAS.sol";
 
-import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-import { SBT } from "../../misc/SBT.sol";
-import { ScrollBadge } from "../ScrollBadge.sol";
-import { ScrollBadgeNoExpiry } from "./ScrollBadgeNoExpiry.sol";
+import {SBT} from "../../misc/SBT.sol";
+import {ScrollBadge} from "../ScrollBadge.sol";
+import {ScrollBadgeNoExpiry} from "./ScrollBadgeNoExpiry.sol";
 
 /// @title ScrollBadgeSBT
 /// @notice This contract attaches an SBT token to each badge.
@@ -59,7 +59,7 @@ abstract contract ScrollBadgeSBT is SBT, ScrollBadgeNoExpiry {
     }
 
     /// @inheritdoc ERC721
-    function tokenURI(uint256 tokenId) public view virtual override(ERC721) returns (string memory) {
+    function tokenURI(uint256 tokenId) public view virtual override (ERC721) returns (string memory) {
         bytes32 uid = bytes32(tokenId);
         return badgeTokenURI(uid);
     }

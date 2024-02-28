@@ -8,7 +8,10 @@ import {SchemaRegistry, ISchemaRegistry} from "@eas/contracts/SchemaRegistry.sol
 import {EAS} from "@eas/contracts/EAS.sol";
 
 import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
-import {ITransparentUpgradeableProxy, TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import {
+    ITransparentUpgradeableProxy,
+    TransparentUpgradeableProxy
+} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 import {AttesterProxy} from "../src/AttesterProxy.sol";
 import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
@@ -36,7 +39,8 @@ contract DeployTestContracts is Script {
 
         // deploy profile registry placeholder
         EmptyContract placeholder = new EmptyContract();
-        address profileRegistryProxy = address(new TransparentUpgradeableProxy(address(placeholder), address(proxyAdmin), ""));
+        address profileRegistryProxy =
+            address(new TransparentUpgradeableProxy(address(placeholder), address(proxyAdmin), ""));
 
         // deploy Scroll badge resolver
         ScrollBadgeResolver resolver = new ScrollBadgeResolver(address(eas), profileRegistryProxy);

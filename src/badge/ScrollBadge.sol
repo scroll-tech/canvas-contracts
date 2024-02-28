@@ -2,12 +2,12 @@
 
 pragma solidity 0.8.19;
 
-import { Attestation } from "@eas/contracts/IEAS.sol";
+import {Attestation} from "@eas/contracts/IEAS.sol";
 
-import { decodeBadgeData }from "../Common.sol";
-import { IScrollBadge } from "../interfaces/IScrollBadge.sol";
-import { IScrollBadgeResolver } from "../interfaces/IScrollBadgeResolver.sol";
-import { Unauthorized, AttestationBadgeMismatch } from "../Errors.sol";
+import {decodeBadgeData} from "../Common.sol";
+import {IScrollBadge} from "../interfaces/IScrollBadge.sol";
+import {IScrollBadgeResolver} from "../interfaces/IScrollBadgeResolver.sol";
+import {Unauthorized, AttestationBadgeMismatch} from "../Errors.sol";
 
 /// @title ScrollBadge
 /// @notice This contract implements the basic functionalities of a Scroll badge.
@@ -17,7 +17,7 @@ abstract contract ScrollBadge is IScrollBadge {
     address public immutable resolver;
 
     // wallet address => badge count
-    mapping (address => uint256) private _userBadgeCount;
+    mapping(address => uint256) private _userBadgeCount;
 
     /// @dev Creates a new ScrollBadge instance.
     /// @param resolver_ The address of the global Scroll badge resolver contract.
@@ -64,14 +64,14 @@ abstract contract ScrollBadge is IScrollBadge {
     /// @notice A resolver callback that should be implemented by child contracts.
     /// @param {attestation} The new attestation.
     /// @return Whether the attestation is valid.
-    function onIssueBadge(Attestation calldata /*attestation*/) internal virtual returns (bool) {
+    function onIssueBadge(Attestation calldata /*attestation*/ ) internal virtual returns (bool) {
         return true;
     }
 
     /// @notice A resolver callback that should be implemented by child contracts.
     /// @param {attestation} The existing attestation to be revoked.
     /// @return Whether the attestation can be revoked.
-    function onRevokeBadge(Attestation calldata /*attestation*/) internal virtual returns (bool) {
+    function onRevokeBadge(Attestation calldata /*attestation*/ ) internal virtual returns (bool) {
         return true;
     }
 
@@ -92,7 +92,7 @@ abstract contract ScrollBadge is IScrollBadge {
     ///         badge token URI if the pass UID is 0x0.
     /// @param uid The badge UID, or 0x0.
     /// @return The badge token URI (same format as ERC721).
-    function badgeTokenURI(bytes32 uid) public virtual view returns (string memory);
+    function badgeTokenURI(bytes32 uid) public view virtual returns (string memory);
 
     /// @notice Returns true if the user has one or more of this badge.
     /// @param user The user's wallet address.

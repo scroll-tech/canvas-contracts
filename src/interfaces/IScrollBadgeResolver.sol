@@ -2,12 +2,14 @@
 
 pragma solidity 0.8.19;
 
-import { Attestation } from "@eas/contracts/IEAS.sol";
+import {Attestation} from "@eas/contracts/IEAS.sol";
 
 interface IScrollBadgeResolver {
-    /**********
+    /**
+     *
      * Events *
-     **********/
+     *
+     */
 
     /// @dev Emitted when a new badge is issued.
     /// @param uid The UID of the new badge attestation.
@@ -22,9 +24,11 @@ interface IScrollBadgeResolver {
     /// @param enable Auto-attach was enabled if true, disabled if false.
     event UpdateAutoAttachWhitelist(address indexed badge, bool indexed enable);
 
-    /*************************
+    /**
+     *
      * Public View Functions *
-     *************************/
+     *
+     */
 
     /// @notice Return the Scroll badge attestation schema.
     /// @return The GUID of the Scroll badge attestation schema.

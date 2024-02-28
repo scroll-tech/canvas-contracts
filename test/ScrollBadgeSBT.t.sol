@@ -2,16 +2,16 @@
 
 pragma solidity 0.8.19;
 
-import { ScrollBadgeTestBase } from "./ScrollBadgeTestBase.sol";
+import {ScrollBadgeTestBase} from "./ScrollBadgeTestBase.sol";
 
-import { SBT } from "../src/misc/SBT.sol";
-import { ScrollBadge } from "../src/badge/ScrollBadge.sol";
-import { ScrollBadgeSBT } from "../src/badge/extensions/ScrollBadgeSBT.sol";
+import {SBT} from "../src/misc/SBT.sol";
+import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
+import {ScrollBadgeSBT} from "../src/badge/extensions/ScrollBadgeSBT.sol";
 
 contract TestContract is ScrollBadgeSBT {
     constructor(address resolver_) ScrollBadge(resolver_) ScrollBadgeSBT("name", "symbol") {}
 
-    function badgeTokenURI(bytes32 /*uid*/) public override pure returns (string memory) {
+    function badgeTokenURI(bytes32 /*uid*/ ) public pure override returns (string memory) {
         return "";
     }
 }

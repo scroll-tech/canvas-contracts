@@ -3,6 +3,4 @@ pragma solidity 0.8.19;
 
 // solhint-disable no-empty-blocks
 
-contract EmptyContract {
-
-}
+contract EmptyContract {}

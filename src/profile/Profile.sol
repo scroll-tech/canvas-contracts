@@ -87,8 +87,8 @@ contract Profile is IProfile, Initializable {
         _;
     }
 
-    modifier onlyOwnerOrResolver() {
-        if (msg.sender != owner && msg.sender != resolver) {
+    modifier onlyResolver() {
+        if (msg.sender != resolver) {
             revert Unauthorized();
         }
         _;
@@ -199,10 +199,25 @@ contract Profile is IProfile, Initializable {
      */
 
     /// @inheritdoc IProfile
-    function attach(bytes32[] memory _uids) external onlyOwnerOrResolver {
+    function attach(bytes32[] memory _uids) external onlyOwner {
+        uint256 numAttached = uids.length + _uids.length;
+        if (numAttached > MAX_ATTACHED_BADGE_NUM) {
+            revert BadgeCountReached();
+        }
+
         for (uint256 i = 0; i < _uids.length; i++) {
+            getAndValidateBadge(_uids[i]); // validate
             _attachOne(_uids[i]);
         }
+    }
+
+    /// @inheritdoc IProfile
+    function autoAttach(bytes32 _uid) external onlyResolver {
+        if (uids.length >= MAX_ATTACHED_BADGE_NUM) {
+            return;
+        }
+
+        _attachOne(_uid);
     }
 
     /// @notice Detach a list of badges to this profile.
@@ -254,14 +269,8 @@ contract Profile is IProfile, Initializable {
     /// @param uid The badge uid to attach.
     function _attachOne(bytes32 uid) private {
         if (indexes[uid] > 0) return;
-        getAndValidateBadge(uid); // validate
-
-        uint256 numAttached = uids.length + 1;
-        if (numAttached > MAX_ATTACHED_BADGE_NUM) {
-            revert BadgeCountReached();
-        }
         uids.push(uid);
-        indexes[uid] = numAttached;
+        indexes[uid] = uids.length;
     }
 
     /// @dev Internal function to detach one batch from this profile.

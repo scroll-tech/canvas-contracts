@@ -136,82 +136,6 @@ contract ProfileRegistryTest is Test {
         assertEq(badges[0], uid1);
     }
 
-    function testAttachOne() external {
-        // revert when not owner
-        vm.prank(address(1));
-        vm.expectRevert(Unauthorized.selector);
-        profile.attachOne(bytes32(0));
-        vm.stopPrank();
-
-        // revert when invalid badge
-        bytes32 invalidUID = _attest(
-            address(badge),
-            "invalidUID",
-            address(badge)
-        );
-        vm.expectRevert(
-            abi.encodeWithSelector(InvalidBadge.selector, invalidUID)
-        );
-        profile.attachOne(invalidUID);
-
-        bytes32 uid0 = _attest(address(badge), "1", address(this));
-        bytes32 uid1 = _attest(address(badge), "2", address(this));
-        // attach one badge
-        profile.attachOne(uid0);
-        bytes32[] memory badges = profile.getAttachedBadges();
-        assertEq(badges.length, 1);
-        assertEq(badges[0], uid0);
-        badges = profile.getValidBadges();
-        assertEq(badges.length, 1);
-        assertEq(badges[0], uid0);
-        uint256[] memory orders = profile.getBadgeOrder();
-        assertEq(orders.length, 1);
-        assertEq(orders[0], 1);
-
-        // attach another badge
-        profile.attachOne(uid1);
-        badges = profile.getAttachedBadges();
-        assertEq(badges.length, 2);
-        assertEq(badges[0], uid0);
-        assertEq(badges[1], uid1);
-        badges = profile.getValidBadges();
-        assertEq(badges.length, 2);
-        assertEq(badges[0], uid0);
-        assertEq(badges[1], uid1);
-        orders = profile.getBadgeOrder();
-        assertEq(orders.length, 2);
-        assertEq(orders[0], 1);
-        assertEq(orders[1], 2);
-
-        // attach 46 badges
-        for (uint256 i = 1; i <= 46; ++i) {
-            bytes32 uid = _attest(
-                address(badge),
-                abi.encodePacked(i),
-                address(this)
-            );
-            profile.attachOne(uid);
-        }
-        badges = profile.getAttachedBadges();
-        assertEq(badges.length, 48);
-        badges = profile.getValidBadges();
-        assertEq(badges.length, 48);
-        orders = profile.getBadgeOrder();
-        assertEq(orders.length, 48);
-        for (uint256 j = 0; j < orders.length; ++j) {
-            assertEq(orders[j], j + 1);
-        }
-
-        // revert exceed maximum
-        bytes32 badgeCountReachedUID = _attest(
-            address(badge),
-            "BadgeCountReached",
-            address(this)
-        );
-        vm.expectRevert(BadgeCountReached.selector);
-        profile.attachOne(badgeCountReachedUID);
-    }
-
     function testDetach() external {
         // revert when not owner
         vm.prank(address(1));
@@ -226,7 +150,9 @@ contract ProfileRegistryTest is Test {
                 abi.encodePacked(i),
                 address(this)
             );
-            profile.attachOne(uid);
+            bytes32[] memory uids = new bytes32[](1);
+            uids[0] = uid;
+            profile.attach(uids);
         }
 
         // current order is: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
@@ -282,7 +208,9 @@ contract ProfileRegistryTest is Test {
                 abi.encodePacked(i),
                 address(this)
             );
-            profile.attachOne(uid);
+            bytes32[] memory uids = new bytes32[](1);
+            uids[0] = uid;
+            profile.attach(uids);
         }
 
         uint256[] memory orders = new uint256[](count);

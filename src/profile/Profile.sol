@@ -185,12 +185,6 @@ contract Profile is Initializable {
         }
     }
 
-    /// @notice Attach one badge to this profile.
-    /// @param _uid The badge uid to attach.
-    function attachOne(bytes32 _uid) external onlyOwner {
-        _attachOne(_uid);
-    }
-
     /// @notice Detach a list of badges to this profile.
     /// @param _uids The list of badge uids to detach.
     function detach(bytes32[] memory _uids) external onlyOwner {

@@ -67,7 +67,13 @@ contract ScrollBadgePowerRank is
     /// @inheritdoc ScrollBadge
     function onRevokeBadge(Attestation calldata attestation)
         internal
-        override (ScrollBadge, ScrollBadgeAccessControl, ScrollBadgeCustomPayload)
+        override (
+            ScrollBadgeAccessControl,
+            ScrollBadgeCustomPayload,
+            ScrollBadgeNoExpiry,
+            ScrollBadgeNonRevocable,
+            ScrollBadgeSingleton
+        )
         returns (bool)
     {
         return super.onRevokeBadge(attestation);

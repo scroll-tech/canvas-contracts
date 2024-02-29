@@ -22,4 +22,9 @@ abstract contract ScrollBadgeNonRevocable is ScrollBadge {
 
         return true;
     }
+
+    /// @inheritdoc ScrollBadge
+    function onRevokeBadge(Attestation calldata attestation) internal virtual override returns (bool) {
+        return super.onRevokeBadge(attestation);
+    }
 }

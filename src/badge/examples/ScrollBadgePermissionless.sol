@@ -6,17 +6,22 @@ import {Attestation} from "@eas/contracts/IEAS.sol";
 
 import {InvalidBadge} from "../../Errors.sol";
 import {ScrollBadge} from "../ScrollBadge.sol";
+import {ScrollBadgeSelfAttest} from "../extensions/ScrollBadgeSelfAttest.sol";
 import {ScrollBadgeSingleton} from "../extensions/ScrollBadgeSingleton.sol";
 
 /// @title ScrollBadgePermissionless
 /// @notice A simple badge that anyone can mint in a permissionless manner.
-contract ScrollBadgePermissionless is ScrollBadgeSingleton {
+contract ScrollBadgePermissionless is ScrollBadgeSelfAttest, ScrollBadgeSingleton {
     constructor(address resolver_, string memory name_, string memory symbol_) ScrollBadge(resolver_) {
         // empty
     }
 
     /// @inheritdoc ScrollBadge
-    function onIssueBadge(Attestation calldata attestation) internal override returns (bool) {
+    function onIssueBadge(Attestation calldata attestation)
+        internal
+        override (ScrollBadgeSelfAttest, ScrollBadgeSingleton)
+        returns (bool)
+    {
         if (attestation.recipient != attestation.attester) {
             revert InvalidBadge(attestation.uid);
         }
@@ -25,7 +30,11 @@ contract ScrollBadgePermissionless is ScrollBadgeSingleton {
     }
 
     /// @inheritdoc ScrollBadge
-    function onRevokeBadge(Attestation calldata attestation) internal override returns (bool) {
+    function onRevokeBadge(Attestation calldata attestation)
+        internal
+        override (ScrollBadgeSelfAttest, ScrollBadgeSingleton)
+        returns (bool)
+    {
         return super.onIssueBadge(attestation);
     }
 

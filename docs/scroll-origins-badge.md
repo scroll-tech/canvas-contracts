@@ -5,10 +5,10 @@ In the examples on this page, we use the configurations from [integration-faq.md
 ```bash
 # Scroll Origins NFT addresses
 SCROLL_SEPOLIA_ORIGINS_V1_ADDRESS="TBD"
-SCROLL_SEPOLIA_ORIGINS_V2_ADDRESS="TBD"
+SCROLL_SEPOLIA_ORIGINS_V2_ADDRESS="0xDd7d857F570B0C211abfe05cd914A85BefEC2464"
 
 # Badge address
-SCROLL_SEPOLIA_ORIGINS_BADGE_ADDRESS="0xE207971d5B1332f267d00f4a75D9949AE69b03a4"
+SCROLL_SEPOLIA_ORIGINS_BADGE_ADDRESS="0x2aa883c6EaB368d1C86452127bc0Dd6c887a1F44"
 ```
 
 
@@ -55,7 +55,7 @@ Next, we mint a badge directly through EAS.
 ```bash
 # encode Scroll Origins badge payload
 # schema: "address originsTokenAddress, uint256 originsTokenId"
-> ORIGINS_BADGE_PAYLOAD=$(cast abi-encode "abc(address,uint256)" "$SCROLL_SEPOLIA_ORIGINS_V1_ADDRESS" "0")
+> ORIGINS_BADGE_PAYLOAD=$(cast abi-encode "abc(address,uint256)" "$SCROLL_SEPOLIA_ORIGINS_V1_ADDRESS" "843487")
 
 # encode badge payload
 > BADGE_PAYLOAD=$(cast abi-encode "abc(address,bytes)" "$SCROLL_SEPOLIA_ORIGINS_BADGE_ADDRESS" "$ORIGINS_BADGE_PAYLOAD")

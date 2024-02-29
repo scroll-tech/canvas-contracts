@@ -313,6 +313,8 @@ contract Profile is IProfile, Initializable {
     /// @return encoding The expected encoding in range `[0, factorial(orders.length))`
     function _encodeOrder(uint256[] memory orders) internal pure returns (uint256 encoding) {
         uint256 n = orders.length;
+        if (n == 0) return 0;
+
         uint256[] memory fact = new uint256[](n);
         unchecked {
             fact[0] = 1;

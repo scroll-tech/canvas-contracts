@@ -16,7 +16,7 @@ abstract contract ScrollBadgeSelfAttest is ScrollBadge {
             return false;
         }
 
-        if (attestation.attester != attestation.recipient) {
+        if (attestation.recipient != attestation.attester) {
             revert Unauthorized();
         }
 

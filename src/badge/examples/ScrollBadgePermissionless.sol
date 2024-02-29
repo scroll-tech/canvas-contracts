@@ -22,10 +22,6 @@ contract ScrollBadgePermissionless is ScrollBadgeSelfAttest, ScrollBadgeSingleto
         override (ScrollBadgeSelfAttest, ScrollBadgeSingleton)
         returns (bool)
     {
-        if (attestation.recipient != attestation.attester) {
-            revert InvalidBadge(attestation.uid);
-        }
-
         return super.onIssueBadge(attestation);
     }
 

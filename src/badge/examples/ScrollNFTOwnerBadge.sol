@@ -42,11 +42,6 @@ contract ScrollNFTOwnerBadge is ScrollBadgeCustomPayload, ScrollBadgeSelfAttest,
             return false;
         }
 
-        // do not allow minting for other users
-        if (attestation.attester != attestation.recipient) {
-            revert Unauthorized();
-        }
-
         // check that badge payload attestation is correct
         bytes memory payload = getPayload(attestation);
         (address tokenAddress, uint256 tokenId) = decodePayloadData(payload);

@@ -2,32 +2,13 @@
 
 pragma solidity 0.8.19;
 
-import {EMPTY_UID, NO_EXPIRATION_TIME} from "@eas/contracts/Common.sol";
-import {
-    IEAS,
-    Attestation,
-    AttestationRequest,
-    AttestationRequestData,
-    RevocationRequest,
-    RevocationRequestData
-} from "@eas/contracts/IEAS.sol";
-import {EAS} from "@eas/contracts/EAS.sol";
-import {ISchemaResolver} from "@eas/contracts/resolver/ISchemaResolver.sol";
-
 import {ScrollBadgeTestBase} from "./ScrollBadgeTestBase.sol";
 
-import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
-import {IScrollBadge} from "../src/interfaces/IScrollBadge.sol";
-import {
-    AttestationExpired,
-    AttestationNotFound,
-    AttestationRevoked,
-    AttestationBadgeMismatch,
-    AttestationSchemaMismatch,
-    BadgeNotFound,
-    BadgeNotAllowed,
-    Unauthorized
-} from "../src/Errors.sol";
+import {EMPTY_UID, NO_EXPIRATION_TIME} from "@eas/contracts/Common.sol";
+import {Attestation, AttestationRequest, AttestationRequestData} from "@eas/contracts/IEAS.sol";
+
+import {IScrollBadge, ScrollBadge} from "../src/badge/ScrollBadge.sol";
+import {AttestationBadgeMismatch, Unauthorized} from "../src/Errors.sol";
 
 contract TestContract is ScrollBadge {
     constructor(address resolver_) ScrollBadge(resolver_) {}
@@ -68,7 +49,7 @@ contract ScrollBadgeTest is ScrollBadgeTestBase {
     }
 
     function testAttestMultiple(address recipient, uint8 times) external {
-        hevm.assume(times < 10);
+        vm.assume(times < 10);
 
         bytes32[] memory uids = new bytes32[](times);
 
@@ -89,16 +70,16 @@ contract ScrollBadgeTest is ScrollBadgeTestBase {
     }
 
     function testIssueBadgeOnlyResolver(address notResolver, Attestation memory attestation) external {
-        hevm.assume(notResolver != address(resolver));
-        hevm.prank(notResolver);
-        hevm.expectRevert(Unauthorized.selector);
+        vm.assume(notResolver != address(resolver));
+        vm.prank(notResolver);
+        vm.expectRevert(Unauthorized.selector);
         badge.issueBadge(attestation);
     }
 
     function testRevokeBadgeOnlyResolver(address notResolver, Attestation memory attestation) external {
-        hevm.assume(notResolver != address(resolver));
-        hevm.prank(notResolver);
-        hevm.expectRevert(Unauthorized.selector);
+        vm.assume(notResolver != address(resolver));
+        vm.prank(notResolver);
+        vm.expectRevert(Unauthorized.selector);
         badge.revokeBadge(attestation);
     }
 
@@ -126,7 +107,7 @@ contract ScrollBadgeTest is ScrollBadgeTestBase {
 
         bytes32 uid = eas.attest(_req);
 
-        hevm.expectRevert(abi.encodeWithSelector(AttestationBadgeMismatch.selector, uid));
+        vm.expectRevert(abi.encodeWithSelector(AttestationBadgeMismatch.selector, uid));
         badge.getAndValidateBadge(uid);
     }
 }

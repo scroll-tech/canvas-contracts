@@ -4,17 +4,11 @@ pragma solidity 0.8.19;
 
 import {ScrollBadgeTestBase} from "./ScrollBadgeTestBase.sol";
 
-import {
-    IEAS,
-    Attestation,
-    AttestationRequest,
-    AttestationRequestData,
-    RevocationRequest,
-    RevocationRequestData
-} from "@eas/contracts/IEAS.sol";
+import {Attestation, AttestationRequest, AttestationRequestData} from "@eas/contracts/IEAS.sol";
 import {EAS} from "@eas/contracts/EAS.sol";
 import {EMPTY_UID, NO_EXPIRATION_TIME} from "@eas/contracts/Common.sol";
 
+import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
 import {ScrollBadgeAccessControl} from "../src/badge/extensions/ScrollBadgeAccessControl.sol";
 import {ScrollBadgeCustomPayload} from "../src/badge/extensions/ScrollBadgeCustomPayload.sol";
 import {ScrollBadgeNoExpiry} from "../src/badge/extensions/ScrollBadgeNoExpiry.sol";
@@ -22,9 +16,6 @@ import {ScrollBadgeNonRevocable} from "../src/badge/extensions/ScrollBadgeNonRev
 import {ScrollBadgeSBT} from "../src/badge/extensions/ScrollBadgeSBT.sol";
 import {ScrollBadgeSelfAttest} from "../src/badge/extensions/ScrollBadgeSelfAttest.sol";
 import {ScrollBadgeSingleton} from "../src/badge/extensions/ScrollBadgeSingleton.sol";
-import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
-import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
-import {Unauthorized} from "../src/Errors.sol";
 
 contract TestContractBase is ScrollBadge {
     bool succeed = true;
@@ -82,7 +73,7 @@ contract ScrollBadgeAccessControlInheritanceChainTest is ScrollBadgeTestBase {
 
     function testAttestFails() external {
         badge.baseFail();
-        hevm.expectRevert(EAS.InvalidAttestation.selector);
+        vm.expectRevert(EAS.InvalidAttestation.selector);
         _attest(address(badge), "", alice);
     }
 
@@ -90,7 +81,7 @@ contract ScrollBadgeAccessControlInheritanceChainTest is ScrollBadgeTestBase {
         badge.toggleAttester(address(this), true);
         bytes32 uid = _attest(address(badge), "", alice);
         badge.baseFail();
-        hevm.expectRevert(EAS.InvalidRevocation.selector);
+        vm.expectRevert(EAS.InvalidRevocation.selector);
         _revoke(uid);
     }
 }
@@ -133,14 +124,14 @@ contract ScrollBadgeCustomPayloadInheritanceChainTest is ScrollBadgeTestBase {
 
     function testAttestFails() external {
         badge.baseFail();
-        hevm.expectRevert(EAS.InvalidAttestation.selector);
+        vm.expectRevert(EAS.InvalidAttestation.selector);
         _attest(address(badge), "abc", alice);
     }
 
     function testRevokeFails() external {
         bytes32 uid = _attest(address(badge), "abc", alice);
         badge.baseFail();
-        hevm.expectRevert(EAS.InvalidRevocation.selector);
+        vm.expectRevert(EAS.InvalidRevocation.selector);
         _revoke(uid);
     }
 }
@@ -179,14 +170,14 @@ contract ScrollBadgeNoExpiryInheritanceChainTest is ScrollBadgeTestBase {
 
     function testAttestFails() external {
         badge.baseFail();
-        hevm.expectRevert(EAS.InvalidAttestation.selector);
+        vm.expectRevert(EAS.InvalidAttestation.selector);
         _attest(address(badge), "", alice);
     }
 
     function testRevokeFails() external {
         bytes32 uid = _attest(address(badge), "", alice);
         badge.baseFail();
-        hevm.expectRevert(EAS.InvalidRevocation.selector);
+        vm.expectRevert(EAS.InvalidRevocation.selector);
         _revoke(uid);
     }
 }
@@ -238,7 +229,7 @@ contract ScrollBadgeNonRevocableInheritanceChainTest is ScrollBadgeTestBase {
         AttestationRequest memory _req = AttestationRequest({schema: schema, data: _attData});
 
         badge.baseFail();
-        hevm.expectRevert(EAS.InvalidAttestation.selector);
+        vm.expectRevert(EAS.InvalidAttestation.selector);
         eas.attest(_req);
     }
 }
@@ -277,14 +268,14 @@ contract ScrollBadgeSBTInheritanceChainTest is ScrollBadgeTestBase {
 
     function testAttestFails() external {
         badge.baseFail();
-        hevm.expectRevert(EAS.InvalidAttestation.selector);
+        vm.expectRevert(EAS.InvalidAttestation.selector);
         _attest(address(badge), "", alice);
     }
 
     function testRevokeFails() external {
         bytes32 uid = _attest(address(badge), "", alice);
         badge.baseFail();
-        hevm.expectRevert(EAS.InvalidRevocation.selector);
+        vm.expectRevert(EAS.InvalidRevocation.selector);
         _revoke(uid);
     }
 }
@@ -323,14 +314,14 @@ contract ScrollBadgeSelfAttestInheritanceChainTest is ScrollBadgeTestBase {
 
     function testAttestFails() external {
         badge.baseFail();
-        hevm.expectRevert(EAS.InvalidAttestation.selector);
+        vm.expectRevert(EAS.InvalidAttestation.selector);
         _attest(address(badge), "", address(this));
     }
 
     function testRevokeFails() external {
         bytes32 uid = _attest(address(badge), "", address(this));
         badge.baseFail();
-        hevm.expectRevert(EAS.InvalidRevocation.selector);
+        vm.expectRevert(EAS.InvalidRevocation.selector);
         _revoke(uid);
     }
 }
@@ -369,14 +360,14 @@ contract ScrollBadgeSingletonInheritanceChainTest is ScrollBadgeTestBase {
 
     function testAttestFails() external {
         badge.baseFail();
-        hevm.expectRevert(EAS.InvalidAttestation.selector);
+        vm.expectRevert(EAS.InvalidAttestation.selector);
         _attest(address(badge), "", alice);
     }
 
     function testRevokeFails() external {
         bytes32 uid = _attest(address(badge), "", alice);
         badge.baseFail();
-        hevm.expectRevert(EAS.InvalidRevocation.selector);
+        vm.expectRevert(EAS.InvalidRevocation.selector);
         _revoke(uid);
     }
 }

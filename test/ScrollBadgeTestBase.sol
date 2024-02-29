@@ -2,10 +2,13 @@
 
 pragma solidity 0.8.19;
 
-import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
+import {Test} from "forge-std/Test.sol";
 
 import {EAS} from "@eas/contracts/EAS.sol";
 import {EMPTY_UID, NO_EXPIRATION_TIME} from "@eas/contracts/Common.sol";
+import {ISchemaResolver} from "@eas/contracts/resolver/ISchemaResolver.sol";
+import {SchemaRegistry, ISchemaRegistry} from "@eas/contracts/SchemaRegistry.sol";
+
 import {
     IEAS,
     AttestationRequest,
@@ -13,11 +16,10 @@ import {
     RevocationRequest,
     RevocationRequestData
 } from "@eas/contracts/IEAS.sol";
-import {ISchemaResolver} from "@eas/contracts/resolver/ISchemaResolver.sol";
-import {SchemaRegistry, ISchemaRegistry} from "@eas/contracts/SchemaRegistry.sol";
+
 import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
 
-contract ScrollBadgeTestBase is DSTestPlus {
+contract ScrollBadgeTestBase is Test {
     ISchemaRegistry internal registry;
     IEAS internal eas;
     ScrollBadgeResolver internal resolver;

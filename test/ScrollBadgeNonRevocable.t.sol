@@ -5,18 +5,11 @@ pragma solidity 0.8.19;
 import {ScrollBadgeTestBase} from "./ScrollBadgeTestBase.sol";
 
 import {EMPTY_UID, NO_EXPIRATION_TIME} from "@eas/contracts/Common.sol";
-import {
-    IEAS,
-    Attestation,
-    AttestationRequest,
-    AttestationRequestData,
-    RevocationRequest,
-    RevocationRequestData
-} from "@eas/contracts/IEAS.sol";
+import {Attestation, AttestationRequest, AttestationRequestData} from "@eas/contracts/IEAS.sol";
 
-import {ScrollBadgeNonRevocable} from "../src/badge/extensions/ScrollBadgeNonRevocable.sol";
 import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
-import {Unauthorized, InvalidPayload, RevocationDisabled} from "../src/Errors.sol";
+import {ScrollBadgeNonRevocable} from "../src/badge/extensions/ScrollBadgeNonRevocable.sol";
+import {RevocationDisabled} from "../src/Errors.sol";
 
 contract TestContract is ScrollBadgeNonRevocable {
     constructor(address resolver_) ScrollBadge(resolver_) {}
@@ -63,7 +56,7 @@ contract ScrollBadgeNonRevocableTest is ScrollBadgeTestBase {
 
         AttestationRequest memory _req = AttestationRequest({schema: schema, data: _attData});
 
-        hevm.expectRevert(RevocationDisabled.selector);
+        vm.expectRevert(RevocationDisabled.selector);
         eas.attest(_req);
     }
 }

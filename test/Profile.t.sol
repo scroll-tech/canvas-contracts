@@ -3,11 +3,11 @@
 pragma solidity 0.8.19;
 
 import {Test} from "forge-std/Test.sol";
-import {VmSafe} from "forge-std/Vm.sol";
-import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
 
 import {EAS} from "@eas/contracts/EAS.sol";
 import {EMPTY_UID, NO_EXPIRATION_TIME} from "@eas/contracts/Common.sol";
+import {SchemaRegistry, ISchemaRegistry} from "@eas/contracts/SchemaRegistry.sol";
+
 import {
     IEAS,
     AttestationRequest,
@@ -15,20 +15,18 @@ import {
     RevocationRequest,
     RevocationRequestData
 } from "@eas/contracts/IEAS.sol";
-import {ISchemaResolver} from "@eas/contracts/resolver/ISchemaResolver.sol";
-import {SchemaRegistry, ISchemaRegistry} from "@eas/contracts/SchemaRegistry.sol";
+
+import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 import {
     ITransparentUpgradeableProxy,
     TransparentUpgradeableProxy
 } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
-import {IProfileRegistry} from "../src/interfaces/IProfileRegistry.sol";
 import {EmptyContract} from "../src/misc/EmptyContract.sol";
 import {Profile} from "../src/profile/Profile.sol";
 import {ProfileRegistry} from "../src/profile/ProfileRegistry.sol";
+import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
 import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
 
 contract TestBadge is ScrollBadge {
@@ -52,12 +50,12 @@ contract TestERC721 is ERC721 {
 }
 
 contract ProfileRegistryTest is Test {
-    error Unauthorized();
-    error InvalidBadge(bytes32 uid);
+    error AttestationOwnerMismatch(bytes32 uid);
     error BadgeCountReached();
-    error InvalidUsername();
     error DuplicatedUsername();
+    error InvalidUsername();
     error TokenNotOwnedByUser(address token, uint256 tokenId);
+    error Unauthorized();
 
     address private constant TREASURY_ADDRESS = 0x1000000000000000000000000000000000000000;
 
@@ -150,7 +148,7 @@ contract ProfileRegistryTest is Test {
 
         // revert when invalid badge
         bytes32 invalidUID = _attest(address(badge), "invalidUID", address(badge));
-        vm.expectRevert(abi.encodeWithSelector(InvalidBadge.selector, invalidUID));
+        vm.expectRevert(abi.encodeWithSelector(AttestationOwnerMismatch.selector, invalidUID));
         _attachOne(invalidUID);
 
         bytes32 uid0 = _attest(address(badge), "1", address(this));

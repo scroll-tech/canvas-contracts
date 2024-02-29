@@ -44,8 +44,8 @@ contract ScrollBadgeSBTTest is ScrollBadgeTestBase {
         assertEq(tokenUri, "uri");
 
         // cannot transfer token
-        hevm.prank(alice);
-        hevm.expectRevert(SBT.TransfersDisabled.selector);
+        vm.prank(alice);
+        vm.expectRevert(SBT.TransfersDisabled.selector);
         badge.transferFrom(alice, bob, tokenId);
 
         // revoke
@@ -54,7 +54,7 @@ contract ScrollBadgeSBTTest is ScrollBadgeTestBase {
         balance = badge.balanceOf(alice);
         assertEq(balance, 0);
 
-        hevm.expectRevert("ERC721: invalid token ID");
+        vm.expectRevert("ERC721: invalid token ID");
         badge.ownerOf(uint256(uid));
     }
 }

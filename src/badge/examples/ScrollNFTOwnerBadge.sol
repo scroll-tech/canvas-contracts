@@ -8,6 +8,7 @@ import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/I
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 import {ScrollBadgeCustomPayload} from "../extensions/ScrollBadgeCustomPayload.sol";
+import {ScrollBadgeSelfAttest} from "../extensions/ScrollBadgeSelfAttest.sol";
 import {ScrollBadgeSingleton} from "../extensions/ScrollBadgeSingleton.sol";
 import {ScrollBadge} from "../ScrollBadge.sol";
 import {Unauthorized} from "../../Errors.sol";
@@ -19,11 +20,11 @@ function decodePayloadData(bytes memory data) pure returns (address, uint256) {
 }
 
 /// @title ScrollNFTOwnerBadge
-/// @notice A simple badge that is attached to a Scroll Origins NFT.
-contract ScrollNFTOwnerBadge is ScrollBadgeCustomPayload, ScrollBadgeSingleton {
+/// @notice A simple badge that attests that the user owns a specific NFT.
+contract ScrollNFTOwnerBadge is ScrollBadgeCustomPayload, ScrollBadgeSelfAttest, ScrollBadgeSingleton {
     error IncorrectBadgeOwner();
 
-    mapping (address => bool) public isTokenAllowed;
+    mapping(address => bool) public isTokenAllowed;
 
     constructor(address resolver_, address[] memory tokens_) ScrollBadge(resolver_) {
         for (uint256 i = 0; i < tokens_.length; ++i) {
@@ -34,16 +35,11 @@ contract ScrollNFTOwnerBadge is ScrollBadgeCustomPayload, ScrollBadgeSingleton {
     /// @inheritdoc ScrollBadge
     function onIssueBadge(Attestation calldata attestation)
         internal
-        override (ScrollBadgeCustomPayload, ScrollBadgeSingleton)
+        override (ScrollBadgeCustomPayload, ScrollBadgeSelfAttest, ScrollBadgeSingleton)
         returns (bool)
     {
         if (!super.onIssueBadge(attestation)) {
             return false;
-        }
-
-        // do not allow minting for other users
-        if (attestation.attester != attestation.recipient) {
-            revert Unauthorized();
         }
 
         // check that badge payload attestation is correct
@@ -64,7 +60,7 @@ contract ScrollNFTOwnerBadge is ScrollBadgeCustomPayload, ScrollBadgeSingleton {
     /// @inheritdoc ScrollBadge
     function onRevokeBadge(Attestation calldata attestation)
         internal
-        override (ScrollBadge, ScrollBadgeCustomPayload)
+        override (ScrollBadgeCustomPayload, ScrollBadgeSelfAttest, ScrollBadgeSingleton)
         returns (bool)
     {
         return super.onRevokeBadge(attestation);

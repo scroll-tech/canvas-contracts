@@ -9,6 +9,7 @@ import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.s
 import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {Multicall} from "@openzeppelin/contracts/utils/Multicall.sol";
 
 import {IProfile} from "../interfaces/IProfile.sol";
 import {IProfileRegistry} from "../interfaces/IProfileRegistry.sol";
@@ -16,7 +17,7 @@ import {IScrollBadgeResolver} from "../interfaces/IScrollBadgeResolver.sol";
 import {MAX_ATTACHED_BADGE_NUM} from "../Common.sol";
 import {BadgeCountReached, InvalidBadge, LengthMismatch, Unauthorized, TokenNotOwnedByUser} from "../Errors.sol";
 
-contract Profile is IProfile, Initializable {
+contract Profile is IProfile, Initializable, Multicall {
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
     /**

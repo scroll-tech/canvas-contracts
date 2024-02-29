@@ -91,7 +91,7 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
 
         // do not process other schemas
         if (attestation.schema != schema) {
-            revert AttestationSchemaMismatch(attestation.uid);
+            revert AttestationSchemaMismatch();
         }
 
         // decode attestation
@@ -163,7 +163,7 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
         }
 
         if (attestation.schema != schema) {
-            revert AttestationSchemaMismatch(uid);
+            revert AttestationSchemaMismatch();
         }
 
         if (attestation.expirationTime != NO_EXPIRATION_TIME && attestation.expirationTime <= block.timestamp) {

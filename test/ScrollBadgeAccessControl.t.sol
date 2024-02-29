@@ -45,4 +45,11 @@ contract ScrollBadgeAccessControlTest is ScrollBadgeTestBase {
         hevm.expectRevert(Unauthorized.selector);
         _revoke(uid);
     }
+
+    function testToggleAttesterOnlyOwner(address notOwner, address anyAttester, bool enable) external {
+        hevm.assume(notOwner != address(this));
+        hevm.prank(notOwner);
+        hevm.expectRevert("Ownable: caller is not the owner");
+        badge.toggleAttester(anyAttester, enable);
+    }
 }

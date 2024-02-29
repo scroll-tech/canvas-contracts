@@ -7,7 +7,7 @@ import { createBadge } from './lib.js';
 import 'dotenv/config';
 
 const abi = [
-  'error SingletonBadge(bytes32 uid)'
+  'error SingletonBadge()'
 ]
 
 async function main() {

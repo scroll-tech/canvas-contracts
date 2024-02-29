@@ -20,7 +20,7 @@ abstract contract ScrollBadgeCustomPayload is ScrollBadge {
         bytes memory payload = getPayload(attestation);
 
         if (payload.length == 0) {
-            revert InvalidPayload(attestation.uid);
+            revert InvalidPayload();
         }
 
         return true;

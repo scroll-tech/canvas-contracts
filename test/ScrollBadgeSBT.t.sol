@@ -12,7 +12,7 @@ contract TestContract is ScrollBadgeSBT {
     constructor(address resolver_) ScrollBadge(resolver_) ScrollBadgeSBT("name", "symbol") {}
 
     function badgeTokenURI(bytes32 /*uid*/ ) public pure override returns (string memory) {
-        return "";
+        return "uri";
     }
 }
 
@@ -39,6 +39,9 @@ contract ScrollBadgeSBTTest is ScrollBadgeTestBase {
         uint256 tokenId = uint256(uid);
         address owner = badge.ownerOf(uint256(uid));
         assertEq(owner, alice);
+
+        string memory tokenUri = badge.tokenURI(tokenId);
+        assertEq(tokenUri, "uri");
 
         // cannot transfer token
         hevm.prank(alice);

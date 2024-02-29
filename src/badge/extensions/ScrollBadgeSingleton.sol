@@ -17,7 +17,7 @@ abstract contract ScrollBadgeSingleton is ScrollBadge {
         }
 
         if (hasBadge(attestation.recipient)) {
-            revert SingletonBadge(attestation.uid);
+            revert SingletonBadge();
         }
 
         return true;

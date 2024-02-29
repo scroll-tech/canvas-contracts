@@ -38,7 +38,7 @@ contract ScrollBadgeOrigins is ScrollBadgeCustomPayload, ScrollBadgeSingleton {
         }
 
         // do not allow minting for other users
-        if (msg.sender != attestation.recipient) {
+        if (attestation.attester != attestation.recipient) {
             revert Unauthorized();
         }
 

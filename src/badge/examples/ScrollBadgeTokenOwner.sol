@@ -19,9 +19,9 @@ function decodePayloadData(bytes memory data) pure returns (address, uint256) {
     return abi.decode(data, (address, uint256));
 }
 
-/// @title ScrollNFTOwnerBadge
+/// @title ScrollBadgeTokenOwner
 /// @notice A simple badge that attests that the user owns a specific NFT.
-contract ScrollNFTOwnerBadge is ScrollBadgeCustomPayload, ScrollBadgeSelfAttest, ScrollBadgeSingleton {
+contract ScrollBadgeTokenOwner is ScrollBadgeCustomPayload, ScrollBadgeSelfAttest, ScrollBadgeSingleton {
     error IncorrectBadgeOwner();
 
     mapping(address => bool) public isTokenAllowed;

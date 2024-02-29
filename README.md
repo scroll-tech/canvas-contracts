@@ -6,9 +6,11 @@
 
 ## Overview
 
-- Each user can create a `Profile` contract, minted through the `ProfileRegistry`. All profiles share the same implementation.
-- Each badge is an EAS attestation that goes through the `ScrollBadgeResolver` contract.
-- Each individual badge type is a standalone `ScrollBadge` contract, which manages the badge-specific logic.
+**Profiles**: Each user can create a `Profile` contract, minted through the `ProfileRegistry`. All profiles share the same implementation.
+
+**Badges**: Each badge is an EAS attestation that goes through the `ScrollBadgeResolver` contract.
+- Each individual badge type is a standalone `ScrollBadge` contract, which manages the badge-specific logic. This badge contract can implement arbitrary logic attached to the attestation.
+- Badges implement a `badgeTokenURI` interface, similar to `ERC721.tokenURI`.
 - Badges are minted to the user's wallet address. The user can express their personalization preferences (attach and order badges, choose a profile photo) through their `Profile`.
 
 ## ScrollBadge Schema and Resolver
@@ -31,16 +33,19 @@ Each badge is a standalone contract, inheriting from `ScrollBadge`.
 This repo contains some useful [extensions](src/badge/extensions):
 - `ScrollBadgeAccessControl` restricts who can create and revoke this badge.
 - `ScrollBadgeCustomPayload` adds custom payload support to the badge.
-- `ScrollBadgeNonRevocable` disables revocation for this badge.
+- `ScrollBadgeNoExpiry` disables expiration for the badge.
+- `ScrollBadgeNonRevocable` disables revocation for the badge.
 - `ScrollBadgeSBT` attaches an SBT token to each badge attestation.
+- `ScrollBadgeSelfAttest` ensures that only the recipient of the badge can create the badge.
+- `ScrollBadgeSingleton` ensures that each user can only have at most one of the badge.
 
 ### Examples
 
 This repo also contains some [examples](src/badge/examples):
-- `ScrollBadgeSimple` is a simple SBT badge with fixed metadata.
-- `ScrollBadgePermissionless` is a permissionless SBT badge that anyone can mint to themselves.
+- `ScrollBadgeSimple` is a simple badge with fixed metadata.
+- `ScrollBadgePermissionless` is a permissionless badge that anyone can mint to themselves.
 - `ScrollBadgeLevels` is an SBT badge that stores a level in its payload and renders different images based on this level.
-- `ScrollBadgeOrigins` is an SBT badge that is tied to a Scroll Origins NFT.
+- `ScrollBadgeTokenOwner` is a badge that is tied to the ownership of a Scroll Origins NFT.
 
 ## Issuing Badges
 

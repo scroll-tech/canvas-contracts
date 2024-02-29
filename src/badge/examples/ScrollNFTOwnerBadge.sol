@@ -12,19 +12,23 @@ import {ScrollBadgeSingleton} from "../extensions/ScrollBadgeSingleton.sol";
 import {ScrollBadge} from "../ScrollBadge.sol";
 import {Unauthorized} from "../../Errors.sol";
 
-string constant SCROLL_BADGE_ORIGINS_SCHEMA = "address originsTokenAddress, uint256 originsTokenId";
+string constant SCROLL_BADGE_NFT_OWNER_SCHEMA = "address tokenAddress, uint256 tokenId";
 
 function decodePayloadData(bytes memory data) pure returns (address, uint256) {
     return abi.decode(data, (address, uint256));
 }
 
-/// @title ScrollBadgeOrigins
+/// @title ScrollNFTOwnerBadge
 /// @notice A simple badge that is attached to a Scroll Origins NFT.
-contract ScrollBadgeOrigins is ScrollBadgeCustomPayload, ScrollBadgeSingleton {
+contract ScrollNFTOwnerBadge is ScrollBadgeCustomPayload, ScrollBadgeSingleton {
     error IncorrectBadgeOwner();
 
-    constructor(address resolver_) ScrollBadge(resolver_) {
-        // empty
+    mapping (address => bool) public isTokenAllowed;
+
+    constructor(address resolver_, address[] memory tokens_) ScrollBadge(resolver_) {
+        for (uint256 i = 0; i < tokens_.length; ++i) {
+            isTokenAllowed[tokens_[i]] = true;
+        }
     }
 
     /// @inheritdoc ScrollBadge
@@ -44,9 +48,13 @@ contract ScrollBadgeOrigins is ScrollBadgeCustomPayload, ScrollBadgeSingleton {
 
         // check that badge payload attestation is correct
         bytes memory payload = getPayload(attestation);
-        (address originsTokenAddress, uint256 originsTokenId) = decodePayloadData(payload);
+        (address tokenAddress, uint256 tokenId) = decodePayloadData(payload);
 
-        if (IERC721(originsTokenAddress).ownerOf(originsTokenId) != attestation.recipient) {
+        if (!isTokenAllowed[tokenAddress]) {
+            revert Unauthorized();
+        }
+
+        if (IERC721(tokenAddress).ownerOf(tokenId) != attestation.recipient) {
             revert IncorrectBadgeOwner();
         }
 
@@ -66,12 +74,12 @@ contract ScrollBadgeOrigins is ScrollBadgeCustomPayload, ScrollBadgeSingleton {
     function badgeTokenURI(bytes32 uid) public view override returns (string memory) {
         Attestation memory attestation = getAndValidateBadge(uid);
         bytes memory payload = getPayload(attestation);
-        (address originsTokenAddress, uint256 originsTokenId) = decodePayloadData(payload);
-        return IERC721Metadata(originsTokenAddress).tokenURI(originsTokenId);
+        (address tokenAddress, uint256 tokenId) = decodePayloadData(payload);
+        return IERC721Metadata(tokenAddress).tokenURI(tokenId);
     }
 
     /// @inheritdoc ScrollBadgeCustomPayload
     function getSchema() public pure override returns (string memory) {
-        return SCROLL_BADGE_ORIGINS_SCHEMA;
+        return SCROLL_BADGE_NFT_OWNER_SCHEMA;
     }
 }

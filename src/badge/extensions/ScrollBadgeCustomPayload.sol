@@ -6,7 +6,7 @@ import {Attestation} from "@eas/contracts/IEAS.sol";
 
 import {ScrollBadge} from "../ScrollBadge.sol";
 import {decodeBadgeData} from "../../Common.sol";
-import {InvalidPayload} from "../../Errors.sol";
+import {MissingPayload} from "../../Errors.sol";
 
 /// @title ScrollBadgeCustomPayload
 /// @notice This contract adds custom payload to ScrollBadge.
@@ -20,7 +20,7 @@ abstract contract ScrollBadgeCustomPayload is ScrollBadge {
         bytes memory payload = getPayload(attestation);
 
         if (payload.length == 0) {
-            revert InvalidPayload();
+            revert MissingPayload();
         }
 
         return true;

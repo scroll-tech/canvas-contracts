@@ -2,24 +2,27 @@
 
 pragma solidity 0.8.19;
 
-import {EMPTY_UID} from "@eas/contracts/Common.sol";
-import {IEAS, Attestation} from "@eas/contracts/IEAS.sol";
+import {Attestation} from "@eas/contracts/IEAS.sol";
 
 import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import {Multicall} from "@openzeppelin/contracts/utils/Multicall.sol";
 
 import {IProfile} from "../interfaces/IProfile.sol";
 import {IProfileRegistry} from "../interfaces/IProfileRegistry.sol";
 import {IScrollBadgeResolver} from "../interfaces/IScrollBadgeResolver.sol";
 import {MAX_ATTACHED_BADGE_NUM} from "../Common.sol";
-import {BadgeCountReached, InvalidBadge, LengthMismatch, Unauthorized, TokenNotOwnedByUser} from "../Errors.sol";
+
+import {
+    AttestationOwnerMismatch,
+    BadgeCountReached,
+    LengthMismatch,
+    TokenNotOwnedByUser,
+    Unauthorized
+} from "../Errors.sol";
 
 contract Profile is IProfile, Initializable, Multicall {
-    using EnumerableSet for EnumerableSet.Bytes32Set;
-
     /**
      *
      * Constants *
@@ -130,7 +133,7 @@ contract Profile is IProfile, Initializable, Multicall {
         Attestation memory badge = IScrollBadgeResolver(resolver).getAndValidateBadge(uid);
 
         if (badge.recipient != owner) {
-            revert InvalidBadge(badge.uid);
+            revert AttestationOwnerMismatch(badge.uid);
         }
 
         return badge;

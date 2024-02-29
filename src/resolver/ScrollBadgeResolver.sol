@@ -8,22 +8,23 @@ import {SchemaResolver, ISchemaResolver} from "@eas/contracts/resolver/SchemaRes
 
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
-import {IScrollBadge} from "../interfaces/IScrollBadge.sol";
-import {IScrollBadgeResolver} from "../interfaces/IScrollBadgeResolver.sol";
 import {IProfile} from "../interfaces/IProfile.sol";
 import {IProfileRegistry} from "../interfaces/IProfileRegistry.sol";
-import {
-    ResolverPaymentsDisabled,
-    AttestationSchemaMismatch,
-    ExpirationTimeDisabled,
-    BadgeNotFound,
-    BadgeNotAllowed,
-    AttestationNotFound,
-    AttestationExpired,
-    AttestationRevoked
-} from "../Errors.sol";
+import {IScrollBadge} from "../interfaces/IScrollBadge.sol";
+import {IScrollBadgeResolver} from "../interfaces/IScrollBadgeResolver.sol";
 import {SCROLL_BADGE_SCHEMA, decodeBadgeData} from "../Common.sol";
 import {ScrollBadgeResolverWhitelist} from "./ScrollBadgeResolverWhitelist.sol";
+
+import {
+    AttestationExpired,
+    AttestationNotFound,
+    AttestationRevoked,
+    AttestationSchemaMismatch,
+    BadgeNotAllowed,
+    BadgeNotFound,
+    ResolverPaymentsDisabled,
+    UnknownSchema
+} from "../Errors.sol";
 
 /// @title ScrollBadgeResolver
 /// @notice This resolver contract receives callbacks every time a Scroll badge
@@ -91,7 +92,7 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
 
         // do not process other schemas
         if (attestation.schema != schema) {
-            revert AttestationSchemaMismatch();
+            revert UnknownSchema();
         }
 
         // decode attestation
@@ -163,7 +164,7 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
         }
 
         if (attestation.schema != schema) {
-            revert AttestationSchemaMismatch();
+            revert AttestationSchemaMismatch(uid);
         }
 
         if (attestation.expirationTime != NO_EXPIRATION_TIME && attestation.expirationTime <= block.timestamp) {

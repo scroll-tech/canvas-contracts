@@ -7,7 +7,7 @@ import {Attestation} from "@eas/contracts/IEAS.sol";
 import {decodeBadgeData} from "../Common.sol";
 import {IScrollBadge} from "../interfaces/IScrollBadge.sol";
 import {IScrollBadgeResolver} from "../interfaces/IScrollBadgeResolver.sol";
-import {Unauthorized, AttestationBadgeMismatch} from "../Errors.sol";
+import {AttestationBadgeMismatch, Unauthorized} from "../Errors.sol";
 
 /// @title ScrollBadge
 /// @notice This contract implements the basic functionalities of a Scroll badge.

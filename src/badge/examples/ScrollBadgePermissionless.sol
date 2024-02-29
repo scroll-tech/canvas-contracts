@@ -4,7 +4,6 @@ pragma solidity 0.8.19;
 
 import {Attestation} from "@eas/contracts/IEAS.sol";
 
-import {InvalidBadge} from "../../Errors.sol";
 import {ScrollBadge} from "../ScrollBadge.sol";
 import {ScrollBadgeSelfAttest} from "../extensions/ScrollBadgeSelfAttest.sol";
 import {ScrollBadgeSingleton} from "../extensions/ScrollBadgeSingleton.sol";

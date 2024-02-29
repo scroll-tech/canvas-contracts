@@ -6,7 +6,7 @@ import {Attestation} from "@eas/contracts/IEAS.sol";
 import {NO_EXPIRATION_TIME} from "@eas/contracts/Common.sol";
 
 import {ScrollBadge} from "../ScrollBadge.sol";
-import {ExpirationTimeDisabled} from "../../Errors.sol";
+import {ExpirationDisabled} from "../../Errors.sol";
 
 /// @title ScrollBadgeNoExpiry
 /// @notice This contract disables expiration for this badge.
@@ -18,7 +18,7 @@ abstract contract ScrollBadgeNoExpiry is ScrollBadge {
         }
 
         if (attestation.expirationTime != NO_EXPIRATION_TIME) {
-            revert ExpirationTimeDisabled();
+            revert ExpirationDisabled();
         }
 
         return true;

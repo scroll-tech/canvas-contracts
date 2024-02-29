@@ -2,15 +2,18 @@
 
 pragma solidity 0.8.19;
 
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {ECDSAUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol";
 import {EIP712Upgradeable} from "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol";
-import {BeaconProxy} from "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
-import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
+import {BeaconProxy} from "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 import {Create2} from "@openzeppelin/contracts/utils/Create2.sol";
+import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 
 import {IProfileRegistry} from "../interfaces/IProfileRegistry.sol";
+import {Profile} from "./Profile.sol";
+
 import {
     CallerIsNotUserProfile,
     DuplicatedUsername,
@@ -22,7 +25,6 @@ import {
     MsgValueMismatchWithMintFee,
     ProfileAlreadyMinted
 } from "../Errors.sol";
-import {Profile} from "./Profile.sol";
 
 contract ClonableBeaconProxy is BeaconProxy {
     constructor() BeaconProxy(msg.sender, "") {}

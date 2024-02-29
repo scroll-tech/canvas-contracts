@@ -4,19 +4,9 @@ pragma solidity 0.8.19;
 
 import {ScrollBadgeTestBase} from "./ScrollBadgeTestBase.sol";
 
-import {EMPTY_UID, NO_EXPIRATION_TIME} from "@eas/contracts/Common.sol";
-import {
-    IEAS,
-    Attestation,
-    AttestationRequest,
-    AttestationRequestData,
-    RevocationRequest,
-    RevocationRequestData
-} from "@eas/contracts/IEAS.sol";
-
-import {ScrollBadgeSingleton} from "../src/badge/extensions/ScrollBadgeSingleton.sol";
 import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
-import {SingletonBadge, InvalidPayload, RevocationDisabled} from "../src/Errors.sol";
+import {ScrollBadgeSingleton} from "../src/badge/extensions/ScrollBadgeSingleton.sol";
+import {SingletonBadge} from "../src/Errors.sol";
 
 contract TestContract is ScrollBadgeSingleton {
     constructor(address resolver_) ScrollBadge(resolver_) {}
@@ -49,7 +39,7 @@ contract ScrollBadgeSingletonTest is ScrollBadgeTestBase {
     function testAttestTwiceFails(address recipient) external {
         _attest(address(badge), "", recipient);
 
-        hevm.expectRevert(SingletonBadge.selector);
+        vm.expectRevert(SingletonBadge.selector);
         _attest(address(badge), "", recipient);
     }
 }

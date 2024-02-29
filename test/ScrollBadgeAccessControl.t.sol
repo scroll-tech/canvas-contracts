@@ -4,8 +4,8 @@ pragma solidity 0.8.19;
 
 import {ScrollBadgeTestBase} from "./ScrollBadgeTestBase.sol";
 
-import {ScrollBadgeAccessControl} from "../src/badge/extensions/ScrollBadgeAccessControl.sol";
 import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
+import {ScrollBadgeAccessControl} from "../src/badge/extensions/ScrollBadgeAccessControl.sol";
 import {Unauthorized} from "../src/Errors.sol";
 
 contract TestContract is ScrollBadgeAccessControl {
@@ -33,7 +33,7 @@ contract ScrollBadgeAccessControlTest is ScrollBadgeTestBase {
     }
 
     function testUnauthorizedAttest() external {
-        hevm.expectRevert(Unauthorized.selector);
+        vm.expectRevert(Unauthorized.selector);
         _attest(address(badge), "", alice);
     }
 
@@ -42,14 +42,14 @@ contract ScrollBadgeAccessControlTest is ScrollBadgeTestBase {
         bytes32 uid = _attest(address(badge), "", alice);
 
         badge.toggleAttester(address(this), false);
-        hevm.expectRevert(Unauthorized.selector);
+        vm.expectRevert(Unauthorized.selector);
         _revoke(uid);
     }
 
     function testToggleAttesterOnlyOwner(address notOwner, address anyAttester, bool enable) external {
-        hevm.assume(notOwner != address(this));
-        hevm.prank(notOwner);
-        hevm.expectRevert("Ownable: caller is not the owner");
+        vm.assume(notOwner != address(this));
+        vm.prank(notOwner);
+        vm.expectRevert("Ownable: caller is not the owner");
         badge.toggleAttester(anyAttester, enable);
     }
 }

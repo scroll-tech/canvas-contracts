@@ -4,11 +4,8 @@ pragma solidity 0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 import {VmSafe} from "forge-std/Vm.sol";
-import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
 
-import {EAS} from "@eas/contracts/EAS.sol";
-import {IEAS} from "@eas/contracts/IEAS.sol";
-import {ISchemaResolver} from "@eas/contracts/resolver/ISchemaResolver.sol";
+import {EAS, IEAS} from "@eas/contracts/EAS.sol";
 import {SchemaRegistry, ISchemaRegistry} from "@eas/contracts/SchemaRegistry.sol";
 
 import {
@@ -16,21 +13,20 @@ import {
     TransparentUpgradeableProxy
 } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
-import {IProfileRegistry} from "../src/interfaces/IProfileRegistry.sol";
 import {EmptyContract} from "../src/misc/EmptyContract.sol";
 import {Profile} from "../src/profile/Profile.sol";
 import {ProfileRegistry} from "../src/profile/ProfileRegistry.sol";
 import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
 
 contract ProfileRegistryTest is Test {
-    error MsgValueMismatchWithMintFee();
-    error DuplicatedUsername();
-    error InvalidUsername();
-    error ExpiredSignature();
-    error InvalidSignature();
-    error InvalidReferrer();
     error CallerIsNotUserProfile();
+    error DuplicatedUsername();
+    error ExpiredSignature();
     error ImplementationNotContract();
+    error InvalidReferrer();
+    error InvalidSignature();
+    error InvalidUsername();
+    error MsgValueMismatchWithMintFee();
     error ProfileAlreadyMinted();
 
     address private constant TREASURY_ADDRESS = 0x1000000000000000000000000000000000000000;

@@ -2,29 +2,30 @@
 
 pragma solidity 0.8.19;
 
+import {ScrollBadgeTestBase} from "./ScrollBadgeTestBase.sol";
+
 import {EMPTY_UID, NO_EXPIRATION_TIME} from "@eas/contracts/Common.sol";
+import {EAS} from "@eas/contracts/EAS.sol";
+import {ISchemaResolver} from "@eas/contracts/resolver/ISchemaResolver.sol";
+
 import {
-    IEAS,
     Attestation,
     AttestationRequest,
     AttestationRequestData,
     RevocationRequest,
     RevocationRequestData
 } from "@eas/contracts/IEAS.sol";
-import {EAS} from "@eas/contracts/EAS.sol";
-import {ISchemaResolver} from "@eas/contracts/resolver/ISchemaResolver.sol";
 
-import {ScrollBadgeTestBase} from "./ScrollBadgeTestBase.sol";
+import {IScrollBadge, ScrollBadge} from "../src/badge/ScrollBadge.sol";
 
-import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
-import {IScrollBadge} from "../src/interfaces/IScrollBadge.sol";
 import {
     AttestationExpired,
     AttestationNotFound,
     AttestationRevoked,
     AttestationSchemaMismatch,
+    BadgeNotAllowed,
     BadgeNotFound,
-    BadgeNotAllowed
+    UnknownSchema
 } from "../src/Errors.sol";
 
 contract TestContract is ScrollBadge {
@@ -46,23 +47,23 @@ contract ScrollBadgeTest is ScrollBadgeTestBase {
     }
 
     function testResolverToggleBadgeOnlyOwner(address notOwner, address anyBadge, bool enable) external {
-        hevm.assume(notOwner != address(this));
-        hevm.prank(notOwner);
-        hevm.expectRevert("Ownable: caller is not the owner");
+        vm.assume(notOwner != address(this));
+        vm.prank(notOwner);
+        vm.expectRevert("Ownable: caller is not the owner");
         resolver.toggleBadge(anyBadge, enable);
     }
 
     function testResolverToggleWhitelistOnlyOwner(address notOwner, bool enable) external {
-        hevm.assume(notOwner != address(this));
-        hevm.prank(notOwner);
-        hevm.expectRevert("Ownable: caller is not the owner");
+        vm.assume(notOwner != address(this));
+        vm.prank(notOwner);
+        vm.expectRevert("Ownable: caller is not the owner");
         resolver.toggleWhitelist(enable);
     }
 
     function testResolverToggleAutoAttachOnlyOwner(address notOwner, address anyBadge, bool enable) external {
-        hevm.assume(notOwner != address(this));
-        hevm.prank(notOwner);
-        hevm.expectRevert("Ownable: caller is not the owner");
+        vm.assume(notOwner != address(this));
+        vm.prank(notOwner);
+        vm.expectRevert("Ownable: caller is not the owner");
         resolver.toggleBadgeAutoAttach(anyBadge, enable);
     }
 
@@ -73,7 +74,7 @@ contract ScrollBadgeTest is ScrollBadgeTestBase {
     }
 
     function testGetNonExistentBadgeFails(bytes32 uid) external {
-        hevm.expectRevert(abi.encodeWithSelector(AttestationNotFound.selector, uid));
+        vm.expectRevert(abi.encodeWithSelector(AttestationNotFound.selector, uid));
         resolver.getAndValidateBadge(uid);
     }
 
@@ -92,7 +93,7 @@ contract ScrollBadgeTest is ScrollBadgeTestBase {
         AttestationRequest memory _req = AttestationRequest({schema: otherSchema, data: _attData});
         bytes32 uid = eas.attest(_req);
 
-        hevm.expectRevert(AttestationSchemaMismatch.selector);
+        vm.expectRevert(abi.encodeWithSelector(AttestationSchemaMismatch.selector, uid));
         resolver.getAndValidateBadge(uid);
     }
 
@@ -111,9 +112,9 @@ contract ScrollBadgeTest is ScrollBadgeTestBase {
         AttestationRequest memory _req = AttestationRequest({schema: schema, data: _attData});
         bytes32 uid = eas.attest(_req);
 
-        hevm.warp(expirationTime);
+        vm.warp(expirationTime);
 
-        hevm.expectRevert(abi.encodeWithSelector(AttestationExpired.selector, uid));
+        vm.expectRevert(abi.encodeWithSelector(AttestationExpired.selector, uid));
         resolver.getAndValidateBadge(uid);
     }
 
@@ -121,15 +122,15 @@ contract ScrollBadgeTest is ScrollBadgeTestBase {
         bytes32 uid = _attest(address(badge), "", alice);
         _revoke(uid);
 
-        hevm.expectRevert(abi.encodeWithSelector(AttestationRevoked.selector, uid));
+        vm.expectRevert(abi.encodeWithSelector(AttestationRevoked.selector, uid));
         resolver.getAndValidateBadge(uid);
     }
 
     // test only EAS can call
 
     function testAttestRejectPayment(uint256 value) external {
-        hevm.assume(value > 0);
-        hevm.deal(address(this), value);
+        vm.assume(value > 0);
+        vm.deal(address(this), value);
 
         AttestationRequestData memory _attData = AttestationRequestData({
             recipient: alice,
@@ -142,7 +143,7 @@ contract ScrollBadgeTest is ScrollBadgeTestBase {
 
         AttestationRequest memory _req = AttestationRequest({schema: schema, data: _attData});
 
-        hevm.expectRevert(EAS.NotPayable.selector);
+        vm.expectRevert(EAS.NotPayable.selector);
         eas.attest{value: value}(_req);
     }
 
@@ -161,7 +162,7 @@ contract ScrollBadgeTest is ScrollBadgeTestBase {
 
         AttestationRequest memory _req = AttestationRequest({schema: otherSchema, data: _attData});
 
-        hevm.expectRevert(AttestationSchemaMismatch.selector);
+        vm.expectRevert(UnknownSchema.selector);
         eas.attest(_req);
     }
 
@@ -180,13 +181,13 @@ contract ScrollBadgeTest is ScrollBadgeTestBase {
         AttestationRequest memory _req = AttestationRequest({schema: schema, data: _attData});
 
         // fail on abi.decode, no error
-        hevm.expectRevert(bytes(""));
+        vm.expectRevert(bytes(""));
         eas.attest(_req);
     }
 
     function testAttestRejectNonContractBadge(address otherBadge) external {
-        hevm.assume(otherBadge != address(badge));
-        hevm.assume(otherBadge.code.length == 0);
+        vm.assume(otherBadge != address(badge));
+        vm.assume(otherBadge.code.length == 0);
 
         bytes memory data = abi.encode(otherBadge, "");
 
@@ -201,7 +202,7 @@ contract ScrollBadgeTest is ScrollBadgeTestBase {
 
         AttestationRequest memory _req = AttestationRequest({schema: schema, data: _attData});
 
-        hevm.expectRevert(abi.encodeWithSelector(BadgeNotFound.selector, otherBadge));
+        vm.expectRevert(abi.encodeWithSelector(BadgeNotFound.selector, otherBadge));
         eas.attest(_req);
     }
 
@@ -220,7 +221,7 @@ contract ScrollBadgeTest is ScrollBadgeTestBase {
 
         AttestationRequest memory _req = AttestationRequest({schema: schema, data: _attData});
 
-        hevm.expectRevert(abi.encodeWithSelector(BadgeNotAllowed.selector, otherBadge));
+        vm.expectRevert(abi.encodeWithSelector(BadgeNotAllowed.selector, otherBadge));
         eas.attest(_req);
     }
 
@@ -241,13 +242,13 @@ contract ScrollBadgeTest is ScrollBadgeTestBase {
         AttestationRequest memory _req = AttestationRequest({schema: schema, data: _attData});
 
         // fail on issueBadge call, no error
-        hevm.expectRevert(bytes(""));
+        vm.expectRevert(bytes(""));
         eas.attest(_req);
     }
 
     function testRevokeRejectPayment(uint256 value) external {
-        hevm.assume(value > 0);
-        hevm.deal(address(this), value);
+        vm.assume(value > 0);
+        vm.deal(address(this), value);
 
         bytes32 uid = _attest(address(badge), "", alice);
 
@@ -255,7 +256,7 @@ contract ScrollBadgeTest is ScrollBadgeTestBase {
 
         RevocationRequest memory _req = RevocationRequest({schema: schema, data: _data});
 
-        hevm.expectRevert(EAS.NotPayable.selector);
+        vm.expectRevert(EAS.NotPayable.selector);
         eas.revoke{value: value}(_req);
     }
 }

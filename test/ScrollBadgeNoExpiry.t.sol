@@ -4,19 +4,12 @@ pragma solidity 0.8.19;
 
 import {ScrollBadgeTestBase} from "./ScrollBadgeTestBase.sol";
 
-import {EMPTY_UID, NO_EXPIRATION_TIME} from "@eas/contracts/Common.sol";
-import {
-    IEAS,
-    Attestation,
-    AttestationRequest,
-    AttestationRequestData,
-    RevocationRequest,
-    RevocationRequestData
-} from "@eas/contracts/IEAS.sol";
+import {Attestation, AttestationRequest, AttestationRequestData} from "@eas/contracts/IEAS.sol";
+import {EMPTY_UID} from "@eas/contracts/Common.sol";
 
-import {ScrollBadgeNoExpiry} from "../src/badge/extensions/ScrollBadgeNoExpiry.sol";
 import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
-import {Unauthorized, InvalidPayload, ExpirationTimeDisabled} from "../src/Errors.sol";
+import {ScrollBadgeNoExpiry} from "../src/badge/extensions/ScrollBadgeNoExpiry.sol";
+import {ExpirationDisabled} from "../src/Errors.sol";
 
 contract TestContract is ScrollBadgeNoExpiry {
     constructor(address resolver_) ScrollBadge(resolver_) {}
@@ -41,7 +34,7 @@ contract ScrollBadgeNoExpiryTest is ScrollBadgeTestBase {
     }
 
     function testAttestWithExpiryFails(uint64 expirationTime) external {
-        hevm.assume(expirationTime > uint64(block.timestamp));
+        vm.assume(expirationTime > uint64(block.timestamp));
 
         AttestationRequestData memory _attData = AttestationRequestData({
             recipient: alice,
@@ -54,7 +47,7 @@ contract ScrollBadgeNoExpiryTest is ScrollBadgeTestBase {
 
         AttestationRequest memory _req = AttestationRequest({schema: schema, data: _attData});
 
-        hevm.expectRevert(ExpirationTimeDisabled.selector);
+        vm.expectRevert(ExpirationDisabled.selector);
         eas.attest(_req);
     }
 }

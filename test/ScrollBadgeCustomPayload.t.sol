@@ -4,18 +4,11 @@ pragma solidity 0.8.19;
 
 import {ScrollBadgeTestBase} from "./ScrollBadgeTestBase.sol";
 
-import {
-    IEAS,
-    Attestation,
-    AttestationRequest,
-    AttestationRequestData,
-    RevocationRequest,
-    RevocationRequestData
-} from "@eas/contracts/IEAS.sol";
+import {Attestation} from "@eas/contracts/IEAS.sol";
 
-import {ScrollBadgeCustomPayload} from "../src/badge/extensions/ScrollBadgeCustomPayload.sol";
 import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
-import {Unauthorized, InvalidPayload} from "../src/Errors.sol";
+import {ScrollBadgeCustomPayload} from "../src/badge/extensions/ScrollBadgeCustomPayload.sol";
+import {MissingPayload} from "../src/Errors.sol";
 
 contract TestContract is ScrollBadgeCustomPayload {
     constructor(address resolver_) ScrollBadge(resolver_) {}
@@ -51,7 +44,7 @@ contract ScrollBadgeCustomPayloadTest is ScrollBadgeTestBase {
     }
 
     function testAttestWithEmptyPayloadFails() external {
-        hevm.expectRevert(InvalidPayload.selector);
+        vm.expectRevert(MissingPayload.selector);
         _attest(address(badge), "", alice);
     }
 }

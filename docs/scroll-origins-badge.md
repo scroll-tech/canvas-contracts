@@ -1,6 +1,6 @@
 # Skelly Origins Badge
 
-In the examples on this page, we use the configurations from [integration-faq.md](./integration-faq.md), as well as the following values:
+In the examples on this page, we use the configurations from [deployments.md](./deployments.md), as well as the following values:
 
 ```bash
 # Scroll Origins NFT addresses

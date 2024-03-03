@@ -10,7 +10,7 @@ This means that the badge data includes two fields: `address badge, bytes payloa
 
 ### How to implement a new badge?
 
-As a badge developer, you need to deploy a badge contract, that inherits from [`ScrollBadge`](../src/badge/ScrollBadge.sol).
+As a badge developer, you need to deploy a badge contract that inherits from [`ScrollBadge`](../src/badge/ScrollBadge.sol).
 Additionally, you can use one of more [extensions](../src/badge/extensions).
 
 The badge must implement 3 APIs (see [`IScrollBadge`](../src/interfaces/IScrollBadge.sol)):
@@ -36,7 +36,7 @@ There are 3 main badge minting flows:
 1. **Fully permissionless**.
    The user attests to themselves using `EAS.attest`.
    The badge contract ensures that the issuer is authorized.
-   See [`ScrollBadgePermissionless.sol](../src/badge/examples/ScrollBadgePermissionless.sol) and [`ScrollBadgeTokenOwner.sol](../src/badge/examples/ScrollBadgeTokenOwner.sol).
+   See [`ScrollBadgePermissionless.sol`](../src/badge/examples/ScrollBadgePermissionless.sol) and [`ScrollBadgeTokenOwner.sol`](../src/badge/examples/ScrollBadgeTokenOwner.sol).
 
 2. **Backend-authorized**.
    A centralized backend implements some off-chain eligibility check.

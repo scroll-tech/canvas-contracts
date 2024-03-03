@@ -6,12 +6,12 @@ import {Attestation} from "@eas/contracts/IEAS.sol";
 
 import {ScrollBadge} from "../ScrollBadge.sol";
 import {ScrollBadgePermissionless} from "./ScrollBadgePermissionless.sol";
-import {ScrollBadgeOnChainEligibility} from "../extensions/ScrollBadgeOnChainEligibility.sol";
+import {ScrollBadgeEligibilityCheck} from "../extensions/ScrollBadgeEligibilityCheck.sol";
 import {Unauthorized} from "../../Errors.sol";
 
 /// @title ScrollBadgeWhale
 /// @notice A badge that shows that the user had 1000 ETH or more at the time of minting.
-contract ScrollBadgeWhale is ScrollBadgePermissionless, ScrollBadgeOnChainEligibility {
+contract ScrollBadgeWhale is ScrollBadgePermissionless, ScrollBadgeEligibilityCheck {
     constructor(address resolver_) ScrollBadgePermissionless(resolver_) {
         // empty
     }
@@ -46,7 +46,7 @@ contract ScrollBadgeWhale is ScrollBadgePermissionless, ScrollBadgeOnChainEligib
         return true;
     }
 
-    /// @inheritdoc ScrollBadgeOnChainEligibility
+    /// @inheritdoc ScrollBadgeEligibilityCheck
     function isEligible(address recipient) external view override returns (bool) {
         return !hasBadge(recipient) && recipient.balance >= 1000 ether;
     }

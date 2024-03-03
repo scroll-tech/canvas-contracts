@@ -33,7 +33,6 @@ Each badge is an EAS attestation that goes through the `ScrollBadgeResolver` con
 
 Each badge type is a standalone contract, inheriting from `ScrollBadge`.
 This badge contract can implement arbitrary logic attached to the attestation.
-
 Badges implement a `badgeTokenURI` interface, similar to `ERC721.tokenURI`.
 
 Badges are minted to the user's wallet address.
@@ -48,6 +47,7 @@ This repo contains some useful [extensions](src/badge/extensions):
 - `ScrollBadgeCustomPayload` adds custom payload support to the badge.
 - `ScrollBadgeNoExpiry` disables expiration for the badge.
 - `ScrollBadgeNonRevocable` disables revocation for the badge.
+- `ScrollBadgeEligibilityCheck` adds a standard on-chain eligibility check interface.
 - `ScrollBadgeSBT` attaches an SBT token to each badge attestation.
 - `ScrollBadgeSelfAttest` ensures that only the recipient of the badge can create the badge.
 - `ScrollBadgeSingleton` ensures that each user can only have at most one of the badge.

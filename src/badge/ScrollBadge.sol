@@ -88,15 +88,10 @@ abstract contract ScrollBadge is IScrollBadge {
         return attestation;
     }
 
-    /// @notice Returns the token URI corresponding to a certain badge UID, or the default
-    ///         badge token URI if the pass UID is 0x0.
-    /// @param uid The badge UID, or 0x0.
-    /// @return The badge token URI (same format as ERC721).
+    /// @inheritdoc IScrollBadge
     function badgeTokenURI(bytes32 uid) public view virtual returns (string memory);
 
-    /// @notice Returns true if the user has one or more of this badge.
-    /// @param user The user's wallet address.
-    /// @return True if the user has one or more of this badge.
+    /// @inheritdoc IScrollBadge
     function hasBadge(address user) public view returns (bool) {
         return _userBadgeCount[user] > 0;
     }

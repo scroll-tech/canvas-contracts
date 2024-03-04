@@ -11,13 +11,14 @@ import {ScrollBadgeSingleton} from "../extensions/ScrollBadgeSingleton.sol";
 /// @title ScrollBadgePermissionless
 /// @notice A simple badge that anyone can mint in a permissionless manner.
 contract ScrollBadgePermissionless is ScrollBadgeSelfAttest, ScrollBadgeSingleton {
-    constructor(address resolver_, string memory name_, string memory symbol_) ScrollBadge(resolver_) {
+    constructor(address resolver_) ScrollBadge(resolver_) {
         // empty
     }
 
     /// @inheritdoc ScrollBadge
     function onIssueBadge(Attestation calldata attestation)
         internal
+        virtual
         override (ScrollBadgeSelfAttest, ScrollBadgeSingleton)
         returns (bool)
     {
@@ -27,6 +28,7 @@ contract ScrollBadgePermissionless is ScrollBadgeSelfAttest, ScrollBadgeSingleto
     /// @inheritdoc ScrollBadge
     function onRevokeBadge(Attestation calldata attestation)
         internal
+        virtual
         override (ScrollBadgeSelfAttest, ScrollBadgeSingleton)
         returns (bool)
     {

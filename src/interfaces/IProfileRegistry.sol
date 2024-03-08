@@ -12,7 +12,8 @@ interface IProfileRegistry {
     /// @notice Emitted when a new profile is minted.
     /// @param account The address of account who minted the profile.
     /// @param profile The address of profile minted.
-    event MintProfile(address indexed account, address indexed profile);
+    /// @param referrer The address of referrer.
+    event MintProfile(address indexed account, address indexed profile, address indexed referrer);
 
     /// @notice Emitted when profile register username.
     /// @param profile The address of profile.

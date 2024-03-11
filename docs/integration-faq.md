@@ -4,12 +4,12 @@ In the examples on this page, we use the configurations from [deployments.md](./
 
 ```bash
 # Skelly badges -- each badge type is a new contract, here we only have three simple test contracts
-SCROLL_SEPOLIA_SIMPLE_BADGE_A_ADDRESS="0xF955E3CDffA1D67E3de6FDC6247D3724DE8DA561"
-SCROLL_SEPOLIA_SIMPLE_BADGE_B_ADDRESS="0xf7f7d145ddAD3Fd3EaE26D4DaC03EcD8183399eE"
-SCROLL_SEPOLIA_SIMPLE_BADGE_C_ADDRESS="0x6697Df63b2951aa3167Db26E293772D50e68c11c"
+SCROLL_SEPOLIA_SIMPLE_BADGE_A_ADDRESS="0x54E0C87672ebEC2A4d86dF3BDbB5286E7Af23396"
+SCROLL_SEPOLIA_SIMPLE_BADGE_B_ADDRESS="0xF03214B490B6d05527cAD0B99a2820356b97840B"
+SCROLL_SEPOLIA_SIMPLE_BADGE_C_ADDRESS="0x5892067fEB828020FBA7B3dD87428010Ecaa86a7"
 
 # Skelly profiles -- each user has their own profile (a smart contract), here we provide a simple test profile
-SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS="0x3d9b1a157B8927E6D7116dfE8D30AeC77866dC98"
+SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS="0x1BB2543cA2e55c83524276DB767218bFa7624A49"
 ```
 
 The following examples use Foundry's `cast`, but the same queries can be made using curl, ethers, etc. analogously.
@@ -21,9 +21,9 @@ We first query the user's deterministic profile address, then see if the profile
 
 ```bash
 > cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_PROFILE_REGISTRY_ADDRESS" "getProfile(address)(address)" "0xF138EdC6038C237e94450bcc9a7085a7b213cAf0"
-0x3d9b1a157B8927E6D7116dfE8D30AeC77866dC98
+0x1BB2543cA2e55c83524276DB767218bFa7624A49
 
-> cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_PROFILE_REGISTRY_ADDRESS" "isProfileMinted(address)(bool)" "0x3d9b1a157B8927E6D7116dfE8D30AeC77866dC98"
+> cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_PROFILE_REGISTRY_ADDRESS" "isProfileMinted(address)(bool)" "0x1BB2543cA2e55c83524276DB767218bFa7624A49"
 false
 ```
 
@@ -63,7 +63,7 @@ We can use the EAS GraphQL API to query a user's Skelly badges.
 query Attestation {
   attestations(
     where: {
-      schemaId: { equals: "0x06cc89865218afac3602d8eb5c84cf0183c3c27bf54327218f2efe12a2383d65" },
+      schemaId: { equals: "0x1bcce3df7047d5c9af46729cbf8d8b3ac29332b7b9afe7037ed6696a3b86c783" },
       recipient: { equals: "0xF138EdC6038C237e94450bcc9a7085a7b213cAf0" },
       revoked: { equals: false }
     }
@@ -88,7 +88,7 @@ Request:
     query Attestation { \
       attestations( \
         where: { \
-          schemaId: { equals: \"0x06cc89865218afac3602d8eb5c84cf0183c3c27bf54327218f2efe12a2383d65\" }, \
+          schemaId: { equals: \"0x1bcce3df7047d5c9af46729cbf8d8b3ac29332b7b9afe7037ed6696a3b86c783\" }, \
           recipient: { equals: \"0xF138EdC6038C237e94450bcc9a7085a7b213cAf0\" }, \
           revoked: { equals: false } \
         } \
@@ -113,24 +113,24 @@ Response:
     "attestations": [
       {
         "attester": "0xF138EdC6038C237e94450bcc9a7085a7b213cAf0",
-        "data": "0x000000000000000000000000f955e3cdffa1d67e3de6fdc6247d3724de8da56100000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000",
-        "id": "0xf360e9632960221c26690aff471c0dc82f9b2b806f838c19097555c569eb5ef5",
-        "time": 1709239263,
-        "txid": "0xb89f9bd3fbdef3abd395a10b2873d52f0b10f5bac27bdbad4d543a9bc0e30e10"
+        "data": "0x00000000000000000000000054e0c87672ebec2a4d86df3bdbb5286e7af2339600000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000",
+        "id": "0xc64ad0c8dba972edea5770c6dd1ca6361655cfcf6804f60c351ac406bd0274a8",
+        "time": 1710172032,
+        "txid": "0xeb0ed13780c253cd13a9cf0b7b2a8f23598520d25d4f9b0665026aa35b7fc0b2"
       },
       {
         "attester": "0xF138EdC6038C237e94450bcc9a7085a7b213cAf0",
-        "data": "0x000000000000000000000000f7f7d145ddad3fd3eae26d4dac03ecd8183399ee00000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000",
-        "id": "0xae3f93e4870b6188cdf7b7276bd26031714eb029542d142a4e5e6c8cb1f2d4bb",
-        "time": 1709239272,
-        "txid": "0xc4b83aca70cbf84a5c459c861d06d05773f459c89c0e516c16824051784bbd24"
+        "data": "0x000000000000000000000000f03214b490b6d05527cad0b99a2820356b97840b00000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000",
+        "id": "0x81472ca091e0af5c93a23cccd59e0a6f8482847130e2bc89ef4308c9a889b17a",
+        "time": 1710172041,
+        "txid": "0x66513603a8e7cf5023d9f41cf79d2b53dd6da9dbd9167746e03567f566456d79"
       },
       {
         "attester": "0xF138EdC6038C237e94450bcc9a7085a7b213cAf0",
-        "data": "0x0000000000000000000000006697df63b2951aa3167db26e293772d50e68c11c00000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000",
-        "id": "0xb2365c2a2309a3d94f0d51292d67311caecc88bce20cbc4ad151e149858d8830",
-        "time": 1709239281,
-        "txid": "0x9c2a5694da60da57e109287ec52ec1393d06c4b437c9b3f9dd6f0a3e37c614d9"
+        "data": "0x0000000000000000000000005892067feb828020fba7b3dd87428010ecaa86a700000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000",
+        "id": "0xe2971a22c2922f48fa3d32c4ec08bac14667efdec0d4bd1a1ae223d8f337c4b1",
+        "time": 1710172053,
+        "txid": "0x3b16b4d04cff130f11fda426f066cafefbc6faf8f586a87d83757be071e8300b"
       }
     ]
   }
@@ -149,8 +149,8 @@ address badge, bytes payload
 `badge` is the badge contract address, while `payload` is additional application-specific data.
 
 ```bash
-> cast abi-decode "foo(address,bytes)" --input "0x000000000000000000000000f955e3cdffa1d67e3de6fdc6247d3724de8da56100000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
-0xF955E3CDffA1D67E3de6FDC6247D3724DE8DA561
+> cast abi-decode "foo(address,bytes)" --input "0x00000000000000000000000054e0c87672ebec2a4d86df3bdbb5286e7af2339600000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+0x54E0C87672ebEC2A4d86dF3BDbB5286E7Af23396
 0x
 ```
 
@@ -160,7 +160,7 @@ address badge, bytes payload
 To get the token URI of a certain badge, first collect the badge attestation UID and the badge contract address. Then call `badgeTokenURI`:
 
 ```bash
-> cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_SIMPLE_BADGE_A_ADDRESS" "badgeTokenURI(bytes32)(string)" "0xf360e9632960221c26690aff471c0dc82f9b2b806f838c19097555c569eb5ef5"
+> cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_SIMPLE_BADGE_A_ADDRESS" "badgeTokenURI(bytes32)(string)" "0xc64ad0c8dba972edea5770c6dd1ca6361655cfcf6804f60c351ac406bd0274a8"
 "ipfs://bafybeibc5sgo2plmjkq2tzmhrn54bk3crhnc23zd2msg4ea7a4pxrkgfna/1"
 ```
 
@@ -197,13 +197,13 @@ A user can attach one or more badges to their profile. Badges are referenced by 
 
 ```bash
 # attach one
-> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "attach(bytes32[])" "[0xf360e9632960221c26690aff471c0dc82f9b2b806f838c19097555c569eb5ef5]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
+> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "attach(bytes32[])" "[0xc64ad0c8dba972edea5770c6dd1ca6361655cfcf6804f60c351ac406bd0274a8]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
 
 # attach many
-> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "attach(bytes32[])" "[0xae3f93e4870b6188cdf7b7276bd26031714eb029542d142a4e5e6c8cb1f2d4bb,0xb2365c2a2309a3d94f0d51292d67311caecc88bce20cbc4ad151e149858d8830]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
+> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "attach(bytes32[])" "[0x81472ca091e0af5c93a23cccd59e0a6f8482847130e2bc89ef4308c9a889b17a,0xe2971a22c2922f48fa3d32c4ec08bac14667efdec0d4bd1a1ae223d8f337c4b1]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
 
 # detach
-> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "detach(bytes32[])" "[0xb2365c2a2309a3d94f0d51292d67311caecc88bce20cbc4ad151e149858d8830]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
+> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "detach(bytes32[])" "[0xe2971a22c2922f48fa3d32c4ec08bac14667efdec0d4bd1a1ae223d8f337c4b1]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
 ```
 
 
@@ -213,7 +213,7 @@ To see which badges are attached to a profile, we can call `getAttachedBadges`:
 
 ```bash
 > cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "getAttachedBadges()(bytes32[])"
-[0xf360e9632960221c26690aff471c0dc82f9b2b806f838c19097555c569eb5ef5, 0xae3f93e4870b6188cdf7b7276bd26031714eb029542d142a4e5e6c8cb1f2d4bb, 0xb2365c2a2309a3d94f0d51292d67311caecc88bce20cbc4ad151e149858d8830]
+[0xc64ad0c8dba972edea5770c6dd1ca6361655cfcf6804f60c351ac406bd0274a8, 0x81472ca091e0af5c93a23cccd59e0a6f8482847130e2bc89ef4308c9a889b17a, 0xe2971a22c2922f48fa3d32c4ec08bac14667efdec0d4bd1a1ae223d8f337c4b1]
 ```
 
 To get the order of the badges, we can call `getBadgeOrder`:
@@ -232,7 +232,7 @@ Let's say the user has 3 badges attached: `A`, `B`, `C`. If we want to reorder t
 > cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "reorderBadges(uint256[])" "[3, 2, 1]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
 
 > cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "getAttachedBadges()(bytes32[])"
-[0xf360e9632960221c26690aff471c0dc82f9b2b806f838c19097555c569eb5ef5, 0xae3f93e4870b6188cdf7b7276bd26031714eb029542d142a4e5e6c8cb1f2d4bb, 0xb2365c2a2309a3d94f0d51292d67311caecc88bce20cbc4ad151e149858d8830]
+[0xc64ad0c8dba972edea5770c6dd1ca6361655cfcf6804f60c351ac406bd0274a8, 0x81472ca091e0af5c93a23cccd59e0a6f8482847130e2bc89ef4308c9a889b17a, 0xe2971a22c2922f48fa3d32c4ec08bac14667efdec0d4bd1a1ae223d8f337c4b1]
 
 > cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "getBadgeOrder()(uint256[])"
 [3, 2, 1]

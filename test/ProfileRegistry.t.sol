@@ -114,6 +114,9 @@ contract ProfileRegistryTest is Test {
         profileRegistry.mint("xxxxx", abi.encode(address(this), deadline, signature));
 
         // should mint with referral and fee goes to referral
+        (uint128 referred, uint128 earned) = profileRegistry.referrerData(address(this));
+        assertEq(referred, 0);
+        assertEq(earned, 0);
         deadline = block.timestamp + 1;
         signature = _signReferralData(signer.privateKey, address(this), address(2), deadline);
         payable(address(2)).transfer(1 ether);
@@ -122,6 +125,9 @@ contract ProfileRegistryTest is Test {
         profileRegistry.mint{value: 0.0005 ether}("yyyyy", abi.encode(address(this), deadline, signature));
         balanceAfter = address(this).balance;
         assertEq(balanceAfter - balanceBefore, 0.0005 ether);
+        (referred, earned) = profileRegistry.referrerData(address(this));
+        assertEq(referred, 1);
+        assertEq(earned, 0.0005 ether);
         vm.stopPrank();
 
         // should revert when mint with same name

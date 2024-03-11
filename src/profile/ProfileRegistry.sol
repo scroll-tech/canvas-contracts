@@ -50,6 +50,19 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
 
     /**
      *
+     * Structs *
+     *
+     */
+
+    /// @param referred The number of profiles minted through this referrer.
+    /// @param earned The amount of ETH earned by referral.
+    struct ReferrerData {
+        uint128 referred;
+        uint128 earned;
+    }
+
+    /**
+     *
      * Variables *
      *
      */
@@ -73,6 +86,9 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
     /// @notice The token URI for default profile avatar.
     /// @dev It should follow the Metadata Standards by opensea: https://docs.opensea.io/docs/metadata-standards.
     string private defaultProfileAvatar;
+
+    /// @notice Mapping from referrer address to referrer statistics.
+    mapping(address => ReferrerData) public referrerData;
 
     /**
      *
@@ -138,6 +154,7 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
     /// @inheritdoc IProfileRegistry
     function mint(string calldata username, bytes memory referral) external payable override returns (address) {
         address receiver = treasury;
+        address referrer;
         uint256 mintFee = MINT_FEE;
         if (referral.length > 0) {
             uint256 deadline;
@@ -155,6 +172,7 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
 
             // half mint fee and fee goes to referral
             mintFee = MINT_FEE / 2;
+            referrer = receiver;
         }
         if (msg.value != mintFee) revert MsgValueMismatchWithMintFee();
         Address.sendValue(payable(receiver), mintFee);
@@ -163,7 +181,14 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
             revert ProfileAlreadyMinted();
         }
 
-        return _mintProfile(_msgSender(), username);
+        if (referrer != address(0)) {
+            ReferrerData memory cached = referrerData[referrer];
+            cached.referred += 1;
+            cached.earned += uint128(mintFee);
+            referrerData[referrer] = cached;
+        }
+
+        return _mintProfile(_msgSender(), username, referrer);
     }
 
     /// @inheritdoc IProfileRegistry
@@ -235,7 +260,7 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
     /// @dev Internal function to mint a profile with given account address and username.
     /// @param account The address of user to mint profile.
     /// @param username The username of the profile.
-    function _mintProfile(address account, string calldata username) private returns (address) {
+    function _mintProfile(address account, string calldata username, address referrer) private returns (address) {
         // deployment will fail and this function will revert if contract `salt` is not unique
         bytes32 salt = keccak256(abi.encode(account));
         address profile = address(new ClonableBeaconProxy{salt: salt}());
@@ -245,7 +270,7 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
 
         Profile(profile).initialize(account, username);
 
-        emit MintProfile(account, profile);
+        emit MintProfile(account, profile, referrer);
 
         return profile;
     }

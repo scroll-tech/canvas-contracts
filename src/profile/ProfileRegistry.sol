@@ -181,7 +181,7 @@ contract ProfileRegistry is OwnableUpgradeable, EIP712Upgradeable, IBeacon, IPro
             revert ProfileAlreadyMinted();
         }
 
-        if (referrer != treasury) {
+        if (referrer != address(0)) {
             ReferrerData memory cached = referrerData[referrer];
             cached.referred += 1;
             cached.earned += uint128(mintFee);

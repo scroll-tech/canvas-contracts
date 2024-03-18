@@ -1,4 +1,4 @@
-# Scroll Skelly Contracts
+# Scroll Canvas Contracts
 
 ![Components overview](images/overview.png "Overview")
 

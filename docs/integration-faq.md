@@ -1,14 +1,14 @@
-# Skelly Integration FAQ
+# Canvas Integration FAQ
 
 In the examples on this page, we use the configurations from [deployments.md](./deployments.md), as well as the following values:
 
 ```bash
-# Skelly badges -- each badge type is a new contract, here we only have three simple test contracts
+# Canvas badges -- each badge type is a new contract, here we only have three simple test contracts
 SCROLL_SEPOLIA_SIMPLE_BADGE_A_ADDRESS="0x54E0C87672ebEC2A4d86dF3BDbB5286E7Af23396"
 SCROLL_SEPOLIA_SIMPLE_BADGE_B_ADDRESS="0xF03214B490B6d05527cAD0B99a2820356b97840B"
 SCROLL_SEPOLIA_SIMPLE_BADGE_C_ADDRESS="0x5892067fEB828020FBA7B3dD87428010Ecaa86a7"
 
-# Skelly profiles -- each user has their own profile (a smart contract), here we provide a simple test profile
+# Canvas profiles -- each user has their own profile (a smart contract), here we provide a simple test profile
 SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS="0x1BB2543cA2e55c83524276DB767218bFa7624A49"
 ```
 
@@ -55,7 +55,7 @@ To mint a profile with a referral, produce a signed referral, then submit it alo
 
 ### How to list all badges that a user has?
 
-We can use the EAS GraphQL API to query a user's Skelly badges.
+We can use the EAS GraphQL API to query a user's Canvas badges.
 
 > Warning: Badges are minted to the user's wallet address, not to their profile address!
 

@@ -1,11 +1,11 @@
-# Skelly Badge FAQ
+# Canvas Badge FAQ
 
 ### What is a badge?
 
-Each Skelly badge is an [EAS attestation](https://docs.attest.sh/docs/core--concepts/attestations), with some additional logic attached to it.
+Each Canvas badge is an [EAS attestation](https://docs.attest.sh/docs/core--concepts/attestations), with some additional logic attached to it.
 
-The badge attestation uses the official Scroll Skelly schema (see `SCROLL_SEPOLIA_BADGE_SCHEMA` in [deployments.md](./deployments.md)).
-This means that the badge data includes two fields: `address badge, bytes payload`, and badges will go through the official Skelly badge resolver contract.
+The badge attestation uses the official Scroll Canvas schema (see `SCROLL_SEPOLIA_BADGE_SCHEMA` in [deployments.md](./deployments.md)).
+This means that the badge data includes two fields: `address badge, bytes payload`, and badges will go through the official Canvas badge resolver contract.
 
 
 ### How to implement a new badge?

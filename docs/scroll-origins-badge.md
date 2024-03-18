@@ -1,4 +1,4 @@
-# Skelly Origins Badge
+# Canvas Origins Badge
 
 In the examples on this page, we use the configurations from [deployments.md](./deployments.md), as well as the following values:
 

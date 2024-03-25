@@ -273,8 +273,18 @@ contract Profile is IProfile, Initializable, Multicall {
     /// @param uid The badge uid to attach.
     function _attachOne(bytes32 uid) private {
         if (indexes[uid] > 0) return;
+
         uids.push(uid);
-        indexes[uid] = uids.length;
+        uint256 length = uids.length;
+        indexes[uid] = length;
+
+        uint256[] memory _oldOrders = _decodeOrder(badgeOrderEncoding, length - 1);
+        uint256[] memory _newOrders = new uint256[](length);
+        for (uint256 i = 0; i < length - 1; i++) {
+            _newOrders[i] = _oldOrders[i];
+        }
+        _newOrders[length - 1] = length;
+        badgeOrderEncoding = _encodeOrder(_newOrders);
     }
 
     /// @dev Internal function to detach one batch from this profile.

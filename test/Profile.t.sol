@@ -301,6 +301,20 @@ contract ProfileRegistryTest is Test {
         for (uint256 i = 0; i < count; ++i) {
             assertEq(badgeOrders[i], orders[i]);
         }
+
+        // attach one more badge
+        bytes32 newUid = _attest(address(badge), "", address(this));
+        bytes32[] memory newUids = new bytes32[](1);
+        newUids[0] = newUid;
+        profile.attach(newUids);
+
+        badgeOrders = profile.getBadgeOrder();
+        assertEq(badgeOrders.length, count + 1);
+        for (uint256 i = 0; i < count; ++i) {
+            // the order of the previous badges did not change
+            assertEq(badgeOrders[i], orders[i]);
+        }
+        assertEq(badgeOrders[count], count + 1);
     }
 
     function testChangeUsername() external {

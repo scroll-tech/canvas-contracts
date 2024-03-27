@@ -49,10 +49,10 @@ contract ScrollBadgeLevels is ScrollBadgeAccessControl, ScrollBadgeCustomPayload
         string memory description = "Scroll Level Badge";
         string memory image = ""; // IPFS, HTTP, or data URL
         string memory tokenUriJson = Base64.encode(
-            abi.encodePacked('{"name":"', name, '", "description":"', description, ', "image": "', image, '"}')
+            abi.encodePacked('{"name":"', name, '", "description":"', description, '", "image": "', image, '", "attributes": [{"trait_type": "Level", "value": "', Strings.toString(level), '"}]}')
         );
         return string(abi.encodePacked("data:application/json;base64,", tokenUriJson));
-    }
+    }    
 
     /// @inheritdoc ScrollBadgeCustomPayload
     function getSchema() public pure override returns (string memory) {

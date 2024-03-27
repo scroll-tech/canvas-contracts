@@ -32,7 +32,7 @@ contract ScrollBadgePermissionless is ScrollBadgeSelfAttest, ScrollBadgeSingleto
         override (ScrollBadgeSelfAttest, ScrollBadgeSingleton)
         returns (bool)
     {
-        return super.onIssueBadge(attestation);
+        return super.onRevokeBadge(attestation);
     }
 
     /// @inheritdoc ScrollBadge

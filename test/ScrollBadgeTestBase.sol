@@ -18,6 +18,7 @@ import {
 } from "@eas/contracts/IEAS.sol";
 
 import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
+import {ProfileRegistry} from "../src/profile/ProfileRegistry.sol";
 
 contract ScrollBadgeTestBase is Test {
     ISchemaRegistry internal registry;
@@ -35,7 +36,9 @@ contract ScrollBadgeTestBase is Test {
         eas = new EAS(registry);
 
         // Scroll components
-        address profileRegistry = address(0);
+        // no need to initialize the registry, since resolver
+        // only uses it to see if a profile has been minted or not.
+        address profileRegistry = address(new ProfileRegistry());
         resolver = new ScrollBadgeResolver(address(eas), profileRegistry);
         schema = resolver.schema();
     }

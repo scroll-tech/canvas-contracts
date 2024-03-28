@@ -57,6 +57,8 @@ contract ProfileRegistryTest is Test {
     error TokenNotOwnedByUser(address token, uint256 tokenId);
     error Unauthorized();
 
+    address internal constant attester = address(1);
+
     address private constant TREASURY_ADDRESS = 0x1000000000000000000000000000000000000000;
 
     address private constant PROXY_ADMIN_ADDRESS = 0x2000000000000000000000000000000000000000;
@@ -144,15 +146,16 @@ contract ProfileRegistryTest is Test {
         vm.prank(address(1));
         vm.expectRevert(Unauthorized.selector);
         _attachOne(bytes32(0));
-        vm.stopPrank();
 
         // revert when invalid badge
         bytes32 invalidUID = _attest(address(badge), "invalidUID", address(badge));
         vm.expectRevert(abi.encodeWithSelector(AttestationOwnerMismatch.selector, invalidUID));
         _attachOne(invalidUID);
 
+        vm.startPrank(attester);
         bytes32 uid0 = _attest(address(badge), "1", address(this));
         bytes32 uid1 = _attest(address(badge), "2", address(this));
+        vm.stopPrank();
         // attach one badge
         _attachOne(uid0);
         bytes32[] memory badges = profile.getAttachedBadges();
@@ -182,7 +185,9 @@ contract ProfileRegistryTest is Test {
 
         // attach 46 badges
         for (uint256 i = 1; i <= 46; ++i) {
+            vm.startPrank(attester);
             bytes32 uid = _attest(address(badge), abi.encodePacked(i), address(this));
+            vm.stopPrank();
             _attachOne(uid);
         }
         badges = profile.getAttachedBadges();
@@ -377,8 +382,7 @@ contract ProfileRegistryTest is Test {
         bytes32[] memory badges = profile.getAttachedBadges();
         assertEq(badges.length, 0);
 
-        resolver.toggleBadgeAutoAttach(address(badge), true);
-
+        vm.prank(address(this));
         _attest(address(badge), "1", address(this));
 
         badges = profile.getAttachedBadges();

@@ -60,13 +60,6 @@ contract ScrollBadgeTest is ScrollBadgeTestBase {
         resolver.toggleWhitelist(enable);
     }
 
-    function testResolverToggleAutoAttachOnlyOwner(address notOwner, address anyBadge, bool enable) external {
-        vm.assume(notOwner != address(this));
-        vm.prank(notOwner);
-        vm.expectRevert("Ownable: caller is not the owner");
-        resolver.toggleBadgeAutoAttach(anyBadge, enable);
-    }
-
     function testGetBadge() external {
         bytes32 uid = _attest(address(badge), "", alice);
         Attestation memory attestation = resolver.getAndValidateBadge(uid);

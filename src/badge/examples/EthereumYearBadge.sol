@@ -7,7 +7,6 @@ import {Attestation} from "@eas/contracts/IEAS.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
-import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 import {ScrollBadge} from "../ScrollBadge.sol";
@@ -16,7 +15,6 @@ import {ScrollBadgeNoExpiry} from "../extensions/ScrollBadgeNoExpiry.sol";
 import {ScrollBadgeNonRevocable} from "../extensions/ScrollBadgeNonRevocable.sol";
 import {ScrollBadgeSelfAttest} from "../extensions/ScrollBadgeSelfAttest.sol";
 import {ScrollBadgeSingleton} from "../extensions/ScrollBadgeSingleton.sol";
-import {Unauthorized} from "../../Errors.sol";
 
 string constant ETHEREUM_YEAR_BADGE_SCHEMA = "uint256 year, bytes signature";
 
@@ -56,7 +54,10 @@ contract EthereumYearBadge is
     // badge UID => current year
     mapping(bytes32 => uint256) public badgeYear;
 
-    constructor(address resolver_, address offchainSigner_, string memory baseTokenURI_) ScrollBadge(resolver_) EIP712("Ethereum Year Badge", "1") {
+    constructor(address resolver_, address offchainSigner_, string memory baseTokenURI_)
+        ScrollBadge(resolver_)
+        EIP712("Ethereum Year Badge", "1")
+    {
         _updateOffchainSigner(offchainSigner_);
 
         baseTokenURI = baseTokenURI_;

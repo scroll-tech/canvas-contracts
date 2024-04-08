@@ -45,15 +45,6 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
 
     /**
      *
-     * Variables *
-     *
-     */
-
-    /// @inheritdoc IScrollBadgeResolver
-    mapping(address => bool) public isBadgeAutoAttach;
-
-    /**
-     *
      * Constructor *
      *
      */
@@ -113,8 +104,9 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
             return false;
         }
 
-        // auto-attach whitelisted badges
-        if (isBadgeAutoAttach[badge]) {
+        // auto-attach self-minted badges
+        // note: in some cases attestation.attester is a proxy, so we also check tx.origin.
+        if (attestation.recipient == attestation.attester || attestation.recipient == tx.origin) {
             _autoAttach(attestation);
         }
 
@@ -176,20 +168,6 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
         }
 
         return attestation;
-    }
-
-    /**
-     *
-     * Restricted Functions *
-     *
-     */
-
-    /// @notice Enable or disable auto-attach for a badge.
-    /// @param badge The address of the badge contract.
-    /// @param enable Enable auto-attach if true, disable if false.
-    function toggleBadgeAutoAttach(address badge, bool enable) external onlyOwner {
-        isBadgeAutoAttach[badge] = enable;
-        emit UpdateAutoAttachWhitelist(badge, enable);
     }
 
     /**

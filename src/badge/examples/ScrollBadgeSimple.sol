@@ -32,7 +32,7 @@ contract ScrollBadgeSimple is ScrollBadgeAccessControl, ScrollBadgeSingleton {
         override (ScrollBadgeAccessControl, ScrollBadgeSingleton)
         returns (bool)
     {
-        return super.onIssueBadge(attestation);
+        return super.onRevokeBadge(attestation);
     }
 
     /// @inheritdoc ScrollBadge

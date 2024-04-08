@@ -46,8 +46,4 @@ interface IScrollBadgeResolver {
     /// @param uid The attestation UID.
     /// @return The attestation.
     function getAndValidateBadge(bytes32 uid) external view returns (Attestation memory);
-
-    /// @notice Mapping from badge address to auto attach whitelist status.
-    /// @param badge The address of the badge contract.
-    function isBadgeAutoAttach(address badge) external view returns (bool);
 }

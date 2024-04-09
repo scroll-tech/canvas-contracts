@@ -7,6 +7,7 @@ import {console} from "forge-std/console.sol";
 import {Attestation} from "@eas/contracts/IEAS.sol";
 
 import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
+import {EthereumYearBadge} from "../src/badge/examples/EthereumYearBadge.sol";
 import {ScrollBadgeTokenOwner} from "../src/badge/examples/ScrollBadgeTokenOwner.sol";
 import {ScrollBadgeSelfAttest} from "../src/badge/extensions/ScrollBadgeSelfAttest.sol";
 import {ScrollBadgeSingleton} from "../src/badge/extensions/ScrollBadgeSingleton.sol";
@@ -42,7 +43,7 @@ contract CanvasTestBadge is ScrollBadgeSelfAttest, ScrollBadgeSingleton {
     }
 }
 
-contract DeployTestContracts is Script {
+contract DeployCanvasTestBadgeContracts is Script {
     uint256 DEPLOYER_PRIVATE_KEY = vm.envUint("DEPLOYER_PRIVATE_KEY");
 
     address RESOLVER_ADDRESS = vm.envAddress("SCROLL_BADGE_RESOLVER_CONTRACT_ADDRESS");
@@ -65,16 +66,21 @@ contract DeployTestContracts is Script {
             address(resolver), "ipfs://bafybeibc5sgo2plmjkq2tzmhrn54bk3crhnc23zd2msg4ea7a4pxrkgfna/3"
         );
 
+        // deploy origins NFT badge
         address[] memory tokens = new address[](1);
         tokens[0] = 0xDd7d857F570B0C211abfe05cd914A85BefEC2464;
 
         ScrollBadgeTokenOwner badge4 = new ScrollBadgeTokenOwner(address(resolver), tokens);
+
+        // deploy Ethereum year badge
+        EthereumYearBadge badge5 = new EthereumYearBadge(address(resolver), "https://nft.scroll.io/canvas/year/");
 
         // set permissions
         resolver.toggleBadge(address(badge1), true);
         resolver.toggleBadge(address(badge2), true);
         resolver.toggleBadge(address(badge3), true);
         resolver.toggleBadge(address(badge4), true);
+        resolver.toggleBadge(address(badge5), true);
 
         // log addresses
         logAddress("DEPLOYER_ADDRESS", vm.addr(DEPLOYER_PRIVATE_KEY));
@@ -82,6 +88,7 @@ contract DeployTestContracts is Script {
         logAddress("SIMPLE_BADGE_B_CONTRACT_ADDRESS", address(badge2));
         logAddress("SIMPLE_BADGE_C_CONTRACT_ADDRESS", address(badge3));
         logAddress("ORIGINS_BADGE_ADDRESS", address(badge4));
+        logAddress("ETHEREUM_YEAR_BADGE_ADDRESS", address(badge5));
 
         vm.stopBroadcast();
     }

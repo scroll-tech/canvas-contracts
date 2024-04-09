@@ -18,7 +18,7 @@ import {Profile} from "../src/profile/Profile.sol";
 import {ProfileRegistry} from "../src/profile/ProfileRegistry.sol";
 import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
 
-contract DeployTestContracts is Script {
+contract DeployCanvasContracts is Script {
     uint256 DEPLOYER_PRIVATE_KEY = vm.envUint("DEPLOYER_PRIVATE_KEY");
 
     address SIGNER_ADDRESS = vm.envAddress("SIGNER_ADDRESS");

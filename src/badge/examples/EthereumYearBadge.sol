@@ -73,7 +73,7 @@ contract EthereumYearBadge is
         bytes memory payload = getPayload(attestation);
         uint256 year = decodePayloadData(payload);
 
-        return string(abi.encodePacked(baseTokenURI, Strings.toString(year)));
+        return string(abi.encodePacked(baseTokenURI, Strings.toString(year), ".json"));
     }
 
     /// @inheritdoc ScrollBadgeCustomPayload

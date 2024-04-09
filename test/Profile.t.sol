@@ -79,7 +79,12 @@ contract ProfileRegistryTest is Test {
         eas = new EAS(schemaRegistry);
         address profileRegistryProxy =
             address(new TransparentUpgradeableProxy(address(new EmptyContract()), PROXY_ADMIN_ADDRESS, ""));
-        resolver = new ScrollBadgeResolver(address(eas), profileRegistryProxy);
+
+        address resolverImpl = address(new ScrollBadgeResolver(address(eas), profileRegistryProxy));
+        address resolverProxy = address(new TransparentUpgradeableProxy(resolverImpl, PROXY_ADMIN_ADDRESS, ""));
+        resolver = ScrollBadgeResolver(payable(resolverProxy));
+        resolver.initialize();
+
         badge = new TestBadge(address(resolver));
         resolver.toggleBadge(address(badge), true);
 

@@ -12,7 +12,7 @@ const provider = new ethers.JsonRpcProvider(process.env.RPC_ENDPOINT);
 const signer = (new ethers.Wallet(process.env.SIGNER_PRIVATE_KEY)).connect(provider);
 
 // example query:
-// curl 'localhost:3000/api/badge/0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9/claim?recipient=0x0000000000000000000000000000000000000001'
+// curl 'localhost:3000/api/badge/0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0/claim?recipient=0x0000000000000000000000000000000000000001'
 app.get('/api/badge/:address/claim', async (req, res) => {
   const { recipient } = req.query;
   const { address } = req.params;

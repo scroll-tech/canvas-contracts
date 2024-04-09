@@ -17,6 +17,6 @@ export SIGNER_ADDRESS=$(cast wallet address "$SIGNER_PRIVATE_KEY")
 export TREASURY_ADDRESS=$(cast wallet address "$SIGNER_PRIVATE_KEY")
 
 pushd ..
-forge script script/DeployTestContracts.sol:DeployTestContracts --rpc-url http://localhost:8545 --broadcast 2>&1
+forge script script/DeployTestContracts.sol:DeployTestContracts --rpc-url http://127.0.0.1:8545 --broadcast 2>&1
 
 fg

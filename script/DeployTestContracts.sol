@@ -43,7 +43,11 @@ contract DeployTestContracts is Script {
             address(new TransparentUpgradeableProxy(address(placeholder), address(proxyAdmin), ""));
 
         // deploy Scroll badge resolver
-        ScrollBadgeResolver resolver = new ScrollBadgeResolver(address(eas), profileRegistryProxy);
+        address resolverImpl = address(new ScrollBadgeResolver(address(eas), profileRegistryProxy));
+        address resolverProxy = address(new TransparentUpgradeableProxy(resolverImpl, address(proxyAdmin), ""));
+        ScrollBadgeResolver resolver = ScrollBadgeResolver(payable(resolverProxy));
+        resolver.initialize();
+
         bytes32 schema = resolver.schema();
 
         // deploy profile implementation and upgrade registry

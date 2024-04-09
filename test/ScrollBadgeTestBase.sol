@@ -17,6 +17,8 @@ import {
     RevocationRequestData
 } from "@eas/contracts/IEAS.sol";
 
+import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+
 import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
 import {ProfileRegistry} from "../src/profile/ProfileRegistry.sol";
 
@@ -30,6 +32,8 @@ contract ScrollBadgeTestBase is Test {
     address internal constant alice = address(1);
     address internal constant bob = address(2);
 
+    address private constant PROXY_ADMIN_ADDRESS = 0x2000000000000000000000000000000000000000;
+
     function setUp() public virtual {
         // EAS infra
         registry = new SchemaRegistry();
@@ -39,7 +43,12 @@ contract ScrollBadgeTestBase is Test {
         // no need to initialize the registry, since resolver
         // only uses it to see if a profile has been minted or not.
         address profileRegistry = address(new ProfileRegistry());
-        resolver = new ScrollBadgeResolver(address(eas), profileRegistry);
+
+        address resolverImpl = address(new ScrollBadgeResolver(address(eas), profileRegistry));
+        address resolverProxy = address(new TransparentUpgradeableProxy(resolverImpl, PROXY_ADMIN_ADDRESS, ""));
+        resolver = ScrollBadgeResolver(payable(resolverProxy));
+        resolver.initialize();
+
         schema = resolver.schema();
     }
 

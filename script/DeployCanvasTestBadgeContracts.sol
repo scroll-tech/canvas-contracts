@@ -4,8 +4,9 @@ pragma solidity 0.8.19;
 import {Script} from "forge-std/Script.sol";
 import {console} from "forge-std/console.sol";
 
-import {Attestation} from "@eas/contracts/IEAS.sol";
+import {Attestation, IEAS} from "@eas/contracts/IEAS.sol";
 
+import {AttesterProxy} from "../src/AttesterProxy.sol";
 import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
 import {EthereumYearBadge} from "../src/badge/examples/EthereumYearBadge.sol";
 import {ScrollBadgeTokenOwner} from "../src/badge/examples/ScrollBadgeTokenOwner.sol";
@@ -47,6 +48,9 @@ contract DeployCanvasTestBadgeContracts is Script {
     uint256 DEPLOYER_PRIVATE_KEY = vm.envUint("DEPLOYER_PRIVATE_KEY");
 
     address RESOLVER_ADDRESS = vm.envAddress("SCROLL_BADGE_RESOLVER_CONTRACT_ADDRESS");
+    address ETHEREUM_YEAR_SIGNER_ADDRESS = vm.envAddress("ETHEREUM_YEAR_SIGNER_ADDRESS");
+
+    address EAS_ADDRESS = vm.envAddress("EAS_ADDRESS");
 
     function run() external {
         vm.startBroadcast(DEPLOYER_PRIVATE_KEY);
@@ -74,6 +78,11 @@ contract DeployCanvasTestBadgeContracts is Script {
 
         // deploy Ethereum year badge
         EthereumYearBadge badge5 = new EthereumYearBadge(address(resolver), "https://nft.scroll.io/canvas/year/");
+        AttesterProxy yearBadgeProxy = new AttesterProxy(IEAS(EAS_ADDRESS));
+
+        // set permissions
+        badge5.toggleAttester(address(yearBadgeProxy), true);
+        yearBadgeProxy.toggleAttester(ETHEREUM_YEAR_SIGNER_ADDRESS, true);
 
         // set permissions
         resolver.toggleBadge(address(badge1), true);
@@ -89,6 +98,7 @@ contract DeployCanvasTestBadgeContracts is Script {
         logAddress("SIMPLE_BADGE_C_CONTRACT_ADDRESS", address(badge3));
         logAddress("ORIGINS_BADGE_ADDRESS", address(badge4));
         logAddress("ETHEREUM_YEAR_BADGE_ADDRESS", address(badge5));
+        logAddress("ETHEREUM_YEAR_ATTESTER_PROXY_ADDRESS", address(yearBadgeProxy));
 
         vm.stopBroadcast();
     }

@@ -55,8 +55,6 @@ contract DeployCanvasContracts is Script {
         blacklist[0] = keccak256(bytes("vpn"));
         ProfileRegistry(profileRegistryProxy).blacklistUsername(blacklist);
 
-        ProfileRegistry(profileRegistryProxy).updateSigner(0x70997970C51812dc3A010C7d01b50e0d17dc79C8);
-
         // log addresses
         logAddress("DEPLOYER_ADDRESS", vm.addr(DEPLOYER_PRIVATE_KEY));
         logAddress("SIGNER_ADDRESS", SIGNER_ADDRESS);

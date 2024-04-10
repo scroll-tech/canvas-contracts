@@ -4,12 +4,12 @@ In the examples on this page, we use the configurations from [deployments.md](./
 
 ```bash
 # Canvas badges -- each badge type is a new contract, here we only have three simple test contracts
-SCROLL_SEPOLIA_SIMPLE_BADGE_A_ADDRESS="0x54E0C87672ebEC2A4d86dF3BDbB5286E7Af23396"
-SCROLL_SEPOLIA_SIMPLE_BADGE_B_ADDRESS="0xF03214B490B6d05527cAD0B99a2820356b97840B"
-SCROLL_SEPOLIA_SIMPLE_BADGE_C_ADDRESS="0x5892067fEB828020FBA7B3dD87428010Ecaa86a7"
+SCROLL_SEPOLIA_SIMPLE_BADGE_A_ADDRESS="0x30C98067517f8ee38e748A3aF63429974103Ea6B"
+SCROLL_SEPOLIA_SIMPLE_BADGE_B_ADDRESS="0xeBFc9B95328B2Cdb3c4CA8913e329c101d2Abbc2"
+SCROLL_SEPOLIA_SIMPLE_BADGE_C_ADDRESS="0x64492EF5a60245fbaF65F69782FCf158F3a8e3Aa"
 
 # Canvas profiles -- each user has their own profile (a smart contract), here we provide a simple test profile
-SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS="0x1BB2543cA2e55c83524276DB767218bFa7624A49"
+SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS="0xa10561B0b0f9F66Ec18A1Eff58e6F37D59dbbdeC"
 ```
 
 The following examples use Foundry's `cast`, but the same queries can be made using curl, ethers, etc. analogously.
@@ -21,9 +21,9 @@ We first query the user's deterministic profile address, then see if the profile
 
 ```bash
 > cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_PROFILE_REGISTRY_ADDRESS" "getProfile(address)(address)" "0xF138EdC6038C237e94450bcc9a7085a7b213cAf0"
-0x1BB2543cA2e55c83524276DB767218bFa7624A49
+0xa10561B0b0f9F66Ec18A1Eff58e6F37D59dbbdeC
 
-> cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_PROFILE_REGISTRY_ADDRESS" "isProfileMinted(address)(bool)" "0x1BB2543cA2e55c83524276DB767218bFa7624A49"
+> cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_PROFILE_REGISTRY_ADDRESS" "isProfileMinted(address)(bool)" "0xa10561B0b0f9F66Ec18A1Eff58e6F37D59dbbdeC"
 false
 ```
 
@@ -33,7 +33,7 @@ false
 Mint a profile without referral:
 
 ```bash
-> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_PROFILE_REGISTRY_ADDRESS" "mint(string,bytes)" "username1" "" --value "0.001ether" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
+> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_PROFILE_REGISTRY_ADDRESS" "mint(string,bytes)" "username1" "0x" --value "0.001ether" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
 ```
 
 To mint a profile with a referral, produce a signed referral, then submit it along with the `mint` call (see [referral.js](../examples/src/referral.js) for details).
@@ -63,7 +63,7 @@ We can use the EAS GraphQL API to query a user's Canvas badges.
 query Attestation {
   attestations(
     where: {
-      schemaId: { equals: "0x1bcce3df7047d5c9af46729cbf8d8b3ac29332b7b9afe7037ed6696a3b86c783" },
+      schemaId: { equals: "0xa35b5470ebb301aa5d309a8ee6ea258cad680ea112c86e456d5f2254448afc74" },
       recipient: { equals: "0xF138EdC6038C237e94450bcc9a7085a7b213cAf0" },
       revoked: { equals: false }
     }
@@ -88,7 +88,7 @@ Request:
     query Attestation { \
       attestations( \
         where: { \
-          schemaId: { equals: \"0x1bcce3df7047d5c9af46729cbf8d8b3ac29332b7b9afe7037ed6696a3b86c783\" }, \
+          schemaId: { equals: \"0xa35b5470ebb301aa5d309a8ee6ea258cad680ea112c86e456d5f2254448afc74\" }, \
           recipient: { equals: \"0xF138EdC6038C237e94450bcc9a7085a7b213cAf0\" }, \
           revoked: { equals: false } \
         } \
@@ -113,24 +113,24 @@ Response:
     "attestations": [
       {
         "attester": "0xF138EdC6038C237e94450bcc9a7085a7b213cAf0",
-        "data": "0x00000000000000000000000054e0c87672ebec2a4d86df3bdbb5286e7af2339600000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000",
-        "id": "0xc64ad0c8dba972edea5770c6dd1ca6361655cfcf6804f60c351ac406bd0274a8",
-        "time": 1710172032,
-        "txid": "0xeb0ed13780c253cd13a9cf0b7b2a8f23598520d25d4f9b0665026aa35b7fc0b2"
+        "data": "0x00000000000000000000000030c98067517f8ee38e748a3af63429974103ea6b00000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000",
+        "id": "0x719876cb21ec011354a230c9446ee0dadfe716127f56ef997850fc14231787b0",
+        "time": 1712751313,
+        "txid": "0x1c732351884b1fa0d9f9828190ca430763e3408f62a25f3c46efc52597268ceb"
       },
       {
         "attester": "0xF138EdC6038C237e94450bcc9a7085a7b213cAf0",
-        "data": "0x000000000000000000000000f03214b490b6d05527cad0b99a2820356b97840b00000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000",
-        "id": "0x81472ca091e0af5c93a23cccd59e0a6f8482847130e2bc89ef4308c9a889b17a",
-        "time": 1710172041,
-        "txid": "0x66513603a8e7cf5023d9f41cf79d2b53dd6da9dbd9167746e03567f566456d79"
+        "data": "0x000000000000000000000000ebfc9b95328b2cdb3c4ca8913e329c101d2abbc200000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000",
+        "id": "0xb3e474b7bed202a54d1c922635fb999abe8432b654a3410be7d5b578ea788fdd",
+        "time": 1712751325,
+        "txid": "0x12410df5c994e744d2e4f7f22bb389937ffd2dd12a3be02164dfbd0703f3f5fe"
       },
       {
         "attester": "0xF138EdC6038C237e94450bcc9a7085a7b213cAf0",
-        "data": "0x0000000000000000000000005892067feb828020fba7b3dd87428010ecaa86a700000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000",
-        "id": "0xe2971a22c2922f48fa3d32c4ec08bac14667efdec0d4bd1a1ae223d8f337c4b1",
-        "time": 1710172053,
-        "txid": "0x3b16b4d04cff130f11fda426f066cafefbc6faf8f586a87d83757be071e8300b"
+        "data": "0x00000000000000000000000064492ef5a60245fbaf65f69782fcf158f3a8e3aa00000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000",
+        "id": "0x80b82bdd262be13a673d1e8684c97b41646cf6168232cd6b600802e4e8d06a54",
+        "time": 1712751427,
+        "txid": "0xa2575ccaba7b9f89a1e056bea28573fa0b70b077bca0e3f19f1dc2f88e89e395"
       }
     ]
   }
@@ -138,7 +138,7 @@ Response:
 ```
 
 
-### How to decode badge payload?
+### How to decode the badge payload?
 
 Each badge is an attestation, whose `data` field contains the abi-encoded badge payload, using the following schema:
 
@@ -149,8 +149,8 @@ address badge, bytes payload
 `badge` is the badge contract address, while `payload` is additional application-specific data.
 
 ```bash
-> cast abi-decode "foo(address,bytes)" --input "0x00000000000000000000000054e0c87672ebec2a4d86df3bdbb5286e7af2339600000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
-0x54E0C87672ebEC2A4d86dF3BDbB5286E7Af23396
+> cast abi-decode "foo(address,bytes)" --input "0x00000000000000000000000030c98067517f8ee38e748a3af63429974103ea6b00000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+0x30C98067517f8ee38e748A3aF63429974103Ea6B
 0x
 ```
 
@@ -160,7 +160,7 @@ address badge, bytes payload
 To get the token URI of a certain badge, first collect the badge attestation UID and the badge contract address. Then call `badgeTokenURI`:
 
 ```bash
-> cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_SIMPLE_BADGE_A_ADDRESS" "badgeTokenURI(bytes32)(string)" "0xc64ad0c8dba972edea5770c6dd1ca6361655cfcf6804f60c351ac406bd0274a8"
+> cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_SIMPLE_BADGE_A_ADDRESS" "badgeTokenURI(bytes32)(string)" "0x719876cb21ec011354a230c9446ee0dadfe716127f56ef997850fc14231787b0"
 "ipfs://bafybeibc5sgo2plmjkq2tzmhrn54bk3crhnc23zd2msg4ea7a4pxrkgfna/1"
 ```
 
@@ -197,13 +197,13 @@ A user can attach one or more badges to their profile. Badges are referenced by 
 
 ```bash
 # attach one
-> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "attach(bytes32[])" "[0xc64ad0c8dba972edea5770c6dd1ca6361655cfcf6804f60c351ac406bd0274a8]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
+> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "attach(bytes32[])" "[0x719876cb21ec011354a230c9446ee0dadfe716127f56ef997850fc14231787b0]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
 
 # attach many
-> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "attach(bytes32[])" "[0x81472ca091e0af5c93a23cccd59e0a6f8482847130e2bc89ef4308c9a889b17a,0xe2971a22c2922f48fa3d32c4ec08bac14667efdec0d4bd1a1ae223d8f337c4b1]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
+> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "attach(bytes32[])" "[0xb3e474b7bed202a54d1c922635fb999abe8432b654a3410be7d5b578ea788fdd,0x80b82bdd262be13a673d1e8684c97b41646cf6168232cd6b600802e4e8d06a54]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
 
 # detach
-> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "detach(bytes32[])" "[0xe2971a22c2922f48fa3d32c4ec08bac14667efdec0d4bd1a1ae223d8f337c4b1]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
+> cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "detach(bytes32[])" "[0x80b82bdd262be13a673d1e8684c97b41646cf6168232cd6b600802e4e8d06a54]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
 ```
 
 
@@ -213,7 +213,7 @@ To see which badges are attached to a profile, we can call `getAttachedBadges`:
 
 ```bash
 > cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "getAttachedBadges()(bytes32[])"
-[0xc64ad0c8dba972edea5770c6dd1ca6361655cfcf6804f60c351ac406bd0274a8, 0x81472ca091e0af5c93a23cccd59e0a6f8482847130e2bc89ef4308c9a889b17a, 0xe2971a22c2922f48fa3d32c4ec08bac14667efdec0d4bd1a1ae223d8f337c4b1]
+[0x719876cb21ec011354a230c9446ee0dadfe716127f56ef997850fc14231787b0, 0xb3e474b7bed202a54d1c922635fb999abe8432b654a3410be7d5b578ea788fdd, 0x80b82bdd262be13a673d1e8684c97b41646cf6168232cd6b600802e4e8d06a54]
 ```
 
 To get the order of the badges, we can call `getBadgeOrder`:
@@ -232,7 +232,7 @@ Let's say the user has 3 badges attached: `A`, `B`, `C`. If we want to reorder t
 > cast send --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "reorderBadges(uint256[])" "[3, 2, 1]" --private-key "$SCROLL_SEPOLIA_PRIVATE_KEY"
 
 > cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "getAttachedBadges()(bytes32[])"
-[0xc64ad0c8dba972edea5770c6dd1ca6361655cfcf6804f60c351ac406bd0274a8, 0x81472ca091e0af5c93a23cccd59e0a6f8482847130e2bc89ef4308c9a889b17a, 0xe2971a22c2922f48fa3d32c4ec08bac14667efdec0d4bd1a1ae223d8f337c4b1]
+[0x719876cb21ec011354a230c9446ee0dadfe716127f56ef997850fc14231787b0, 0xb3e474b7bed202a54d1c922635fb999abe8432b654a3410be7d5b578ea788fdd, 0x80b82bdd262be13a673d1e8684c97b41646cf6168232cd6b600802e4e8d06a54]
 
 > cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_TEST_PROFILE_ADDRESS" "getBadgeOrder()(uint256[])"
 [3, 2, 1]

@@ -32,7 +32,7 @@ contract ScrollBadgeTestBase is Test {
     address internal constant alice = address(1);
     address internal constant bob = address(2);
 
-    address private constant PROXY_ADMIN_ADDRESS = 0x2000000000000000000000000000000000000000;
+    address internal constant PROXY_ADMIN_ADDRESS = 0x2000000000000000000000000000000000000000;
 
     function setUp() public virtual {
         // EAS infra

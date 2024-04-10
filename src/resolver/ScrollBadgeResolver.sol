@@ -38,10 +38,19 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
      */
 
     /// @inheritdoc IScrollBadgeResolver
-    bytes32 public immutable schema;
+    address public immutable registry;
+
+    /**
+     *
+     * Variables *
+     *
+     */
 
     /// @inheritdoc IScrollBadgeResolver
-    address public immutable registry;
+    bytes32 public schema;
+
+    // Storage slots reserved for future upgrades.
+    uint256[49] private __gap;
 
     /**
      *
@@ -53,15 +62,20 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
     /// @param eas_ The address of the global EAS contract.
     /// @param registry_ The address of the profile registry contract.
     constructor(address eas_, address registry_) SchemaResolver(IEAS(eas_)) {
+        registry = registry_;
+        _disableInitializers();
+    }
+
+    function initialize() external initializer {
+        __Whitelist_init();
+
         // register Scroll badge schema,
         // we do this here to ensure that the resolver is correctly configured
-        schema = IEAS(eas_).getSchemaRegistry().register(
+        schema = _eas.getSchemaRegistry().register(
             SCROLL_BADGE_SCHEMA,
             ISchemaResolver(address(this)), // resolver
             true // revocable
         );
-
-        registry = registry_;
     }
 
     /**

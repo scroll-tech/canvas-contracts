@@ -2,14 +2,43 @@
 
 pragma solidity 0.8.19;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-abstract contract ScrollBadgeResolverWhitelist is Ownable {
+abstract contract ScrollBadgeResolverWhitelist is OwnableUpgradeable {
+    /**
+     *
+     * Variables *
+     *
+     */
+
     // If false, all badges are allowed.
-    bool public whitelistEnabled = true;
+    bool public whitelistEnabled;
 
     // Authorized badge contracts.
     mapping(address => bool) public whitelist;
+
+    // Storage slots reserved for future upgrades.
+    uint256[48] private __gap;
+
+    /**
+     *
+     * Constructor *
+     *
+     */
+    constructor() {
+        _disableInitializers();
+    }
+
+    function __Whitelist_init() internal onlyInitializing {
+        __Ownable_init();
+        whitelistEnabled = true;
+    }
+
+    /**
+     *
+     * Restricted Functions *
+     *
+     */
 
     /// @notice Enables or disables a given badge contract.
     /// @param badge The badge address.

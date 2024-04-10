@@ -7,7 +7,8 @@ import { createBadge } from './lib.js';
 import 'dotenv/config';
 
 const abi = [
-  'error SingletonBadge()'
+  'error SingletonBadge()',
+  'error Unauthorized()'
 ]
 
 async function main() {

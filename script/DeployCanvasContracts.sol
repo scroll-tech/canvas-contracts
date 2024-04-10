@@ -4,35 +4,30 @@ pragma solidity 0.8.19;
 import {Script} from "forge-std/Script.sol";
 import {console} from "forge-std/console.sol";
 
-import {SchemaRegistry, ISchemaRegistry} from "@eas/contracts/SchemaRegistry.sol";
 import {EAS} from "@eas/contracts/EAS.sol";
 
 import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
+
 import {
     ITransparentUpgradeableProxy,
     TransparentUpgradeableProxy
 } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
-import {AttesterProxy} from "../src/AttesterProxy.sol";
-import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
-import {ScrollBadgeSimple} from "../src/badge/examples/ScrollBadgeSimple.sol";
-import {ProfileRegistry} from "../src/profile/ProfileRegistry.sol";
+import {EmptyContract} from "../src/misc/EmptyContract.sol";
 import {Profile} from "../src/profile/Profile.sol";
 import {ProfileRegistry} from "../src/profile/ProfileRegistry.sol";
-import {EmptyContract} from "../src/misc/EmptyContract.sol";
+import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
 
-contract DeployTestContracts is Script {
+contract DeployCanvasContracts is Script {
     uint256 DEPLOYER_PRIVATE_KEY = vm.envUint("DEPLOYER_PRIVATE_KEY");
+
     address SIGNER_ADDRESS = vm.envAddress("SIGNER_ADDRESS");
     address TREASURY_ADDRESS = vm.envAddress("TREASURY_ADDRESS");
-    address ATTESTER_ADDRESS = vm.envAddress("ATTESTER_ADDRESS");
+
+    address EAS_ADDRESS = vm.envAddress("EAS_ADDRESS");
 
     function run() external {
         vm.startBroadcast(DEPLOYER_PRIVATE_KEY);
-
-        // deploy EAS
-        SchemaRegistry schemaRegistry = new SchemaRegistry();
-        EAS eas = new EAS(schemaRegistry);
 
         // deploy proxy admin
         ProxyAdmin proxyAdmin = new ProxyAdmin();
@@ -42,7 +37,7 @@ contract DeployTestContracts is Script {
         address profileRegistryProxy = address(new TransparentUpgradeableProxy(placeholder, address(proxyAdmin), ""));
 
         // deploy Scroll badge resolver
-        address resolverImpl = address(new ScrollBadgeResolver(address(eas), profileRegistryProxy));
+        address resolverImpl = address(new ScrollBadgeResolver(EAS_ADDRESS, profileRegistryProxy));
         address resolverProxy = address(new TransparentUpgradeableProxy(resolverImpl, address(proxyAdmin), ""));
         ScrollBadgeResolver resolver = ScrollBadgeResolver(payable(resolverProxy));
         resolver.initialize();
@@ -55,26 +50,24 @@ contract DeployTestContracts is Script {
         proxyAdmin.upgrade(ITransparentUpgradeableProxy(profileRegistryProxy), address(profileRegistryImpl));
         ProfileRegistry(profileRegistryProxy).initialize(TREASURY_ADDRESS, SIGNER_ADDRESS, address(profileImpl));
 
-        // deploy test badge
-        ScrollBadgeSimple badge = new ScrollBadgeSimple(address(resolver), "uri");
-        AttesterProxy proxy = new AttesterProxy(eas);
+        // misc
+        bytes32[] memory blacklist = new bytes32[](1);
+        blacklist[0] = keccak256(bytes("vpn"));
+        ProfileRegistry(profileRegistryProxy).blacklistUsername(blacklist);
 
-        // set permissions
-        resolver.toggleBadge(address(badge), true);
-        badge.toggleAttester(address(proxy), true);
-        proxy.toggleAttester(ATTESTER_ADDRESS, true);
+        ProfileRegistry(profileRegistryProxy).updateSigner(0x70997970C51812dc3A010C7d01b50e0d17dc79C8);
 
         // log addresses
-        logAddress("EAS_REGISTRY_CONTRACT_ADDRESS", address(schemaRegistry));
-        logAddress("EAS_MAIN_CONTRACT_ADDRESS", address(eas));
-        logAddress("SCROLL_BADGE_PROXY_ADMIN_ADDRESS", address(proxyAdmin));
+        logAddress("DEPLOYER_ADDRESS", vm.addr(DEPLOYER_PRIVATE_KEY));
+        logAddress("SIGNER_ADDRESS", SIGNER_ADDRESS);
+        logAddress("TREASURY_ADDRESS", TREASURY_ADDRESS);
+        logAddress("EAS_ADDRESS", EAS_ADDRESS);
+        logAddress("SCROLL_PROFILE_REGISTRY_PROXY_ADMIN_ADDRESS", address(proxyAdmin));
+        logAddress("SCROLL_PROFILE_REGISTRY_PROXY_CONTRACT_ADDRESS", address(profileRegistryProxy));
         logAddress("SCROLL_BADGE_RESOLVER_CONTRACT_ADDRESS", address(resolver));
         logBytes32("SCROLL_BADGE_SCHEMA_UID", schema);
-        logAddress("SIMPLE_BADGE_CONTRACT_ADDRESS", address(badge));
-        logAddress("SIMPLE_BADGE_ATTESTER_PROXY_CONTRACT_ADDRESS", address(proxy));
         logAddress("SCROLL_PROFILE_IMPLEMENTATION_CONTRACT_ADDRESS", address(profileImpl));
         logAddress("SCROLL_PROFILE_REGISTRY_IMPLEMENTATION_CONTRACT_ADDRESS", address(profileRegistryImpl));
-        logAddress("SCROLL_PROFILE_REGISTRY_PROXY_CONTRACT_ADDRESS", address(profileRegistryProxy));
 
         vm.stopBroadcast();
     }

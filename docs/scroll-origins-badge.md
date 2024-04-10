@@ -8,9 +8,10 @@ SCROLL_SEPOLIA_ORIGINS_V1_ADDRESS="TBD"
 SCROLL_SEPOLIA_ORIGINS_V2_ADDRESS="0xDd7d857F570B0C211abfe05cd914A85BefEC2464"
 
 # Badge address
-SCROLL_SEPOLIA_ORIGINS_BADGE_ADDRESS="0x25Dd56E9F0F27881e7f9DcD315a45f5a41ef42b2"
+SCROLL_SEPOLIA_ORIGINS_BADGE_ADDRESS="0x2A3aC1337845f8C02d2dD7f80Dada22f01b569f9"
 ```
 
+In these examples, we will assume that the user's address is `0x58DB79a596Bf46D400C14672084a145aed08e19b`.
 
 ### How to check eligibility?
 
@@ -26,7 +27,7 @@ The Scroll Origin NFT's eligibility has two components:
 2. The user has not minted a Scroll Origins badge yet.
 
 ```bash
-> cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_ORIGINS_BADGE_ADDRESS" "hasBadge(address)(bool)" "0xF138EdC6038C237e94450bcc9a7085a7b213cAf0"
+> cast call --rpc-url "$SCROLL_SEPOLIA_RPC_URL" "$SCROLL_SEPOLIA_ORIGINS_BADGE_ADDRESS" "hasBadge(address)(bool)" "0x58DB79a596Bf46D400C14672084a145aed08e19b"
 false
 ```
 
@@ -34,8 +35,6 @@ false
 ### How to mint a Scroll Origins badge?
 
 A Scroll Origins badge can be minted from the frontend, no backend support is required.
-
-In this example, we will assume that the user's address is `0x58DB79a596Bf46D400C14672084a145aed08e19b`.
 
 First, find the user's token ID.
 

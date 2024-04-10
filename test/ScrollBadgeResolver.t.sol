@@ -48,6 +48,7 @@ contract ScrollBadgeTest is ScrollBadgeTestBase {
 
     function testResolverToggleBadgeOnlyOwner(address notOwner, address anyBadge, bool enable) external {
         vm.assume(notOwner != address(this));
+        vm.assume(notOwner != PROXY_ADMIN_ADDRESS);
         vm.prank(notOwner);
         vm.expectRevert("Ownable: caller is not the owner");
         resolver.toggleBadge(anyBadge, enable);
@@ -55,6 +56,7 @@ contract ScrollBadgeTest is ScrollBadgeTestBase {
 
     function testResolverToggleWhitelistOnlyOwner(address notOwner, bool enable) external {
         vm.assume(notOwner != address(this));
+        vm.assume(notOwner != PROXY_ADMIN_ADDRESS);
         vm.prank(notOwner);
         vm.expectRevert("Ownable: caller is not the owner");
         resolver.toggleWhitelist(enable);

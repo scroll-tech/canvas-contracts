@@ -2,10 +2,7 @@
 
 pragma solidity 0.8.19;
 
-import {Attestation} from "@eas/contracts/IEAS.sol";
-
 import {ScrollBadge} from "../ScrollBadge.sol";
-import {Unauthorized} from "../../Errors.sol";
 
 /// @title ScrollBadgeDefaultURI
 /// @notice This contract sets a default badge URI.

@@ -45,9 +45,10 @@ See [badges](./docs/badges.md) for details.
 This repo contains some useful [extensions](src/badge/extensions):
 - `ScrollBadgeAccessControl` restricts who can create and revoke this badge.
 - `ScrollBadgeCustomPayload` adds custom payload support to the badge.
+- `ScrollBadgeDefaultURI` sets a default badge token URI.
+- `ScrollBadgeEligibilityCheck` adds a standard on-chain eligibility check interface.
 - `ScrollBadgeNoExpiry` disables expiration for the badge.
 - `ScrollBadgeNonRevocable` disables revocation for the badge.
-- `ScrollBadgeEligibilityCheck` adds a standard on-chain eligibility check interface.
 - `ScrollBadgeSBT` attaches an SBT token to each badge attestation.
 - `ScrollBadgeSelfAttest` ensures that only the recipient of the badge can create the badge.
 - `ScrollBadgeSingleton` ensures that each user can only have at most one of the badge.

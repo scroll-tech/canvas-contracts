@@ -9,6 +9,7 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 import {ScrollBadgeAccessControl} from "../extensions/ScrollBadgeAccessControl.sol";
 import {ScrollBadgeCustomPayload} from "../extensions/ScrollBadgeCustomPayload.sol";
+import {ScrollBadgeDefaultURI} from "../extensions/ScrollBadgeDefaultURI.sol";
 import {ScrollBadge} from "../ScrollBadge.sol";
 
 string constant SCROLL_BADGE_LEVELS_SCHEMA = "uint8 scrollLevel";
@@ -19,15 +20,18 @@ function decodePayloadData(bytes memory data) pure returns (uint8) {
 
 /// @title ScrollBadgeLevels
 /// @notice A simple badge that represents the user's level.
-contract ScrollBadgeLevels is ScrollBadgeAccessControl, ScrollBadgeCustomPayload {
-    constructor(address resolver_) ScrollBadge(resolver_) {
+contract ScrollBadgeLevels is ScrollBadgeAccessControl, ScrollBadgeCustomPayload, ScrollBadgeDefaultURI {
+    constructor(address resolver_, string memory _defaultBadgeURI)
+        ScrollBadge(resolver_)
+        ScrollBadgeDefaultURI(_defaultBadgeURI)
+    {
         // empty
     }
 
     /// @inheritdoc ScrollBadge
     function onIssueBadge(Attestation calldata attestation)
         internal
-        override (ScrollBadgeAccessControl, ScrollBadgeCustomPayload)
+        override (ScrollBadge, ScrollBadgeAccessControl, ScrollBadgeCustomPayload)
         returns (bool)
     {
         return super.onIssueBadge(attestation);
@@ -36,14 +40,14 @@ contract ScrollBadgeLevels is ScrollBadgeAccessControl, ScrollBadgeCustomPayload
     /// @inheritdoc ScrollBadge
     function onRevokeBadge(Attestation calldata attestation)
         internal
-        override (ScrollBadgeAccessControl, ScrollBadgeCustomPayload)
+        override (ScrollBadge, ScrollBadgeAccessControl, ScrollBadgeCustomPayload)
         returns (bool)
     {
         return super.onRevokeBadge(attestation);
     }
 
-    /// @inheritdoc ScrollBadge
-    function badgeTokenURI(bytes32 uid) public view override returns (string memory) {
+    /// @inheritdoc ScrollBadgeDefaultURI
+    function getBadgeTokenURI(bytes32 uid) internal view override returns (string memory) {
         uint8 level = getCurrentLevel(uid);
         string memory name = string(abi.encode("Scroll Level #", Strings.toString(level)));
         string memory description = "Scroll Level Badge";

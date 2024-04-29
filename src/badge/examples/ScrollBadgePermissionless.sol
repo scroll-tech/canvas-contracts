@@ -40,9 +40,4 @@ contract ScrollBadgePermissionless is ScrollBadgeSelfAttest, ScrollBadgeEligibil
     function badgeTokenURI(bytes32 /*uid*/ ) public pure override returns (string memory) {
         return "";
     }
-
-    /// @inheritdoc ScrollBadgeEligibilityCheck
-    function isEligible(address) external view virtual override returns (bool) {
-        return true;
-    }
 }

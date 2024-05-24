@@ -3,8 +3,11 @@
 In the examples on this page, we use the configurations from [deployments.md](./deployments.md), as well as the following values:
 
 ```bash
-ETHEREUM_YEAR_BADGE_ADDRESS=0xB59B6466B21a089c93B14030AF88b164905a58fd
-ETHEREUM_YEAR_ATTESTER_PROXY_ADDRESS=0xdAe8D9a30681899C305534849e138579aF0BF88e
+SCROLL_MAINNET_ETHEREUM_YEAR_BADGE_ADDRESS=0x24Eb2CC4657986efbB2cCE41943C59d6708c8f54
+SCROLL_MAINNET_ETHEREUM_YEAR_ATTESTER_PROXY_ADDRESS=0xc1d9C7Cdb33107f1fEa871F2e874b9a95EE3f260
+
+SCROLL_SEPOLIA_ETHEREUM_YEAR_BADGE_ADDRESS=0xB59B6466B21a089c93B14030AF88b164905a58fd
+SCROLL_SEPOLIA_ETHEREUM_YEAR_ATTESTER_PROXY_ADDRESS=0xdAe8D9a30681899C305534849e138579aF0BF88e
 ```
 
 This badge uses backend-authorized delegated attestations. For details, refer to [badges.md](./badges.md). For an example of producing delegated attestations, refer to [attest-server.js](../examples/src/attest-server.js).

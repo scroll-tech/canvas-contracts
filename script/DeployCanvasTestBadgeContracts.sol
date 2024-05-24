@@ -52,6 +52,8 @@ contract DeployCanvasTestBadgeContracts is Script {
 
     address EAS_ADDRESS = vm.envAddress("EAS_ADDRESS");
 
+    bool IS_MAINNET = vm.envBool("IS_MAINNET");
+
     function run() external {
         vm.startBroadcast(DEPLOYER_PRIVATE_KEY);
 
@@ -71,8 +73,16 @@ contract DeployCanvasTestBadgeContracts is Script {
         );
 
         // deploy origins NFT badge
-        address[] memory tokens = new address[](1);
-        tokens[0] = 0xDd7d857F570B0C211abfe05cd914A85BefEC2464;
+        address[] memory tokens;
+
+        if (IS_MAINNET) {
+            tokens = new address[](2);
+            tokens[0] = 0x74670A3998d9d6622E32D0847fF5977c37E0eC91;
+            tokens[1] = 0x42bCaCb8D24Ba588cab8Db0BB737DD2eFca408EC;
+        } else {
+            tokens = new address[](1);
+            tokens[0] = 0xDd7d857F570B0C211abfe05cd914A85BefEC2464;
+        }
 
         ScrollBadgeTokenOwner badge4 = new ScrollBadgeTokenOwner(address(resolver), tokens);
 

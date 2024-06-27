@@ -92,7 +92,7 @@ abstract contract ScrollBadge is IScrollBadge {
     function badgeTokenURI(bytes32 uid) public view virtual returns (string memory);
 
     /// @inheritdoc IScrollBadge
-    function hasBadge(address user) public view returns (bool) {
+    function hasBadge(address user) public view virtual returns (bool) {
         return _userBadgeCount[user] > 0;
     }
 }

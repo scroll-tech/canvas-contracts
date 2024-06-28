@@ -3,6 +3,7 @@
 pragma solidity 0.8.19;
 
 error Unauthorized();
+error CannotUpgrade(bytes32 uid);
 
 // attestation errors
 // note: these don't include the uid since it is not known prior to the attestation.

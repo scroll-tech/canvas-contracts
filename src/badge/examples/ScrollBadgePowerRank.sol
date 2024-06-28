@@ -13,7 +13,8 @@ import {ScrollBadgeCustomPayload} from "../extensions/ScrollBadgeCustomPayload.s
 import {ScrollBadgeNoExpiry} from "../extensions/ScrollBadgeNoExpiry.sol";
 import {ScrollBadgeNonRevocable} from "../extensions/ScrollBadgeNonRevocable.sol";
 import {ScrollBadgeSingleton} from "../extensions/ScrollBadgeSingleton.sol";
-import {Unauthorized} from "../../Errors.sol";
+import {IScrollBadgeUpgradeable} from "../extensions/IScrollBadgeUpgradeable.sol";
+import {Unauthorized, CannotUpgrade} from "../../Errors.sol";
 
 string constant SCROLL_BADGE_POWER_RANK_SCHEMA = "uint256 firstTxTimestamp";
 
@@ -28,10 +29,9 @@ contract ScrollBadgePowerRank is
     ScrollBadgeCustomPayload,
     ScrollBadgeNoExpiry,
     ScrollBadgeNonRevocable,
-    ScrollBadgeSingleton
+    ScrollBadgeSingleton,
+    IScrollBadgeUpgradeable
 {
-    error CannotUpgrade();
-
     event Upgrade(uint256 oldRank, uint256 newRank);
 
     // badge UID => current rank
@@ -92,6 +92,19 @@ contract ScrollBadgePowerRank is
         return SCROLL_BADGE_POWER_RANK_SCHEMA;
     }
 
+    /// @inheritdoc IScrollBadgeUpgradeable
+    function canUpgrade(bytes32 uid) external view returns (bool) {
+        Attestation memory badge = getAndValidateBadge(uid);
+
+        bytes memory payload = getPayload(badge);
+        (uint256 firstTxTimestamp) = decodePayloadData(payload);
+        uint256 newRank = timestampToRank(firstTxTimestamp);
+
+        uint256 oldRank = badgeRank[uid];
+        return newRank > oldRank;
+    }
+
+    /// @inheritdoc IScrollBadgeUpgradeable
     function upgrade(bytes32 uid) external {
         Attestation memory badge = getAndValidateBadge(uid);
 
@@ -105,7 +118,7 @@ contract ScrollBadgePowerRank is
 
         uint256 oldRank = badgeRank[uid];
         if (newRank <= oldRank) {
-            revert CannotUpgrade();
+            revert CannotUpgrade(uid);
         }
 
         badgeRank[uid] = newRank;

@@ -78,11 +78,11 @@ contract ScrollBadgePowerRank is
     /// @inheritdoc ScrollBadge
     function badgeTokenURI(bytes32 uid) public view override returns (string memory) {
         uint256 rank = badgeRank[uid];
-        string memory name = string(abi.encode("Scroll Power Rank #", Strings.toString(rank)));
+        string memory name = string(abi.encodePacked("Scroll Power Rank #", Strings.toString(rank)));
         string memory description = "Scroll Power Rank Badge";
         string memory image = ""; // IPFS, HTTP, or data URL
         string memory tokenUriJson = Base64.encode(
-            abi.encodePacked('{"name":"', name, '", "description":"', description, ', "image": "', image, '"}')
+            abi.encodePacked('{"name":"', name, '", "description":"', description, '", "image": "', image, '"}')
         );
         return string(abi.encodePacked("data:application/json;base64,", tokenUriJson));
     }

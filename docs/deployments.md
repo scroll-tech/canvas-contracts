@@ -1,7 +1,5 @@
 # Canvas Deployments
 
-> Warning: Canvas is still under development, the deployed addresses might change before the live deployment of Scroll Canvas.
-
 
 ## Scroll Mainnet
 

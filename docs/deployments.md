@@ -17,8 +17,6 @@ SCROLL_MAINNET_PROFILE_REGISTRY_ADDRESS="0xB23AF8707c442f59BDfC368612Bd8DbCca8a7
 SCROLL_MAINNET_RPC_URL="https://rpc.scroll.io"
 SCROLL_MAINNET_EAS_GRAPHQL_URL="https://scroll.easscan.org/graphql"
 ```
-
-
 ## Scroll Sepolia
 
 ```bash

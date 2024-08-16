@@ -4,7 +4,9 @@
 
 ## Welcome to Scroll Canvas
 
-We are thrilled to have you join us in building unique discoveries with Scroll Canvas, a new product designed for ecosystem projects to interact with users in a more tailored way.
+We are thrilled to have you join us in building unique discoveries with [Scroll Canvas](https://scroll.io/canvas), a new product designed for ecosystem projects to interact with users in a more tailored way.
+
+Try Canvas at https://scroll.io/canvas
 
 ## Overview
 
@@ -29,6 +31,12 @@ Users can mint a non-transferable and unique personal persona to collect and dis
 Visit the [Developer Documentation](./docs) in this repo to learn more about Canvas.
 
 See [Deployments](./docs/deployments.md) for the official Canvas contract addresses.
+
+See the [Integration Guide](https://scrollzkp.notion.site/Introducing-Scroll-Canvas-Badge-Integration-Guide-8656463ab63b42e8baf924763ed8c9d5) for more information.
+
+## Support
+
+For questions regarding Canvas and custom badge development, please join [Scroll dev support channel](https://discord.com/channels/853955156100907018/1028102371894624337) on Discord.
 
 ## Running the Code
 

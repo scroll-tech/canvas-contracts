@@ -26,6 +26,32 @@ Refer to the examples in [examples](../src/badge/examples).
 > While this is not mandatory, we recommend creating badges that do no expire, are non-revocable, and are singletons (at most 1 badge per user).
 
 
+### Badge Token URI
+
+Each badge must define a badge token URI.
+
+The badge token URI is very similar to the tokenURI in ERC-721.
+It must point to a metadata JSON object that contains `name`, `description`, `image`, and `issuerName`.
+You can use a normal URL, an IPFS link, or a [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs) as your token URI.
+The metadata is used by the Canvas frontend to render the badge.
+
+
+For example, the badge token URI https://nft.scroll.io/canvas/year/2024.json points to the following metadata:
+
+```json
+{
+  "name": "Ethereum Year",
+  "description": "Check out the Ethereum Year Badge! It's like a digital trophy that shows off the year your wallet made its debut on Ethereum. It's a little present from Scroll to celebrate all the cool stuff you've done in the Ethereum ecosystem.",
+  "image": "https://nft.scroll.io/canvas/year/2024.webp",
+  "issuerName": "Scroll"
+}
+```
+
+Your badge contract can provide a single URI for all badges, in which case all instances of your badge will look the same.
+Alternatively, you can also render a different image for different instances of your badge, see [`EthereumYearBadge`](../src/badge/examples/EthereumYearBadge.sol).
+You should also configure a default badge token URI, see [`ScrollBadgeDefaultURI`](../src/badge/extensions/ScrollBadgeDefaultURI.sol).
+
+
 ### Badge Types
 
 Badges are created by attesting to the recipient using the [`BADGE_SCHEMA`](./deployments.md).
@@ -59,8 +85,7 @@ There are three main badge types of badges:
 <tr>
 <th style="text-align: center">Type</th>
 <th style="text-align: center">Description</th>
-<th style="text-align: center">Basic Requirements</th>
-<th style="text-align: center">Additional Requirements</th>
+<th style="text-align: center">Requirements</th>
 <th style="text-align: center">Examples</th>
 </tr>
 
@@ -79,6 +104,9 @@ There are three main badge types of badges:
 
    </td>
    <td>
+
+   **Basic Requirements**:
+
    <ul>
    <li>
 
@@ -104,7 +132,9 @@ There are three main badge types of badges:
    </td>
 
    <td>
-   N/A
+
+   [`ScrollBadgePermissionless`](../src/badge/examples/ScrollBadgePermissionless.sol), [`ScrollBadgeTokenOwner`](../src/badge/examples/ScrollBadgeTokenOwner.sol), [`ScrollBadgeWhale`](../src/badge/examples/ScrollBadgeWhale.sol).
+
    </td>
 </tr>
 
@@ -123,8 +153,9 @@ There are three main badge types of badges:
 
    </td>
    <td>
-   </td>
-   <td>
+
+   All **Basic Requirements**, plus
+
    <ul>
    <li>
 
@@ -137,6 +168,12 @@ There are three main badge types of badges:
 
    </li>
    </ul>
+   </td>
+
+   <td>
+
+   [`EthereumYearBadge`](../src/badge/examples/EthereumYearBadge.sol), [`ScrollBadgeSimple`](../src/badge/examples/ScrollBadgeSimple.sol).
+
    </td>
 </tr>
 
@@ -155,8 +192,9 @@ There are three main badge types of badges:
 
    </td>
    <td>
-   </td>
-   <td>
+
+   All **Basic Requirements**, plus
+
    <ul>
    <li>
 
@@ -165,6 +203,10 @@ There are three main badge types of badges:
    </li>
    </ul>
    </td>
+
+   <td>
+   N/A
+   <td>
 </tr>
 
 </table>

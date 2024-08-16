@@ -51,6 +51,11 @@ Your badge contract can provide a single URI for all badges, in which case all i
 Alternatively, you can also render a different image for different instances of your badge, see [`EthereumYearBadge`](../src/badge/examples/EthereumYearBadge.sol).
 You should also configure a default badge token URI, see [`ScrollBadgeDefaultURI`](../src/badge/extensions/ScrollBadgeDefaultURI.sol).
 
+Design guidelines for badge images:
+- Maximum resolution: 480px x 480px
+- Optimal resolution: 600px x 600px
+- File size: Under 300KB
+
 
 ### Badge Types
 
@@ -69,6 +74,7 @@ There are three main badge types of badges:
    This backend implements some off-chain eligibility check and exposes an eligibility check and claim API.
    If the user is authorized to mint, the backend issues a signed permit.
    The user then mints using this permit.
+   See [this document](https://scrollzkp.notion.site/Badge-APIs-95890d7ca14944e2a6d34835ceb6b914) for the API requirements.
 
    For backend-authorized badges, you need to deploy two contracts: the badge contract, and an [`AttesterProxy`](../src/AttesterProxy.sol).
    `AttesterProxy` allows executing delegated attestations in arbitrary order.
@@ -120,12 +126,12 @@ There are three main badge types of badges:
    </li>
    <li>
 
-   Your project is listed on [Scroll Ecosystem - Browse all protocols](https://scroll.io/ecosystem#protocols).
+   Your project is listed on [Scroll Ecosystem - Browse all protocols](https://scroll.io/ecosystem#protocols). (If not listed, apply [here](https://tally.so/r/waxLBW).)
 
    </li>
    <li>
 
-   All URLs mentioned above are configured for cross-origin access on https://scroll.io.
+   All URLs mentioned above are configured for cross-origin access (CORS) on https://scroll.io.
 
    </li>
    </ul>
@@ -159,7 +165,7 @@ There are three main badge types of badges:
    <ul>
    <li>
 
-   The **check API** and **claim API** have been deployed to **production**.
+   The [**check API**](https://scrollzkp.notion.site/Badge-APIs-95890d7ca14944e2a6d34835ceb6b914) and [**claim API**](https://scrollzkp.notion.site/Badge-APIs-95890d7ca14944e2a6d34835ceb6b914) have been deployed to **production**.
 
    </li>
    <li>
@@ -198,7 +204,7 @@ There are three main badge types of badges:
    <ul>
    <li>
 
-   The **check API** has been deployed to **production**.
+   The [**check API**](https://scrollzkp.notion.site/Badge-APIs-95890d7ca14944e2a6d34835ceb6b914) has been deployed to **production**.
 
    </li>
    </ul>

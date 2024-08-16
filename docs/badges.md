@@ -74,6 +74,7 @@ There are three main badge types of badges:
    This backend implements some off-chain eligibility check and exposes an eligibility check and claim API.
    If the user is authorized to mint, the backend issues a signed permit.
    The user then mints using this permit.
+
    See [this document](https://scrollzkp.notion.site/Badge-APIs-95890d7ca14944e2a6d34835ceb6b914) for the API requirements.
 
    For backend-authorized badges, you need to deploy two contracts: the badge contract, and an [`AttesterProxy`](../src/AttesterProxy.sol).
@@ -116,7 +117,7 @@ There are three main badge types of badges:
    <ul>
    <li>
 
-   The badge is deployed on the **Scroll Mainnet** and verified on [ScrollScan](https://scrollscan.com).
+   The badge is deployed on the **Scroll Mainnet** and verified on [Scrollscan](https://scrollscan.com).
 
    </li>
    <li>
@@ -170,7 +171,7 @@ There are three main badge types of badges:
    </li>
    <li>
 
-   The attester proxy contract is deployed on the **Scroll Mainnet** and verified on [ScrollScan](https://scrollscan.com).
+   The attester proxy contract is deployed on the **Scroll Mainnet** and verified on [Scrollscan](https://scrollscan.com).
 
    </li>
    </ul>
@@ -212,7 +213,7 @@ There are three main badge types of badges:
 
    <td>
    N/A
-   <td>
+   </td>
 </tr>
 
 </table>
@@ -245,12 +246,12 @@ This repo also contains some [examples](src/badge/examples):
 
 We recommend going through this checklist before your badge is published:
 
-- [ ] The badge contract is deployed on Scroll mainnet and verified on Scrollscan.
-- [ ] The badge contract configured the correct resolver address, see [Deployments](./deployments.md).
+- [ ] The badge contract is deployed on Scroll mainnet and verified on [Scrollscan](https://scrollscan.com).
+- [ ] The badge contract was deployed with the correct resolver address, see [Deployments](./deployments.md).
 
 Backend-authorized badges:
 
-- [ ] The attester proxy contract is deployed on Scroll mainnet and verified on Scrollscan.
+- [ ] The attester proxy contract is deployed on Scroll mainnet and verified on [Scrollscan](https://scrollscan.com).
 - [ ] The badge enabled the attester proxy: `badge.toggleAttester(attesterProxy, true)`.
 - [ ] The attester proxy enabled your backend signer account: `attesterProxy.toggleAttester(signer, true)`.
 

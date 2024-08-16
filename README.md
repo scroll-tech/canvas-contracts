@@ -16,8 +16,10 @@ Users can mint a non-transferable and unique personal persona to collect and dis
 ### Key Features
 
 - **Canvas**: Each Canvas is a smart contract minted through the `ProfileRegistry` contract by the user on Scroll’s website.
-- **Badges**: Attestations of achievements and traits verified through the Ethereum Attestation Service ([EAS service](https://docs.attest.sh/docs/welcome)), issued by different projects and the Scroll Foundation.
+- **Badges**: Attestations of achievements and traits verified through the [Ethereum Attestation Service](https://docs.attest.sh/docs/welcome) (EAS), issued by different projects and the Scroll Foundation.
   Badges are wallet-bound and non-transferable.
+
+Differences between attestations and NFTs:
 
 | Attestation | NFT |
 | --- | --- |

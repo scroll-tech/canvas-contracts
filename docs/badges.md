@@ -57,7 +57,7 @@ Design guidelines for badge images:
 - File size: Under 300KB
 
 
-### Badge Types
+### Ways to Issue Badges
 
 Badges are created by attesting to the recipient using the [`BADGE_SCHEMA`](./deployments.md).
 EAS provides multiple interfaces to attest: `attest`, `attestByDelegation`, `multiAttest`, `multiAttestByDelegation`. See [`IEAS.sol`](https://github.com/ethereum-attestation-service/eas-contracts/blob/master/contracts/IEAS.sol).
@@ -217,6 +217,21 @@ There are three main badge types of badges:
 </tr>
 
 </table>
+
+
+### Upgradable Badges
+
+> This section is not about contract upgradability.
+> If you want to make your badge contract upgradable, use any standard [upgradability pattern](https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies).
+
+Upgradable badges are badges that can evolve over time.
+This pattern is most suitable for badges that represent that the user has reached a certain "level".
+A user can first mint a badge at a certain level.
+Then, once the user is eligible, they can upgrade their badge to a higher level.
+
+Upgradable badges must implement the [`IScrollBadgeUpgradeable`](../src/badge/extensions/IScrollBadgeUpgradeable.sol) interface.
+Currently this interface only supports on-chain upgrade conditions.
+
 
 
 ### Extensions

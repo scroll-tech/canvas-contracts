@@ -57,7 +57,7 @@ Badges implement a `badgeTokenURI` interface, similar to `ERC721.tokenURI`.
 Badges are minted to the user's wallet address.
 The user can express their personalization preferences (attach and reorder badges, choose a profile photo) through their Canvas [`Profile`](../src/profile/Profile.sol).
 
-See the [Badges](./badges.md) section for more details.
+See the [Badges](./badges.md) section for more details, and [Badge Examples](./badge-examples.md) for Solidity code examples.
 
 
 ## Explore the Documentation
@@ -65,5 +65,6 @@ See the [Badges](./badges.md) section for more details.
 Explore the following pages to learn more about different aspects of Canvas:
 - [Deployments](./deployments.md) lists the official Canvas contract addresses on Scroll mainnet and on the Scroll Sepolia testnet.
 - [Badges](./badges.md) introduces the basic requirements for badge contracts and lists resources for getting started as a badge developer.
+- [Badge Examples](./badge-examples.md) shows the process of developing custom badges by going through some common examples and use cases.
 - [Canvas Interaction Guide](./canvas-interaction-guide.md) lists common questions and examples for interacting with Canvas profiles and badges.
 - [Official Badges](./official-badges) contains addresses and documentation for some badges issued by Scroll.

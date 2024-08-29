@@ -1,5 +1,18 @@
 # Badges
 
+This section introduces the basic concepts of Canvas badges.
+For jumping into code examples, see [Badge Examples](./badge-examples.md).
+
+- [What is a badge?](#what-is-a-badge)
+- [How to implement a new badge?](#how-to-implement-a-new-badge)
+- [Badge Token URI](#badge-token-uri)
+- [Ways to Issue Badges](#ways-to-issue-badges)
+- [Overview of Requirements](#overview-of-requirements)
+- [Upgradable Badges](#upgradable-badges)
+- [Extensions](#extensions)
+- [Examples](#examples)
+- [Troubleshooting](#troubleshooting)
+
 ### What is a badge?
 
 Each Canvas badge is an [EAS attestation](https://docs.attest.sh/docs/core--concepts/attestations), with some additional logic attached to it.
@@ -26,7 +39,7 @@ Refer to the examples in [examples](../src/badge/examples).
 > While this is not mandatory, we recommend creating badges that do no expire, are non-revocable, and are singletons (at most 1 badge per user).
 
 
-### Badge Token URI
+### <a name="badge-token-uri"></a>Badge Token URI
 
 Each badge must define a badge token URI.
 
@@ -117,22 +130,32 @@ There are three main badge types of badges:
    <ul>
    <li>
 
-   The badge is deployed on the **Scroll Mainnet** and verified on [Scrollscan](https://scrollscan.com).
+   The badge contract is deployed on the **Scroll Mainnet** and verified on [Scrollscan](https://scrollscan.com).
 
    </li>
    <li>
 
-   The badge contract implements [defaultTokenURI](https://github.com/scroll-tech/canvas-contracts/blob/master/src/badge/extensions/ScrollBadgeDefaultURI.sol).
+   The badge contract is configured to use the correct **badge resolver address**, see [Deployments](./deployments.md).
+
+   </li>
+   <li>
+
+   The badge contract has a **default token URI**, see [ScrollBadgeDefaultURI](../src/badge/extensions/ScrollBadgeDefaultURI.sol).
+
+   </li>
+   </ul>
+
+   **Additional Requirements**:
+
+   <ul>
+   <li>
+
+   The badge contract implements on-chain eligibility check, see [ScrollBadgeEligibilityCheck](../src/badge/extensions/ScrollBadgeEligibilityCheck.sol).
 
    </li>
    <li>
 
    Your project is listed on [Scroll Ecosystem - Browse all protocols](https://scroll.io/ecosystem#protocols). (If not listed, apply [here](https://tally.so/r/waxLBW).)
-
-   </li>
-   <li>
-
-   All URLs mentioned above are configured for cross-origin access (CORS) on https://scroll.io.
 
    </li>
    </ul>
@@ -166,12 +189,27 @@ There are three main badge types of badges:
    <ul>
    <li>
 
-   The [**check API**](https://scrollzkp.notion.site/Badge-APIs-95890d7ca14944e2a6d34835ceb6b914) and [**claim API**](https://scrollzkp.notion.site/Badge-APIs-95890d7ca14944e2a6d34835ceb6b914) have been deployed to **production**.
+   The [**check API**](https://scrollzkp.notion.site/Badge-APIs-95890d7ca14944e2a6d34835ceb6b914) (off-chain eligibility check) and [**claim API**](https://scrollzkp.notion.site/Badge-APIs-95890d7ca14944e2a6d34835ceb6b914) have been deployed to **production**.
+
+   </li>
+   <li>
+
+   All URLs mentioned above are configured for cross-origin access (CORS) on https://scroll.io.
 
    </li>
    <li>
 
    The attester proxy contract is deployed on the **Scroll Mainnet** and verified on [Scrollscan](https://scrollscan.com).
+
+   </li>
+   <li>
+
+   The attester proxy contract is authorized to mint your badge (through `badge.toggleAttester`).
+
+   </li>
+   <li>
+
+   The backend signer is authorized to sign permits (through `attesterProxy.toggleAttester`).
 
    </li>
    </ul>
@@ -259,16 +297,7 @@ This repo also contains some [examples](src/badge/examples):
 
 ### Troubleshooting
 
-We recommend going through this checklist before your badge is published:
-
-- [ ] The badge contract is deployed on Scroll mainnet and verified on [Scrollscan](https://scrollscan.com).
-- [ ] The badge contract was deployed with the correct resolver address, see [Deployments](./deployments.md).
-
-Backend-authorized badges:
-
-- [ ] The attester proxy contract is deployed on Scroll mainnet and verified on [Scrollscan](https://scrollscan.com).
-- [ ] The badge enabled the attester proxy: `badge.toggleAttester(attesterProxy, true)`.
-- [ ] The attester proxy enabled your backend signer account: `attesterProxy.toggleAttester(signer, true)`.
+We recommend going through the [requirements](#overview-of-requirements) before your badge is published.
 
 If your badge minting transaction reverts, we recommend debugging using `cast`:
 
@@ -276,4 +305,4 @@ If your badge minting transaction reverts, we recommend debugging using `cast`:
 cast run --rpc-url https://rpc.scroll.io [txhash]
 ```
 
-This call will simulate the transaction in a local environment, and show you the call stack and revert reason.
+This call will simulate the transaction in a local environment and show you the call stack and revert reason.

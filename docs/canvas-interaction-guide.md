@@ -1,13 +1,11 @@
-# Canvas Integration FAQ
+# Canvas Interaction Guide
 
-In the examples on this page, we use the configurations from [deployments.md](./deployments.md), as well as the following values:
+This document will show you the basic steps how one would interact with a Canvas profile.
+
+In the examples on this page, we use the configurations from [Deployments](./deployments.md), as well as the following values:
 
 ```bash
 # Canvas badges -- each badge type is a new contract, here we only have three simple test contracts
-SCROLL_MAINNET_SIMPLE_BADGE_A_ADDRESS="0xB1Dbd079c62d181926E5A54932Bb1b15F760e8A0"
-SCROLL_MAINNET_SIMPLE_BADGE_B_ADDRESS="0xe626E631BdDcd985D02D2eEe4fbdF901b52AE33C"
-SCROLL_MAINNET_SIMPLE_BADGE_C_ADDRESS="0xe485f8fcBf3b678e83d208fa3f1933a315d58356"
-
 SCROLL_SEPOLIA_SIMPLE_BADGE_A_ADDRESS="0x30C98067517f8ee38e748A3aF63429974103Ea6B"
 SCROLL_SEPOLIA_SIMPLE_BADGE_B_ADDRESS="0xeBFc9B95328B2Cdb3c4CA8913e329c101d2Abbc2"
 SCROLL_SEPOLIA_SIMPLE_BADGE_C_ADDRESS="0x64492EF5a60245fbaF65F69782FCf158F3a8e3Aa"
@@ -59,7 +57,7 @@ To mint a profile with a referral, produce a signed referral, then submit it alo
 
 ### How to list all badges that a user has?
 
-We can use the EAS GraphQL API to query a user's Canvas badges.
+We can use the [EAS GraphQL API](https://docs.attest.org/docs/developer-tools/api) to query a user's Canvas badges.
 
 > Warning: Badges are minted to the user's wallet address, not to their profile address!
 

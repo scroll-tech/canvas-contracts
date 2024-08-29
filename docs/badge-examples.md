@@ -44,7 +44,7 @@ See the address in [Deployments](./deployments.md).
 string public staticTokenURI;
 
 constructor(address resolver_, string memory tokenURI_) ScrollBadge(resolver_) {
- staticTokenURI = tokenURI_;
+    staticTokenURI = tokenURI_;
 }
 
 function badgeTokenURI(bytes32 /*uid*/ ) public pure override returns (string memory) {
@@ -62,17 +62,17 @@ Second, we check whether the user is minting for themselves or not.
 function onIssueBadge(Attestation calldata attestation) internal virtual override returns (bool) {
     if (!super.onIssueBadge(attestation)) {
         return false;
- }
+    }
 
     // singleton
     if (hasBadge(attestation.recipient)) {
         revert SingletonBadge();
- }
+    }
 
     // self-attest
     if (attestation.recipient != attestation.attester) {
         revert Unauthorized();
- }
+    }
 
     return true;
 }
@@ -119,8 +119,8 @@ contract ScrollBadgePermissionless is ScrollBadgeSelfAttest, ScrollBadgeEligibil
     string public staticTokenURI;
 
     constructor(address resolver_, string memory tokenURI_) ScrollBadge(resolver_) {
- staticTokenURI = tokenURI_;
- }
+        staticTokenURI = tokenURI_;
+    }
 
     /// @inheritdoc ScrollBadge
     function onIssueBadge(Attestation calldata attestation)
@@ -128,9 +128,9 @@ contract ScrollBadgePermissionless is ScrollBadgeSelfAttest, ScrollBadgeEligibil
         virtual
         override (ScrollBadge, ScrollBadgeSelfAttest, ScrollBadgeSingleton)
         returns (bool)
- {
+    {
         return super.onIssueBadge(attestation);
- }
+    }
 
     /// @inheritdoc ScrollBadge
     function onRevokeBadge(Attestation calldata attestation)
@@ -138,14 +138,14 @@ contract ScrollBadgePermissionless is ScrollBadgeSelfAttest, ScrollBadgeEligibil
         virtual
         override (ScrollBadge, ScrollBadgeSelfAttest, ScrollBadgeSingleton)
         returns (bool)
- {
+    {
         return super.onRevokeBadge(attestation);
- }
+    }
 
     /// @inheritdoc ScrollBadge
     function badgeTokenURI(bytes32 /*uid*/ ) public pure override returns (string memory) {
         return staticTokenURI;
- }
+    }
 }
 ```
 
@@ -182,14 +182,14 @@ contract ScrollBadgeLevels is ScrollBadgeCustomPayload {
     /// @inheritdoc ScrollBadgeCustomPayload
     function getSchema() public pure override returns (string memory) {
         return BADGE_LEVELS_SCHEMA;
- }
+    }
 
     function getCurrentLevel(bytes32 uid) public view returns (uint8) {
- Attestation memory badge = getAndValidateBadge(uid);
+        Attestation memory badge = getAndValidateBadge(uid);
         bytes memory payload = getPayload(badge);
- (uint8 level) = decodePayloadData(payload);
+        (uint8 level) = decodePayloadData(payload);
         return level;
- }
+    }
 }
 ```
 
@@ -200,11 +200,11 @@ function onIssueBadge(Attestation calldata attestation) internal override return
     if (!super.onIssueBadge(attestation)) return false;
 
     bytes memory payload = getPayload(attestation);
- (uint8 level) = decodePayloadData(payload);
+    (uint8 level) = decodePayloadData(payload);
 
     if (level > 10) {
         revert InvalidLevel();
- }
+    }
 
     return true;
 }
@@ -214,20 +214,21 @@ You can also use the custom payload when constructing the token URI (in `badgeTo
 This is particularly useful for badges that generate different token URIs based on each badge using [Data URLs](https://developer.mozilla.org/en-US/docs/Web/URI/Schemes/data):
 
 ```solidity
-
 /// @inheritdoc ScrollBadge
-    function badgeTokenURI(bytes32 uid) public pure override returns (string memory) {
-        uint8 level = getCurrentLevel(uid);
-        string memory name = string(abi.encode("Level #", Strings.toString(level)));
-        string memory description = "Level Badge";
-        string memory image = ""; // IPFS, HTTP, or data URL
-        string memory issuerName = "Scroll";
-        "issuerName": "Scroll"
-        string memory tokenUriJson = Base64.encode(
-            abi.encodePacked('{"name":"', name, '", "description":"', description, ', "image": "', image, ', "issuerName": "', issuerName, '"}')
- );
-        return string(abi.encodePacked("data:application/json;base64,", tokenUriJson));
- }
+function badgeTokenURI(bytes32 uid) public pure override returns (string memory) {
+    uint8 level = getCurrentLevel(uid);
+
+    string memory name = string(abi.encode("Level #", Strings.toString(level)));
+    string memory description = "Level Badge";
+    string memory image = ""; // IPFS, HTTP, or data URL
+    string memory issuerName = "Scroll";
+
+    string memory tokenUriJson = Base64.encode(
+        abi.encodePacked('{"name":"', name, '", "description":"', description, ', "image": "', image, ', "issuerName": "', issuerName, '"}')
+    );
+
+    return string(abi.encodePacked("data:application/json;base64,", tokenUriJson));
+}
 ```
 
 You can see the full example in [`ScrollBadgeLevels`](../src/badge/examples/ScrollBadgeLevels.sol).
@@ -258,31 +259,31 @@ contract ScrollBadgeSimple is ScrollBadgeAccessControl, ScrollBadgeSingleton {
     string public sharedTokenURI;
 
     constructor(address resolver_, string memory tokenUri_) ScrollBadge(resolver_) {
- sharedTokenURI = tokenUri_;
- }
+        sharedTokenURI = tokenUri_;
+    }
 
     /// @inheritdoc ScrollBadge
     function onIssueBadge(Attestation calldata attestation)
         internal
         override (ScrollBadgeAccessControl, ScrollBadgeSingleton)
         returns (bool)
- {
+    {
         return super.onIssueBadge(attestation);
- }
+    }
 
     /// @inheritdoc ScrollBadge
     function onRevokeBadge(Attestation calldata attestation)
         internal
         override (ScrollBadgeAccessControl, ScrollBadgeSingleton)
         returns (bool)
- {
+    {
         return super.onRevokeBadge(attestation);
- }
+    }
 
     /// @inheritdoc ScrollBadge
     function badgeTokenURI(bytes32 /*uid*/ ) public view override returns (string memory) {
         return sharedTokenURI;
- }
+    }
 }
 ```
 

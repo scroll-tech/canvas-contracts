@@ -6,7 +6,7 @@
 
 We are thrilled to have you join us in building unique discoveries with [Scroll Canvas](https://scroll.io/canvas), a new product designed for ecosystem projects to interact with users in a more tailored way.
 
-Try Canvas at https://scroll.io/canvas
+Try Canvas at [scroll.io/canvas](https://scroll.io/canvas)
 
 ## Overview
 

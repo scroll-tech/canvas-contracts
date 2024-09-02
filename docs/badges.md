@@ -143,6 +143,11 @@ There are three main badge types of badges:
    The badge contract has a **default token URI**, see [ScrollBadgeDefaultURI](../src/badge/extensions/ScrollBadgeDefaultURI.sol).
 
    </li>
+   <li>
+
+   Your project is listed on [Scroll Ecosystem - Browse all protocols](https://scroll.io/ecosystem#protocols). (If not listed, apply [here](https://tally.so/r/waxLBW).)
+
+   </li>
    </ul>
 
    **Additional Requirements**:
@@ -151,11 +156,6 @@ There are three main badge types of badges:
    <li>
 
    The badge contract implements on-chain eligibility check, see [ScrollBadgeEligibilityCheck](../src/badge/extensions/ScrollBadgeEligibilityCheck.sol).
-
-   </li>
-   <li>
-
-   Your project is listed on [Scroll Ecosystem - Browse all protocols](https://scroll.io/ecosystem#protocols). (If not listed, apply [here](https://tally.so/r/waxLBW).)
 
    </li>
    </ul>
@@ -194,7 +194,7 @@ There are three main badge types of badges:
    </li>
    <li>
 
-   All URLs mentioned above are configured for cross-origin access (CORS) on https://scroll.io.
+   All involved URLs, including those for the Check API, Claim API, and the badgeTokenURI returned by the contract, are configured for cross-origin access (CORS) on https://scroll.io.
 
    </li>
    <li>

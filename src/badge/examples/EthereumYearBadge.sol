@@ -9,6 +9,7 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {ScrollBadge} from "../ScrollBadge.sol";
 import {ScrollBadgeAccessControl} from "../extensions/ScrollBadgeAccessControl.sol";
 import {ScrollBadgeCustomPayload} from "../extensions/ScrollBadgeCustomPayload.sol";
+import {ScrollBadgeDefaultURI} from "../extensions/ScrollBadgeDefaultURI.sol";
 import {ScrollBadgeNoExpiry} from "../extensions/ScrollBadgeNoExpiry.sol";
 import {ScrollBadgeNonRevocable} from "../extensions/ScrollBadgeNonRevocable.sol";
 import {ScrollBadgeSingleton} from "../extensions/ScrollBadgeSingleton.sol";
@@ -24,6 +25,7 @@ function decodePayloadData(bytes memory data) pure returns (uint256) {
 contract EthereumYearBadge is
     ScrollBadgeAccessControl,
     ScrollBadgeCustomPayload,
+    ScrollBadgeDefaultURI,
     ScrollBadgeNoExpiry,
     ScrollBadgeNonRevocable,
     ScrollBadgeSingleton
@@ -31,20 +33,24 @@ contract EthereumYearBadge is
     /// @notice The base token URI.
     string public baseTokenURI;
 
-    constructor(address resolver_, string memory baseTokenURI_) ScrollBadge(resolver_) {
-        baseTokenURI = baseTokenURI_;
+    constructor(address resolver_, string memory baseTokenURI_)
+        ScrollBadge(resolver_)
+        ScrollBadgeDefaultURI(baseTokenURI_)
+    {
+        // empty
     }
 
     /// @notice Update the base token URI.
     /// @param baseTokenURI_ The new base token URI.
     function updateBaseTokenURI(string memory baseTokenURI_) external onlyOwner {
-        baseTokenURI = baseTokenURI_;
+        defaultBadgeURI = baseTokenURI_;
     }
 
     /// @inheritdoc ScrollBadge
     function onIssueBadge(Attestation calldata attestation)
         internal
         override (
+            ScrollBadge,
             ScrollBadgeAccessControl,
             ScrollBadgeCustomPayload,
             ScrollBadgeNoExpiry,
@@ -67,13 +73,13 @@ contract EthereumYearBadge is
         return super.onRevokeBadge(attestation);
     }
 
-    /// @inheritdoc ScrollBadge
-    function badgeTokenURI(bytes32 uid) public view override returns (string memory) {
+    /// @inheritdoc ScrollBadgeDefaultURI
+    function getBadgeTokenURI(bytes32 uid) internal view override returns (string memory) {
         Attestation memory attestation = getAndValidateBadge(uid);
         bytes memory payload = getPayload(attestation);
         uint256 year = decodePayloadData(payload);
 
-        return string(abi.encodePacked(baseTokenURI, Strings.toString(year), ".json"));
+        return string(abi.encodePacked(defaultBadgeURI, Strings.toString(year), ".json"));
     }
 
     /// @inheritdoc ScrollBadgeCustomPayload

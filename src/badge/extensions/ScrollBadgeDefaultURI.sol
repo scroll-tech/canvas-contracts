@@ -23,7 +23,9 @@ abstract contract ScrollBadgeDefaultURI is ScrollBadge {
     }
 
     /// @notice Returns the token URI corresponding to a certain badge UID.
-    /// @param uid The badge UID.
+    /// @param {uid} The badge UID.
     /// @return The badge token URI (same format as ERC721).
-    function getBadgeTokenURI(bytes32 uid) internal view virtual returns (string memory);
+    function getBadgeTokenURI(bytes32) internal view virtual returns (string memory) {
+        return defaultBadgeURI;
+    }
 }

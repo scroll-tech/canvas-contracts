@@ -7,10 +7,12 @@ import {Attestation} from "@eas/contracts/IEAS.sol";
 import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
+import {ScrollBadge} from "../ScrollBadge.sol";
 import {ScrollBadgeCustomPayload} from "../extensions/ScrollBadgeCustomPayload.sol";
+import {ScrollBadgeDefaultURI} from "../extensions/ScrollBadgeDefaultURI.sol";
+import {ScrollBadgeEligibilityCheck} from "../extensions/ScrollBadgeEligibilityCheck.sol";
 import {ScrollBadgeSelfAttest} from "../extensions/ScrollBadgeSelfAttest.sol";
 import {ScrollBadgeSingleton} from "../extensions/ScrollBadgeSingleton.sol";
-import {ScrollBadge} from "../ScrollBadge.sol";
 import {Unauthorized} from "../../Errors.sol";
 
 string constant SCROLL_BADGE_NFT_OWNER_SCHEMA = "address tokenAddress, uint256 tokenId";
@@ -21,12 +23,21 @@ function decodePayloadData(bytes memory data) pure returns (address, uint256) {
 
 /// @title ScrollBadgeTokenOwner
 /// @notice A simple badge that attests that the user owns a specific NFT.
-contract ScrollBadgeTokenOwner is ScrollBadgeCustomPayload, ScrollBadgeSelfAttest, ScrollBadgeSingleton {
+contract ScrollBadgeTokenOwner is
+    ScrollBadgeCustomPayload,
+    ScrollBadgeDefaultURI,
+    ScrollBadgeEligibilityCheck,
+    ScrollBadgeSelfAttest,
+    ScrollBadgeSingleton
+{
     error IncorrectBadgeOwner();
 
     mapping(address => bool) public isTokenAllowed;
 
-    constructor(address resolver_, address[] memory tokens_) ScrollBadge(resolver_) {
+    constructor(address resolver_, string memory _defaultBadgeURI, address[] memory tokens_)
+        ScrollBadge(resolver_)
+        ScrollBadgeDefaultURI(_defaultBadgeURI)
+    {
         for (uint256 i = 0; i < tokens_.length; ++i) {
             isTokenAllowed[tokens_[i]] = true;
         }
@@ -35,7 +46,7 @@ contract ScrollBadgeTokenOwner is ScrollBadgeCustomPayload, ScrollBadgeSelfAttes
     /// @inheritdoc ScrollBadge
     function onIssueBadge(Attestation calldata attestation)
         internal
-        override (ScrollBadgeCustomPayload, ScrollBadgeSelfAttest, ScrollBadgeSingleton)
+        override (ScrollBadge, ScrollBadgeCustomPayload, ScrollBadgeSelfAttest, ScrollBadgeSingleton)
         returns (bool)
     {
         if (!super.onIssueBadge(attestation)) {
@@ -60,14 +71,14 @@ contract ScrollBadgeTokenOwner is ScrollBadgeCustomPayload, ScrollBadgeSelfAttes
     /// @inheritdoc ScrollBadge
     function onRevokeBadge(Attestation calldata attestation)
         internal
-        override (ScrollBadgeCustomPayload, ScrollBadgeSelfAttest, ScrollBadgeSingleton)
+        override (ScrollBadge, ScrollBadgeCustomPayload, ScrollBadgeSelfAttest, ScrollBadgeSingleton)
         returns (bool)
     {
         return super.onRevokeBadge(attestation);
     }
 
-    /// @inheritdoc ScrollBadge
-    function badgeTokenURI(bytes32 uid) public view override returns (string memory) {
+    /// @inheritdoc ScrollBadgeDefaultURI
+    function getBadgeTokenURI(bytes32 uid) internal view override returns (string memory) {
         Attestation memory attestation = getAndValidateBadge(uid);
         bytes memory payload = getPayload(attestation);
         (address tokenAddress, uint256 tokenId) = decodePayloadData(payload);

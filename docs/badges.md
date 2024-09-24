@@ -312,6 +312,8 @@ This repo also contains some [examples](src/badge/examples):
 
 We recommend going through the [requirements](#overview-of-requirements) before your badge is published.
 
+Once your badge has been deployed on Scroll, you can auto-check some of these requirements by running `yarn check-badge`.
+
 If your badge minting transaction reverts, we recommend debugging using `cast`:
 
 ```sh

@@ -5,7 +5,9 @@
   "main": "",
   "scripts": {
     "build": "forge build",
-    "test": "forge test -vvv"
+    "test": "forge test -vvv",
+    "fmt": "forge fmt",
+    "check-badge": "forge script --rpc-url https://rpc.scroll.io script/CheckBadge.s.sol --skip-simulation"
   },
   "author": "",
   "license": "MIT",

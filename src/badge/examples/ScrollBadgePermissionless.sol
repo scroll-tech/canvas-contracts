@@ -5,14 +5,23 @@ pragma solidity 0.8.19;
 import {Attestation} from "@eas/contracts/IEAS.sol";
 
 import {ScrollBadge} from "../ScrollBadge.sol";
-import {ScrollBadgeSelfAttest} from "../extensions/ScrollBadgeSelfAttest.sol";
+import {ScrollBadgeDefaultURI} from "../extensions/ScrollBadgeDefaultURI.sol";
 import {ScrollBadgeEligibilityCheck} from "../extensions/ScrollBadgeEligibilityCheck.sol";
+import {ScrollBadgeSelfAttest} from "../extensions/ScrollBadgeSelfAttest.sol";
 import {ScrollBadgeSingleton} from "../extensions/ScrollBadgeSingleton.sol";
 
 /// @title ScrollBadgePermissionless
 /// @notice A simple badge that anyone can mint in a permissionless manner.
-contract ScrollBadgePermissionless is ScrollBadgeSelfAttest, ScrollBadgeEligibilityCheck, ScrollBadgeSingleton {
-    constructor(address resolver_) ScrollBadge(resolver_) {
+contract ScrollBadgePermissionless is
+    ScrollBadgeDefaultURI,
+    ScrollBadgeEligibilityCheck,
+    ScrollBadgeSelfAttest,
+    ScrollBadgeSingleton
+{
+    constructor(address resolver_, string memory _defaultBadgeURI)
+        ScrollBadge(resolver_)
+        ScrollBadgeDefaultURI(_defaultBadgeURI)
+    {
         // empty
     }
 
@@ -34,10 +43,5 @@ contract ScrollBadgePermissionless is ScrollBadgeSelfAttest, ScrollBadgeEligibil
         returns (bool)
     {
         return super.onRevokeBadge(attestation);
-    }
-
-    /// @inheritdoc ScrollBadge
-    function badgeTokenURI(bytes32 /*uid*/ ) public pure override returns (string memory) {
-        return "";
     }
 }

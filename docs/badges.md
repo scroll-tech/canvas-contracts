@@ -106,6 +106,7 @@ There are three main badge types of badges:
 <th style="text-align: center">Type</th>
 <th style="text-align: center">Description</th>
 <th style="text-align: center">Requirements</th>
+<th style="text-align: center">Required Extensions</th>
 <th style="text-align: center">Examples</th>
 </tr>
 
@@ -163,6 +164,12 @@ There are three main badge types of badges:
 
    <td>
 
+   [ScrollBadgeDefaultURI](../src/badge/extensions/ScrollBadgeDefaultURI.sol), [ScrollBadgeEligibilityCheck](../src/badge/extensions/ScrollBadgeEligibilityCheck.sol)
+
+   </td>
+
+   <td>
+
    [`ScrollBadgePermissionless`](../src/badge/examples/ScrollBadgePermissionless.sol), [`ScrollBadgeTokenOwner`](../src/badge/examples/ScrollBadgeTokenOwner.sol), [`ScrollBadgeWhale`](../src/badge/examples/ScrollBadgeWhale.sol).
 
    </td>
@@ -214,7 +221,11 @@ There are three main badge types of badges:
    </li>
    </ul>
    </td>
+   <td>
 
+   [ScrollBadgeDefaultURI](../src/badge/extensions/ScrollBadgeDefaultURI.sol), [ScrollBadgeAccessControl](../src/badge/extensions/ScrollBadgeAccessControl.sol)
+
+   </td>
    <td>
 
    [`EthereumYearBadge`](../src/badge/examples/EthereumYearBadge.sol), [`ScrollBadgeSimple`](../src/badge/examples/ScrollBadgeSimple.sol).
@@ -250,7 +261,9 @@ There are three main badge types of badges:
    </td>
 
    <td>
-   N/A
+   </td>
+
+   <td>
    </td>
 </tr>
 

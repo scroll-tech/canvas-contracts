@@ -12,7 +12,9 @@ import {Unauthorized} from "../../Errors.sol";
 /// @title ScrollBadgeWhale
 /// @notice A badge that shows that the user had 1000 ETH or more at the time of minting.
 contract ScrollBadgeWhale is ScrollBadgePermissionless {
-    constructor(address resolver_) ScrollBadgePermissionless(resolver_) {
+    constructor(address resolver_, string memory _defaultBadgeURI)
+        ScrollBadgePermissionless(resolver_, _defaultBadgeURI)
+    {
         // empty
     }
 

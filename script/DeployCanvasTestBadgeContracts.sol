@@ -84,7 +84,7 @@ contract DeployCanvasTestBadgeContracts is Script {
             tokens[0] = 0xDd7d857F570B0C211abfe05cd914A85BefEC2464;
         }
 
-        ScrollBadgeTokenOwner badge4 = new ScrollBadgeTokenOwner(address(resolver), tokens);
+        ScrollBadgeTokenOwner badge4 = new ScrollBadgeTokenOwner(address(resolver), "", tokens);
 
         // deploy Ethereum year badge
         EthereumYearBadge badge5 = new EthereumYearBadge(address(resolver), "https://nft.scroll.io/canvas/year/");

@@ -28,17 +28,16 @@ contract SCRHoldingBadge is ScrollBadgeCustomPayload, ScrollBadgeDefaultURI, Own
     uint256 private constant LEVEL_TWO_SCR_AMOUNT = 10 ether;
     uint256 private constant LEVEL_THREE_SCR_AMOUNT = 100 ether;
     uint256 private constant LEVEL_FOUR_SCR_AMOUNT = 1000 ether;
-    uint256 private constant LEVEL_FIVE_SCR_AMOUNT = 10000 ether;
-    uint256 private constant LEVEL_SIX_SCR_AMOUNT = 100000 ether;
+    uint256 private constant LEVEL_FIVE_SCR_AMOUNT = 10_000 ether;
+    uint256 private constant LEVEL_SIX_SCR_AMOUNT = 100_000 ether;
 
     /// @notice The address of SCR token.
     address public immutable scr;
 
-    constructor(
-        address resolver_,
-        string memory baseTokenURI_,
-        address scr_
-    ) ScrollBadge(resolver_) ScrollBadgeDefaultURI(baseTokenURI_) {
+    constructor(address resolver_, string memory baseTokenURI_, address scr_)
+        ScrollBadge(resolver_)
+        ScrollBadgeDefaultURI(baseTokenURI_)
+    {
         scr = scr_;
     }
 
@@ -49,33 +48,48 @@ contract SCRHoldingBadge is ScrollBadgeCustomPayload, ScrollBadgeDefaultURI, Own
     }
 
     /// @inheritdoc ScrollBadge
-    function onIssueBadge(
-        Attestation calldata
-    ) internal virtual override(ScrollBadge, ScrollBadgeCustomPayload) returns (bool) {
+    function onIssueBadge(Attestation calldata)
+        internal
+        virtual
+        override (ScrollBadge, ScrollBadgeCustomPayload)
+        returns (bool)
+    {
         return false;
     }
 
     /// @inheritdoc ScrollBadge
-    function onRevokeBadge(
-        Attestation calldata
-    ) internal virtual override(ScrollBadge, ScrollBadgeCustomPayload) returns (bool) {
+    function onRevokeBadge(Attestation calldata)
+        internal
+        virtual
+        override (ScrollBadge, ScrollBadgeCustomPayload)
+        returns (bool)
+    {
         return false;
     }
 
     /// @inheritdoc ScrollBadge
-    function badgeTokenURI(
-        bytes32 uid
-    ) public view override(IScrollBadge, ScrollBadge, ScrollBadgeDefaultURI) returns (string memory) {
+    function badgeTokenURI(bytes32 uid)
+        public
+        view
+        override (IScrollBadge, ScrollBadge, ScrollBadgeDefaultURI)
+        returns (string memory)
+    {
         return ScrollBadgeDefaultURI.badgeTokenURI(uid);
+    }
+
+    /// @inheritdoc IScrollBadge
+    function hasBadge(address user) public view virtual override (IScrollBadge, ScrollBadge) returns (bool) {
+        uint256 balance = IERC20(scr).balanceOf(user);
+        return balance >= LEVEL_ONE_SCR_AMOUNT;
     }
 
     /// @inheritdoc ScrollBadgeDefaultURI
     function getBadgeTokenURI(bytes32 uid) internal view override returns (string memory) {
         Attestation memory attestation = getAndValidateBadge(uid);
         bytes memory payload = getPayload(attestation);
-        uint256 year = decodePayloadData(payload);
+        uint256 level = decodePayloadData(payload);
 
-        return string(abi.encodePacked(defaultBadgeURI, Strings.toString(year), ".json"));
+        return string(abi.encodePacked(defaultBadgeURI, Strings.toString(level), ".json"));
     }
 
     /// @inheritdoc ScrollBadgeCustomPayload

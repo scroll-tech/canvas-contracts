@@ -32,15 +32,15 @@ interface IScrollBadgeResolver {
 
     /// @notice Return the Scroll badge attestation schema.
     /// @return The GUID of the Scroll badge attestation schema.
-    function schema() external returns (bytes32);
+    function schema() external view returns (bytes32);
 
     /// @notice The profile registry contract.
     /// @return The address of the profile registry.
-    function registry() external returns (address);
+    function registry() external view returns (address);
 
     /// @notice The global EAS contract.
     /// @return The address of the global EAS contract.
-    function eas() external returns (address);
+    function eas() external view returns (address);
 
     /// @notice Validate and return a Scroll badge attestation.
     /// @param uid The attestation UID.

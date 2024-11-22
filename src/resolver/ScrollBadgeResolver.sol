@@ -12,6 +12,7 @@ import {IProfile} from "../interfaces/IProfile.sol";
 import {IProfileRegistry} from "../interfaces/IProfileRegistry.sol";
 import {IScrollBadge} from "../interfaces/IScrollBadge.sol";
 import {IScrollBadgeResolver} from "../interfaces/IScrollBadgeResolver.sol";
+import {IScrollSelfAttestationBadge} from "../interfaces/IScrollSelfAttestationBadge.sol";
 import {SCROLL_BADGE_SCHEMA, decodeBadgeData} from "../Common.sol";
 import {ScrollBadgeResolverWhitelist} from "./ScrollBadgeResolverWhitelist.sol";
 
@@ -49,8 +50,19 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
     /// @inheritdoc IScrollBadgeResolver
     bytes32 public schema;
 
+    /// @notice The list of self attested badges, mapping from badge id to badge address.
+    /// @dev This is a list of badges with special needs which EAS cannot satisfy, such as
+    /// auto attest/revoke badge based on certain token holding amount.
+    /// The uid for the badge is customized in the following way:
+    /// ```text
+    /// [  address  | badge id | customized data ]
+    /// [ 160  bits | 32  bits |     64 bits     ]
+    /// [LSB                                  MSB]
+    /// ```
+    mapping(uint256 => address) public selfAttestedBadges;
+
     // Storage slots reserved for future upgrades.
-    uint256[49] private __gap;
+    uint256[48] private __gap;
 
     /**
      *
@@ -165,8 +177,19 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
     function getAndValidateBadge(bytes32 uid) external view returns (Attestation memory) {
         Attestation memory attestation = _eas.getAttestation(uid);
 
+        // if we cannot find the badge in EAS, try self attestation
         if (attestation.uid == EMPTY_UID) {
-            revert AttestationNotFound(uid);
+            // extract badge address from uid and do self attestation
+            uint256 badgeId = uint256(uid) >> 160 & 0xffffffff;
+            address badgeAddr = selfAttestedBadges[badgeId];
+            if (badgeAddr != address(0)) {
+                attestation = IScrollSelfAttestationBadge(badgeAddr).getAttestation(uid);
+            }
+            if (attestation.uid == EMPTY_UID) {
+                revert AttestationNotFound(uid);
+            } else {
+                return attestation;
+            }
         }
 
         if (attestation.schema != schema) {
@@ -182,6 +205,17 @@ contract ScrollBadgeResolver is IScrollBadgeResolver, SchemaResolver, ScrollBadg
         }
 
         return attestation;
+    }
+
+    /**
+     *
+     * Restricted Functions *
+     *
+     */
+
+    /// @notice Update the address of a self attested badge.
+    function updateSelfAttestedBadge(uint256 badgeId, address badgeAddress) external onlyOwner {
+        selfAttestedBadges[badgeId] = badgeAddress;
     }
 
     /**

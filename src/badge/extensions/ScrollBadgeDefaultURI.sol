@@ -14,7 +14,7 @@ abstract contract ScrollBadgeDefaultURI is ScrollBadge {
     }
 
     /// @inheritdoc ScrollBadge
-    function badgeTokenURI(bytes32 uid) public view override returns (string memory) {
+    function badgeTokenURI(bytes32 uid) public view virtual override returns (string memory) {
         if (uid == bytes32(0)) {
             return defaultBadgeURI;
         }

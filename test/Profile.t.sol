@@ -57,6 +57,12 @@ contract ProfileRegistryTest is Test {
     error TokenNotOwnedByUser(address token, uint256 tokenId);
     error Unauthorized();
 
+    event AttachBadge(bytes32 indexed uid);
+    event DetachBadge(bytes32 indexed uid);
+    event ChangeUsername(string oldUsername, string newUsername);
+    event ChangeAvatar(address oldToken, uint256 oldTokenId, address newToken, uint256 newTokenId);
+    event ReorderBadges(uint256 oldOrder, uint256 newOrder);
+
     address internal constant attester = address(1);
 
     address private constant TREASURY_ADDRESS = 0x1000000000000000000000000000000000000000;
@@ -114,6 +120,10 @@ contract ProfileRegistryTest is Test {
         bytes32[] memory uids = new bytes32[](2);
         uids[0] = uid0;
         uids[1] = uid1;
+        vm.expectEmit(false, false, false, true, address(profile));
+        emit AttachBadge(uid0);
+        vm.expectEmit(false, false, false, true, address(profile));
+        emit AttachBadge(uid1);
         profile.attach(uids);
         bytes32[] memory badges = profile.getAttachedBadges();
         assertEq(badges.length, 2);
@@ -129,6 +139,10 @@ contract ProfileRegistryTest is Test {
         assertEq(orders[1], 2);
 
         // attach again, no op
+        vm.expectEmit(false, false, false, true, address(profile));
+        emit AttachBadge(uid0);
+        vm.expectEmit(false, false, false, true, address(profile));
+        emit AttachBadge(uid1);
         profile.attach(uids);
         badges = profile.getAttachedBadges();
         assertEq(badges.length, 2);
@@ -231,6 +245,8 @@ contract ProfileRegistryTest is Test {
         // detach 6, order would be: 1, 2, 3, 4, 5, 9, 6, 7, 8
         bytes32[] memory detachBadges = new bytes32[](1);
         detachBadges[0] = originalBadges[5];
+        vm.expectEmit(false, false, false, true, address(profile));
+        emit DetachBadge(originalBadges[5]);
         profile.detach(detachBadges);
         bytes32[] memory badges = profile.getAttachedBadges();
         assertEq(badges.length, 9);
@@ -252,6 +268,14 @@ contract ProfileRegistryTest is Test {
         detachBadges[1] = badges[1];
         detachBadges[2] = badges[2];
         detachBadges[3] = badges[3];
+        vm.expectEmit(false, false, false, true, address(profile));
+        emit DetachBadge(badges[0]);
+        vm.expectEmit(false, false, false, true, address(profile));
+        emit DetachBadge(badges[1]);
+        vm.expectEmit(false, false, false, true, address(profile));
+        emit DetachBadge(badges[2]);
+        vm.expectEmit(false, false, false, true, address(profile));
+        emit DetachBadge(badges[3]);
         profile.detach(detachBadges);
         badges = profile.getAttachedBadges();
         assertEq(badges.length, 5);
@@ -353,6 +377,8 @@ contract ProfileRegistryTest is Test {
 
         // succeed
         assertEq(profile.username(), "xxxxx");
+        vm.expectEmit(false, false, false, true, address(profile));
+        emit ChangeUsername("xxxxx", "zzzzz");
         profile.changeUsername("zzzzz");
         assertEq(profile.username(), "zzzzz");
     }
@@ -375,6 +401,8 @@ contract ProfileRegistryTest is Test {
 
         // succeed
         assertEq(profile.getAvatar(), "123");
+        vm.expectEmit(false, false, false, true, address(profile));
+        emit ChangeAvatar(address(0), 0, address(token), 1);
         profile.changeAvatar(address(token), 1);
         assertEq(profile.getAvatar(), "testBaseURI/1");
 

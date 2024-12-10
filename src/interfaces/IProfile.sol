@@ -5,6 +5,29 @@ pragma solidity 0.8.19;
 interface IProfile {
     /**
      *
+     * Events *
+     *
+     */
+
+    /// @notice Emitted when a badge is attached.
+    /// @param uid The id of the badge.
+    event AttachBadge(bytes32 indexed uid);
+
+    /// @notice Emitted when a badge is detached.
+    /// @param uid The id of the badge.
+    event DetachBadge(bytes32 indexed uid);
+
+    /// @notice Emitted when the username is updated.
+    event ChangeUsername(string oldUsername, string newUsername);
+
+    /// @notice Emitted when the avatar is updated.
+    event ChangeAvatar(address oldToken, uint256 oldTokenId, address newToken, uint256 newTokenId);
+
+    /// @notice Emitted when the badge order is updated.
+    event ReorderBadges(uint256 oldOrder, uint256 newOrder);
+
+    /**
+     *
      * Public Mutating Functions *
      *
      */

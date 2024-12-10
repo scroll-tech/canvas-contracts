@@ -240,16 +240,23 @@ contract Profile is IProfile, Initializable, Multicall {
     function reorderBadges(uint256[] memory _orders) external onlyOwner {
         if (_orders.length != uids.length) revert LengthMismatch();
 
-        badgeOrderEncoding = _encodeOrder(_orders);
+        uint256 oldOrder = badgeOrderEncoding;
+        uint256 newOrder = _encodeOrder(_orders);
+        badgeOrderEncoding = newOrder;
+
+        emit ReorderBadges(oldOrder, newOrder);
     }
 
     /// @notice Change the username.
     /// @param newUsername The new username.
     function changeUsername(string memory newUsername) external onlyOwner {
         address _registry = registry;
-        IProfileRegistry(_registry).unregisterUsername(username);
+        string memory oldUsername = username;
+        IProfileRegistry(_registry).unregisterUsername(oldUsername);
         IProfileRegistry(_registry).registerUsername(newUsername);
         username = newUsername;
+
+        emit ChangeUsername(oldUsername, newUsername);
     }
 
     /// @notice Change the avatar.
@@ -260,7 +267,10 @@ contract Profile is IProfile, Initializable, Multicall {
             revert TokenNotOwnedByUser(token, tokenId);
         }
 
+        Avatar memory oldAvatar = avatar;
         avatar = Avatar(token, tokenId);
+
+        emit ChangeAvatar(oldAvatar.token, oldAvatar.tokenId, token, tokenId);
     }
 
     /**
@@ -272,6 +282,8 @@ contract Profile is IProfile, Initializable, Multicall {
     /// @dev Internal function to attach one batch to this profile.
     /// @param uid The badge uid to attach.
     function _attachOne(bytes32 uid) private {
+        // @note This will possible cause re-emit an existing badge, used for off-chain to index any attach tx.
+        emit AttachBadge(uid);
         if (indexes[uid] > 0) return;
 
         uids.push(uid);
@@ -292,6 +304,7 @@ contract Profile is IProfile, Initializable, Multicall {
     function _detachOne(bytes32 uid) private {
         uint256 valueIndex = indexes[uid];
         if (valueIndex == 0) return;
+        emit DetachBadge(uid);
 
         uint256 length = uids.length;
         uint256[] memory _oldOrders = _decodeOrder(badgeOrderEncoding, length);

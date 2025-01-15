@@ -25,7 +25,7 @@ import {
 
 import {EmptyContract} from "../src/misc/EmptyContract.sol";
 import {Profile} from "../src/profile/Profile.sol";
-import {ProfileRegistry} from "../src/profile/ProfileRegistry.sol";
+import {ProfileRegistryMintable} from "../src/profile/ProfileRegistry.sol";
 import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
 import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
 
@@ -75,7 +75,7 @@ contract ProfileRegistryTest is Test {
     ScrollBadge private badge;
 
     Profile private profileImpl;
-    ProfileRegistry private profileRegistry;
+    ProfileRegistryMintable private profileRegistry;
     Profile private profile;
 
     receive() external payable {}
@@ -95,10 +95,10 @@ contract ProfileRegistryTest is Test {
         resolver.toggleBadge(address(badge), true);
 
         profileImpl = new Profile(address(resolver));
-        ProfileRegistry profileRegistryImpl = new ProfileRegistry();
+        ProfileRegistryMintable profileRegistryImpl = new ProfileRegistryMintable();
         vm.prank(PROXY_ADMIN_ADDRESS);
         ITransparentUpgradeableProxy(profileRegistryProxy).upgradeTo(address(profileRegistryImpl));
-        profileRegistry = ProfileRegistry(profileRegistryProxy);
+        profileRegistry = ProfileRegistryMintable(profileRegistryProxy);
         profileRegistry.initialize(TREASURY_ADDRESS, TREASURY_ADDRESS, address(profileImpl));
         profile = Profile(profileRegistry.mint{value: 0.001 ether}("xxxxx", new bytes(0)));
     }

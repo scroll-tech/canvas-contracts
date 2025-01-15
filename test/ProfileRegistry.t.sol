@@ -15,7 +15,7 @@ import {
 
 import {EmptyContract} from "../src/misc/EmptyContract.sol";
 import {Profile} from "../src/profile/Profile.sol";
-import {ProfileRegistry} from "../src/profile/ProfileRegistry.sol";
+import {ProfileRegistryMintable} from "../src/profile/ProfileRegistry.sol";
 import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
 
 contract ProfileRegistryTest is Test {
@@ -40,7 +40,7 @@ contract ProfileRegistryTest is Test {
     VmSafe.Wallet private signer;
 
     Profile private profileImpl;
-    ProfileRegistry private profileRegistry;
+    ProfileRegistryMintable private profileRegistry;
 
     receive() external payable {}
 
@@ -58,10 +58,10 @@ contract ProfileRegistryTest is Test {
         signer = vm.createWallet(10_001);
 
         profileImpl = new Profile(address(resolver));
-        ProfileRegistry profileRegistryImpl = new ProfileRegistry();
+        ProfileRegistryMintable profileRegistryImpl = new ProfileRegistryMintable();
         vm.prank(PROXY_ADMIN_ADDRESS);
         ITransparentUpgradeableProxy(profileRegistryProxy).upgradeTo(address(profileRegistryImpl));
-        profileRegistry = ProfileRegistry(profileRegistryProxy);
+        profileRegistry = ProfileRegistryMintable(profileRegistryProxy);
         profileRegistry.initialize(TREASURY_ADDRESS, signer.addr, address(profileImpl));
         vm.warp(1_000_000);
     }

@@ -16,7 +16,7 @@ import {ITransparentUpgradeableProxy, TransparentUpgradeableProxy} from "@openze
 
 import {EmptyContract} from "../src/misc/EmptyContract.sol";
 import {Profile} from "../src/profile/Profile.sol";
-import {ProfileRegistry} from "../src/profile/ProfileRegistry.sol";
+import {ProfileRegistryMintable} from "../src/profile/ProfileRegistry.sol";
 import {ScrollBadge} from "../src/badge/ScrollBadge.sol";
 import {ScrollBadgeResolver} from "../src/resolver/ScrollBadgeResolver.sol";
 import {SCRHoldingBadge} from "../src/badge/examples/SCRHoldingBadge.sol";
@@ -42,7 +42,7 @@ contract SCRHoldingBadgeTest is Test {
     Token private token;
 
     Profile private profileImpl;
-    ProfileRegistry private profileRegistry;
+    ProfileRegistryMintable private profileRegistry;
     Profile private profile;
 
     receive() external payable {}
@@ -64,10 +64,10 @@ contract SCRHoldingBadgeTest is Test {
         resolver.updateSelfAttestedBadge(0, address(badge));
 
         profileImpl = new Profile(address(resolver));
-        ProfileRegistry profileRegistryImpl = new ProfileRegistry();
+        ProfileRegistryMintable profileRegistryImpl = new ProfileRegistryMintable();
         vm.prank(PROXY_ADMIN_ADDRESS);
         ITransparentUpgradeableProxy(profileRegistryProxy).upgradeTo(address(profileRegistryImpl));
-        profileRegistry = ProfileRegistry(profileRegistryProxy);
+        profileRegistry = ProfileRegistryMintable(profileRegistryProxy);
         profileRegistry.initialize(TREASURY_ADDRESS, TREASURY_ADDRESS, address(profileImpl));
         profile = Profile(profileRegistry.mint{value: 0.001 ether}("xxxxx", new bytes(0)));
     }

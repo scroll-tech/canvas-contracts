@@ -72,12 +72,6 @@ interface IProfileRegistry {
      *
      */
 
-    /// @notice Mint a profile for caller with given username.
-    /// @param username The username of the profile.
-    /// @param referral The referral data.
-    /// @return The address of minted profile.
-    function mint(string calldata username, bytes calldata referral) external payable returns (address);
-
     /// @notice Register an username.
     /// @param username The username to register.
     function registerUsername(string memory username) external;
